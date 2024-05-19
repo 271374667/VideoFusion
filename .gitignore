@@ -1,0 +1,18 @@
+# python generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# venv
+.venv
+/temp/
+测试
+*.mp4
+*.exe
+/打包参数.txt
+/nuitkaHelp.txt
+/vm2.py
+/video_mosaic/

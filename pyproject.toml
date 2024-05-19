@@ -1,0 +1,35 @@
+[project]
+name = "videomosaic"
+version = "0.1.0"
+description = "视频拼接工具"
+authors = [
+    { name = "PythonImporter", email = "271374667@qq.com" }
+]
+dependencies = [
+    "pillow>=10.3.0",
+    "opencv-python>=4.9.0.80",
+    "loguru>=0.7.2",
+    "numpy>=1.26.4",
+    "rich>=13.7.1",
+    "pyside6>=6.7.0",
+    "gooey>=1.0.8.1",
+    "ansi2html>=1.9.1",
+]
+readme = "README.md"
+requires-python = ">= 3.10"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "nuitka>=2.2.3",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/videomosaic"]
