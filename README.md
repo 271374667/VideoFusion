@@ -6,9 +6,10 @@
     无依赖,点击即用,自动去黑边,自动帧同步,自动调整分辨率,批量变更视频为横屏/竖屏
 </p>
 
-![Clip_2024-05-19_16-51-42](./README.assets/Clip_2024-05-19_16-51-42.png)
-
-![Clip_2024-05-19_17-01-09](./README.assets/Clip_2024-05-19_17-01-09.png)
+<div align="center">
+    <img src="./README.assets/Clip_2024-05-19_16-51-42.png" alt="主页">
+    <img src="./README.assets/Clip_2024-05-19_17-01-09.png" alt="视频排序工具">
+</div>
 
 ## 软件介绍
 
