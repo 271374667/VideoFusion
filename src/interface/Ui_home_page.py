@@ -28,14 +28,14 @@ class Ui_Form(object):
     def setupUi(self, Form):
         if not Form.objectName():
             Form.setObjectName(u"Form")
-        Form.resize(730, 800)
+        Form.resize(732, 866)
         Form.setToolTipDuration(-1)
         Form.setStyleSheet(u"QComboBox { color: rgb(0, 0, 0);\n"
 "	alternate-background-color: rgb(255, 255, 255);\n"
 "}\n"
 "")
-        self.verticalLayout_5 = QVBoxLayout(Form)
-        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_12 = QVBoxLayout(Form)
+        self.verticalLayout_12.setObjectName(u"verticalLayout_12")
         self.groupBox = QGroupBox(Form)
         self.groupBox.setObjectName(u"groupBox")
         self.verticalLayout_3 = QVBoxLayout(self.groupBox)
@@ -99,7 +99,7 @@ class Ui_Form(object):
         self.verticalLayout_3.addWidget(self.frame)
 
 
-        self.verticalLayout_5.addWidget(self.groupBox)
+        self.verticalLayout_12.addWidget(self.groupBox)
 
         self.groupBox_2 = QGroupBox(Form)
         self.groupBox_2.setObjectName(u"groupBox_2")
@@ -112,7 +112,7 @@ class Ui_Form(object):
         self.scrollArea.setWidgetResizable(True)
         self.scrollAreaWidgetContents = QWidget()
         self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
-        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 692, 234))
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 694, 265))
         self.verticalLayout_10 = QVBoxLayout(self.scrollAreaWidgetContents)
         self.verticalLayout_10.setObjectName(u"verticalLayout_10")
         self.verticalLayout_6 = QVBoxLayout()
@@ -267,16 +267,20 @@ class Ui_Form(object):
         self.verticalLayout_4.addWidget(self.scrollArea)
 
 
-        self.verticalLayout_5.addWidget(self.groupBox_2)
+        self.verticalLayout_12.addWidget(self.groupBox_2)
 
+        self.groupBox_4 = QGroupBox(Form)
+        self.groupBox_4.setObjectName(u"groupBox_4")
+        self.verticalLayout_5 = QVBoxLayout(self.groupBox_4)
+        self.verticalLayout_5.setObjectName(u"verticalLayout_5")
         self.horizontalLayout_2 = QHBoxLayout()
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
-        self.label = QLabel(Form)
+        self.label = QLabel(self.groupBox_4)
         self.label.setObjectName(u"label")
 
         self.horizontalLayout_2.addWidget(self.label)
 
-        self.progressBar = QProgressBar(Form)
+        self.progressBar = QProgressBar(self.groupBox_4)
         self.progressBar.setObjectName(u"progressBar")
         self.progressBar.setMinimum(1)
         self.progressBar.setMaximum(1)
@@ -290,12 +294,12 @@ class Ui_Form(object):
 
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
-        self.label_2 = QLabel(Form)
+        self.label_2 = QLabel(self.groupBox_4)
         self.label_2.setObjectName(u"label_2")
 
         self.horizontalLayout_3.addWidget(self.label_2)
 
-        self.progressBar_2 = QProgressBar(Form)
+        self.progressBar_2 = QProgressBar(self.groupBox_4)
         self.progressBar_2.setObjectName(u"progressBar_2")
         self.progressBar_2.setMinimum(1)
         self.progressBar_2.setMaximum(1)
@@ -305,6 +309,9 @@ class Ui_Form(object):
 
 
         self.verticalLayout_5.addLayout(self.horizontalLayout_3)
+
+
+        self.verticalLayout_12.addWidget(self.groupBox_4)
 
         self.horizontalLayout_4 = QHBoxLayout()
         self.horizontalLayout_4.setObjectName(u"horizontalLayout_4")
@@ -327,7 +334,7 @@ class Ui_Form(object):
         self.horizontalLayout_4.addWidget(self.commandLinkButton)
 
 
-        self.verticalLayout_5.addLayout(self.horizontalLayout_4)
+        self.verticalLayout_12.addLayout(self.horizontalLayout_4)
 
         self.groupBox_3 = QGroupBox(Form)
         self.groupBox_3.setObjectName(u"groupBox_3")
@@ -340,7 +347,7 @@ class Ui_Form(object):
         self.verticalLayout_11.addWidget(self.widget)
 
 
-        self.verticalLayout_5.addWidget(self.groupBox_3)
+        self.verticalLayout_12.addWidget(self.groupBox_3)
 
 #if QT_CONFIG(shortcut)
         self.label_3.setBuddy(self.lineEdit)
@@ -394,16 +401,48 @@ class Ui_Form(object):
         self.label_5.setText(QCoreApplication.translate("Form", u"\u8f93\u51fa\u6587\u4ef6\u8def\u5f84(\u5141\u8bb8\u62d6\u62fd\u6587\u4ef6\u8fdb\u5165\u4e0b\u65b9\u8f93\u5165\u6846)", None))
         self.lineEdit_3.setText(QCoreApplication.translate("Form", u"output.mp4", None))
         self.pushButton_3.setText(QCoreApplication.translate("Form", u"\u9009\u62e9\u8def\u5f84", None))
+#if QT_CONFIG(tooltip)
+        self.label_6.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u8f93\u51fa\u7684\u89c6\u9891\u5c06\u4f1a\u88ab<span style=\" font-weight:700;\">\u5e73\u6ed1\u62bd\u5e27</span>\u6216\u8005<span style=\" font-weight:700;\">\u5e73\u6ed1\u8865\u5e27</span>\u5230\u8fd9\u4e2a\u5e27\u6570</p><p>\u76f8\u6bd4\u4f20\u7edfOpenCv\u7684\u62bd\u5e27\u548c\u8865\u5e27\uff0c\u8be5\u8f6f\u4ef6\u91c7\u7528\u7279\u6b8a\u7684\u5e73\u6ed1\u62bd\u5e27\u548c\u8865\u5e27\u4ece\u5168\u5c40\u8fdb\u884c\u8865\u5e27\u6216\u8005\u62bd\u5e27\uff0c\u80fd<span style=\" font-weight:700;\">\u6700\u5927\u7a0b\u5ea6\u7684\u4fdd\u8bc1\u89c6\u9891\u6d41\u7545\u548c\u8fde\u8d2f</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.label_6.setText(QCoreApplication.translate("Form", u"\u8f93\u51fa\u89c6\u9891\u5e27\u7387", None))
 #if QT_CONFIG(tooltip)
         self.spinBox.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u8f93\u51fa\u7684\u89c6\u9891\u5c06\u4f1a\u88ab<span style=\" font-weight:700;\">\u5e73\u6ed1\u62bd\u5e27</span>\u6216\u8005<span style=\" font-weight:700;\">\u5e73\u6ed1\u8865\u5e27</span>\u5230\u8fd9\u4e2a\u5e27\u6570</p><p>\u76f8\u6bd4\u4f20\u7edfOpenCv\u7684\u62bd\u5e27\u548c\u8865\u5e27\uff0c\u8be5\u8f6f\u4ef6\u91c7\u7528\u7279\u6b8a\u7684\u5e73\u6ed1\u62bd\u5e27\u548c\u8865\u5e27\u4ece\u5168\u5c40\u8fdb\u884c\u8865\u5e27\u6216\u8005\u62bd\u5e27\uff0c\u80fd<span style=\" font-weight:700;\">\u6700\u5927\u7a0b\u5ea6\u7684\u4fdd\u8bc1\u89c6\u9891\u6d41\u7545\u548c\u8fde\u8d2f</span></p></body></html>", None))
 #endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.label_7.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p><span style=\" font-weight:700;\">\u8f6f\u4ef6\u91c7\u7528\u81ea\u7814\u53bb\u9ed1\u8fb9\u7b97\u6cd5\uff0c\u81ea\u52a8\u8bc6\u522b\u5e76\u53bb\u9664\u8fb9\u89d2Logo\uff0c\u5b57\u5e55\uff0c\u52a8\u6001\u56fe\u6807\u7b49\uff0c\u80fd\u7cbe\u51c6\u83b7\u53d6\u4e3b\u4f53\u753b\u9762</span>\uff0c\u76f8\u6bd4\u4f20\u7edf\u7b97\u6cd5\u63d0\u53d6\u4e3b\u4f53\u753b\u9762\u7684\u901f\u5ea6<span style=\" font-weight:700;\">\u63d0\u9ad85\u500d\u4ee5\u4e0a</span>(\u970d\u592b,\u975e\u6781\u5927\u503c\u6291\u5236)</p><p><br/></p><p>\u8be5\u53d6\u503c\u662f\u4ece\u753b\u9762\u4e2d\u8fdb\u884c\u91c7\u6837\u7684\u6bd4\u4f8b,0\u8868\u793a\u5b8c\u5168\u5173\u95ed\u53bb\u9ed1\u8fb9\u529f\u80fd,1\u8868\u793a\u53bb\u9ed1\u8fb9\u529f\u80fd\u6700\u5927\u5316,\u9002\u5408\u60a8\u7684\u89c6\u9891\u8f83\u6697\u6216\u8005\u8fb9\u7f18\u672a\u80fd\u5b8c\u5168\u53bb\u9664\u7684\u60c5\u51b5\uff0c\u6570\u503c\u8d8a\u5927\u53bb\u9ed1\u8fb9\u6548\u679c\u8d8a\u597d\uff0c\u901f\u5ea6\u8d8a\u6162</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.label_7.setText(QCoreApplication.translate("Form", u"\u89c6\u9891\u53bb\u9ed1\u8fb9\u91c7\u6837\u7387", None))
+#if QT_CONFIG(tooltip)
+        self.doubleSpinBox.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p><span style=\" font-weight:700;\">\u8f6f\u4ef6\u91c7\u7528\u81ea\u7814\u53bb\u9ed1\u8fb9\u7b97\u6cd5\uff0c\u81ea\u52a8\u8bc6\u522b\u5e76\u53bb\u9664\u8fb9\u89d2Logo\uff0c\u5b57\u5e55\uff0c\u52a8\u6001\u56fe\u6807\u7b49\uff0c\u80fd\u7cbe\u51c6\u83b7\u53d6\u4e3b\u4f53\u753b\u9762</span>\uff0c\u76f8\u6bd4\u4f20\u7edf\u7b97\u6cd5\u63d0\u53d6\u4e3b\u4f53\u753b\u9762\u7684\u901f\u5ea6<span style=\" font-weight:700;\">\u63d0\u9ad85\u500d\u4ee5\u4e0a</span>(\u970d\u592b,\u975e\u6781\u5927\u503c\u6291\u5236)</p><p><br/></p><p>\u8be5\u53d6\u503c\u662f\u4ece\u753b\u9762\u4e2d\u8fdb\u884c\u91c7\u6837\u7684\u6bd4\u4f8b,0\u8868\u793a\u5b8c\u5168\u5173\u95ed\u53bb\u9ed1\u8fb9\u529f\u80fd,1\u8868\u793a\u53bb\u9ed1\u8fb9\u529f\u80fd\u6700\u5927\u5316,\u9002\u5408\u60a8\u7684\u89c6\u9891\u8f83\u6697\u6216\u8005\u8fb9\u7f18\u672a\u80fd\u5b8c\u5168\u53bb\u9664\u7684\u60c5\u51b5\uff0c\u6570\u503c\u8d8a\u5927\u53bb\u9ed1\u8fb9\u6548\u679c\u8d8a\u597d\uff0c\u901f\u5ea6\u8d8a\u6162</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.label_8.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u9009\u62e9\u8f93\u51fa\u89c6\u9891\u7684\u65b9\u5411,\u8f6f\u4ef6\u4f1a\u81ea\u52a8\u5c06\u6240\u6709\u7684\u89c6\u9891\u8f6c\u6362\u6210\u8be5\u65b9\u5411</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.label_8.setText(QCoreApplication.translate("Form", u"\u8f93\u51fa\u89c6\u9891\u65b9\u5411", None))
+#if QT_CONFIG(tooltip)
+        self.comboBox.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u9009\u62e9\u8f93\u51fa\u89c6\u9891\u7684\u65b9\u5411,\u8f6f\u4ef6\u4f1a\u81ea\u52a8\u5c06\u6240\u6709\u7684\u89c6\u9891\u8f6c\u6362\u6210\u8be5\u65b9\u5411</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.comboBox.setPlaceholderText("")
+#if QT_CONFIG(tooltip)
+        self.label_9.setToolTip(QCoreApplication.translate("Form", u"\u5982\u679c\u60a8\u9009\u62e9\u4e86\u7ad6\u5c4f\uff0c\u90a3\u4e48\u8bf7\u9009\u62e9\u8be5\u9009\u9879\u8ba9\u7a0b\u5e8f\u77e5\u9053\u60a8\u8981\u5904\u7406\u60a8\u7684\u6a2a\u5c4f\u89c6\u9891\n"
+"\u5982\u679c\u60a8\u7684\u6a2a\u5c4f\u89c6\u9891\u53ea\u9700\u8981\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\u5c31\u80fd\u53d8\u6210\u7ad6\u5c4f\u5219\u5728\u6b64\u5904\u9009\u62e9\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\n"
+"\u6ce8\u610f\uff0c\u5982\u679c\u60a8\u65cb\u8f6c\u51fa\u9519\u60a8\u7684\u753b\u9762\u4f1a\u51fa\u73b0\u66f4\u5927\u7684\u9ed1\u8fb9", None))
+#endif // QT_CONFIG(tooltip)
         self.label_9.setText(QCoreApplication.translate("Form", u"\u6a2a\u5c4f\u89c6\u9891\u65cb\u8f6c\u65b9\u5411", None))
+#if QT_CONFIG(tooltip)
+        self.comboBox_2.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u5982\u679c\u60a8\u9009\u62e9\u4e86\u7ad6\u5c4f\uff0c\u90a3\u4e48\u8bf7\u9009\u62e9\u8be5\u9009\u9879\u8ba9\u7a0b\u5e8f\u77e5\u9053\u60a8\u8981\u5904\u7406\u60a8\u7684\u6a2a\u5c4f\u89c6\u9891</p><p>\u5982\u679c\u60a8\u7684\u6a2a\u5c4f\u89c6\u9891\u53ea\u9700\u8981\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\u5c31\u80fd\u53d8\u6210\u7ad6\u5c4f\u5219\u5728\u6b64\u5904\u9009\u62e9\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0</p><p><span style=\" font-weight:700;\">\u6ce8\u610f\uff0c\u5982\u679c\u60a8\u65cb\u8f6c\u51fa\u9519\u60a8\u7684\u753b\u9762\u4f1a\u51fa\u73b0\u66f4\u5927\u7684\u9ed1\u8fb9</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.comboBox_2.setPlaceholderText("")
+#if QT_CONFIG(tooltip)
+        self.label_10.setToolTip(QCoreApplication.translate("Form", u"\u5982\u679c\u60a8\u9009\u62e9\u4e86\u6a2a\u5c4f\uff0c\u90a3\u4e48\u8bf7\u9009\u62e9\u8be5\u9009\u9879\u8ba9\u7a0b\u5e8f\u77e5\u9053\u60a8\u8981\u5904\u7406\u60a8\u7684\u7ad6\u5c4f\u89c6\u9891\n"
+"\u5982\u679c\u60a8\u7684\u7ad6\u5c4f\u89c6\u9891\u53ea\u9700\u8981\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\u5c31\u80fd\u53d8\u6210\u6a2a\u5c4f\u5219\u5728\u6b64\u5904\u9009\u62e9\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\n"
+"\u6ce8\u610f\uff0c\u5982\u679c\u60a8\u65cb\u8f6c\u51fa\u9519\u60a8\u7684\u753b\u9762\u4f1a\u51fa\u73b0\u66f4\u5927\u7684\u9ed1\u8fb9", None))
+#endif // QT_CONFIG(tooltip)
         self.label_10.setText(QCoreApplication.translate("Form", u"\u7ad6\u76f4\u89c6\u9891\u65cb\u8f6c\u65b9\u5411", None))
+#if QT_CONFIG(tooltip)
+        self.comboBox_3.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u5982\u679c\u60a8\u9009\u62e9\u4e86\u6a2a\u5c4f\uff0c\u90a3\u4e48\u8bf7\u9009\u62e9\u8be5\u9009\u9879\u8ba9\u7a0b\u5e8f\u77e5\u9053\u60a8\u8981\u5904\u7406\u60a8\u7684\u7ad6\u5c4f\u89c6\u9891</p><p>\u5982\u679c\u60a8\u7684\u7ad6\u5c4f\u89c6\u9891\u53ea\u9700\u8981\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0\u5c31\u80fd\u53d8\u6210\u6a2a\u5c4f\u5219\u5728\u6b64\u5904\u9009\u62e9\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0</p><p><span style=\" font-weight:700;\">\u6ce8\u610f\uff0c\u5982\u679c\u60a8\u65cb\u8f6c\u51fa\u9519\u60a8\u7684\u753b\u9762\u4f1a\u51fa\u73b0\u66f4\u5927\u7684\u9ed1\u8fb9</span></p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
+        self.groupBox_4.setTitle(QCoreApplication.translate("Form", u"\u8fdb\u5ea6\u6761", None))
         self.label.setText(QCoreApplication.translate("Form", u"\u83b7\u53d6\u4fe1\u606f", None))
         self.progressBar.setFormat(QCoreApplication.translate("Form", u"(%v/%m) %p%", None))
         self.label_2.setText(QCoreApplication.translate("Form", u"\u8be6\u7ec6\u8fdb\u5ea6", None))

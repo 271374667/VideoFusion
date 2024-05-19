@@ -56,7 +56,6 @@ class HomePresenter:
             # 同时将输出文件夹设置为输入文件夹
             path = Path(path)
             path / "output.mp4"
-            self.get_view().get_output_le().setText(str(path))
         else:
             path, _ = QFileDialog.getOpenFileName(self.get_view(), "选择文件", "", "Text Files (*.txt)")
             # 将路径设置到输入框中
@@ -64,22 +63,21 @@ class HomePresenter:
             path = Path(path)
             path = path.parent / "output.mp4"
 
+        self.get_view().get_output_le().setText(str(path))
+
     def _drop_file_or_dir(self, path: str):
         is_die_mode: bool = self.get_view().get_dir_rb().isChecked()
-        if is_die_mode:
-            # 将路径设置到输入框中
-            self.get_view().get_input_le().setText(path)
+        # 将路径设置到输入框中
+        self.get_view().get_input_le().setText(path)
 
-            # 同时将输出文件夹设置为输入文件夹
-            path = Path(path)
+        # 同时将输出文件夹设置为输入文件夹
+        path = Path(path)
+        if is_die_mode:
             path / "output.mp4"
-            self.get_view().get_output_le().setText(str(path))
         else:
-            # 将路径设置到输入框中
-            self.get_view().get_input_le().setText(path)
-            path = Path(path)
             path = path.parent / "output.mp4"
-            self.get_view().get_output_le().setText(str(path))
+
+        self.get_view().get_output_le().setText(str(path))
 
     def _set_output_save_file_path(self):
         path, _ = QFileDialog.getSaveFileName(self.get_view(), "选择文件", "", "Text Files (*.mp4)")
