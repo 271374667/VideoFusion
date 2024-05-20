@@ -8,6 +8,7 @@ import loguru
 import numpy as np
 
 from src.common.black_remover import BlackRemover
+from src.common.ffmpeg_command import FFmpegCommand
 from src.common.video_info import get_most_compatible_resolution, get_video_info
 from src.core.datacls import VideoInfo
 from src.core.enums import Orientation, Rotation
@@ -32,6 +33,7 @@ class VideoMosaic:
         self._vertical_rotation: Rotation = Rotation.CLOCKWISE
 
         self._black_remover = BlackRemover()
+        self._ffmpeg_command = FFmpegCommand()
         self._signal_bus = SignalBus()
 
     @property
@@ -235,6 +237,21 @@ class VideoMosaic:
         output_video.release()
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
+        # 开始拼接音频
+        loguru.logger.info('视频拼接完成,开始拼接音频')
+        # 在目标视频的目录下创建一个临时文件夹
+        audio_output_file: Path = self._output_file_path.parent / 'audio.mp3'
+
+        extracted_audios: List[Path] = [x.video_path for x in video_info_list]
+        audio_file_path = self._ffmpeg_command.audio_extract(extracted_audios,
+                                                             audio_output_file)
+        # 合并视频和音频
+        self._ffmpeg_command.merge_video_with_audio(self._output_file_path, audio_file_path)
+
+        # 压缩视频
+        compress_video_path: Path = self._output_file_path.parent / "压缩.mp4"
+        self._ffmpeg_command.compress_video(self._output_file_path, compress_video_path)
+
         loguru.logger.info(
                 f'\n视频拼接:视频拼接完成, 输出文件为[{self._output_file_path}], 总共耗时[{time.time() - start_time:.2f}s]\n')
         self._signal_bus.finished.emit()
@@ -247,11 +264,11 @@ class VideoMosaic:
     def _is_video_need_rotation(self, video_info: VideoInfo) -> bool:
         """视频是否需要旋转, 横屏视频宽度大于高度, 竖屏视频宽度小于高度"""
         return (
-            self._video_orientation != Orientation.HORIZONTAL
-            or video_info.width <= video_info.height
+                self._video_orientation != Orientation.HORIZONTAL
+                or video_info.width <= video_info.height
         ) and (
-            self._video_orientation != Orientation.VERTICAL
-            or video_info.width >= video_info.height
+                self._video_orientation != Orientation.VERTICAL
+                or video_info.width >= video_info.height
         )
 
     def _rotation_video(self, frame: np.ndarray, angle: Literal[90, 180, 270]) -> np.ndarray:
@@ -264,4 +281,3 @@ class VideoMosaic:
                 return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
             case _:
                 raise ValueError('angle must be 90, 180 or 270')
-

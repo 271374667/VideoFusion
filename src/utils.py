@@ -74,14 +74,17 @@ def evenly_interpolate_numbers(current_num: int, target_num: int) -> list[int]:
     numbers = list(range(current_num))
     new_numbers = []
 
+    # 计算所有插入点
+    insert_positions = [round((i + 1) * interval) for i in range(diff)]
+
     # 均匀插入数字
-    insert_count = 0
+    insert_index = 0
     for i in range(current_num):
         new_numbers.append(numbers[i])
-        # 计算插入点
-        while insert_count < diff and (i + 1) >= round((insert_count + 1) * interval):
+        # 在插入点插入数字
+        if insert_index < diff and i + 1 >= insert_positions[insert_index]:
             new_numbers.append(numbers[i])
-            insert_count += 1
+            insert_index += 1
 
     return new_numbers
 
