@@ -50,19 +50,14 @@ class HomePresenter:
         is_die_mode: bool = self.get_view().get_dir_rb().isChecked()
         if is_die_mode:
             path = QFileDialog.getExistingDirectory(self.get_view(), "选择文件夹")
-            # 将路径设置到输入框中
-            self.get_view().get_input_le().setText(path)
-
-            # 同时将输出文件夹设置为输入文件夹
-            path = Path(path)
-            path / "output.mp4"
         else:
             path, _ = QFileDialog.getOpenFileName(self.get_view(), "选择文件", "", "Text Files (*.txt)")
-            # 将路径设置到输入框中
-            self.get_view().get_input_le().setText(path)
-            path = Path(path)
-            path = path.parent / "output.mp4"
+        # 将路径设置到输入框中
+        self.get_view().get_input_le().setText(path)
 
+        # 同时将输出文件夹设置为输入文件夹
+        path = Path(path)
+        path = path.parent / "output.mp4"
         self.get_view().get_output_le().setText(str(path))
 
     def _drop_file_or_dir(self, path: str):

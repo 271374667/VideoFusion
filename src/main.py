@@ -151,14 +151,17 @@ class VideoMosaic:
             fps: int = int(video.get(cv2.CAP_PROP_FPS))
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
-            frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+            total_seconds = total_frames / fps
+            target_total_frames = int(total_seconds * self._fps)
             current_frame_index: int = 0
 
             # 设置进度条
             loguru.logger.debug(f'正在拼接视频[{video_info.video_path.name}]')
+            loguru.logger.debug(f'当前视频时长为{total_seconds}s, 目标视频时长为{target_total_frames / self._fps}s')
             self._signal_bus.set_total_progress_description.emit('拼接视频')
             self._signal_bus.set_detail_progress_reset.emit()
-            self._signal_bus.set_detail_progress_max.emit(frame_count)
+            self._signal_bus.set_detail_progress_max.emit(total_frames)
 
             # 平滑抽帧或者平滑插值
             is_distribute: bool = fps > self._fps
@@ -166,19 +169,19 @@ class VideoMosaic:
             frame_index_list: list[int] = []
 
             if is_distribute:
-                frame_index_list = evenly_distribute_numbers(fps, self._fps)
+                frame_index_list = evenly_distribute_numbers(total_frames, target_total_frames)
                 loguru.logger.warning(f'视频拼接:视频帧率为{fps}, 目标帧率为{self._fps}, 采用平滑抽帧')
             elif is_interpolate:
-                frame_index_list = evenly_interpolate_numbers(fps, self._fps)
+                # frame_index_list = evenly_interpolate_numbers(fps, self._fps)
+                frame_index_list = evenly_interpolate_numbers(total_frames, target_total_frames)
                 loguru.logger.warning(f'视频拼接:视频帧率为{fps}, 目标帧率为{self._fps}, 采用平滑插帧')
 
             while True:
                 # 如果当前的 fps 大于目标 fps, 则需要continue跳过一些帧
-                if is_distribute:
-                    if current_frame_index % self._fps not in frame_index_list:
-                        current_frame_index += 1
-                        self._signal_bus.advance_detail_progress.emit(1)
-                        continue
+                if is_distribute and current_frame_index not in frame_index_list:
+                    current_frame_index += 1
+                    self._signal_bus.advance_detail_progress.emit(1)
+                    continue
 
                 ret, frame = video.read()
                 if not ret:
@@ -217,8 +220,7 @@ class VideoMosaic:
 
                 # 如果当前的 fps 小于目标 fps, 则需要重复一些帧
                 if is_interpolate:
-                    current_frame = frame_index_list[current_frame_index % self._fps]
-                    repeat_time: int = frame_index_list.count(current_frame)
+                    repeat_time: int = frame_index_list.count(current_frame_index)
                     for _ in range(repeat_time):
                         output_video.write(frame)
                 # 不需要补帧或者抽帧
@@ -244,15 +246,13 @@ class VideoMosaic:
 
     def _is_video_need_rotation(self, video_info: VideoInfo) -> bool:
         """视频是否需要旋转, 横屏视频宽度大于高度, 竖屏视频宽度小于高度"""
-        if (
-                (self._video_orientation == Orientation.HORIZONTAL
-                 and video_info.width > video_info.height)
-                or
-                (self._video_orientation == Orientation.VERTICAL
-                 and video_info.width < video_info.height)
-        ):
-            return False
-        return True
+        return (
+            self._video_orientation != Orientation.HORIZONTAL
+            or video_info.width <= video_info.height
+        ) and (
+            self._video_orientation != Orientation.VERTICAL
+            or video_info.width >= video_info.height
+        )
 
     def _rotation_video(self, frame: np.ndarray, angle: Literal[90, 180, 270]) -> np.ndarray:
         match angle:

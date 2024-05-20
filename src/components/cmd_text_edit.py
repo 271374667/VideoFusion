@@ -96,7 +96,8 @@ class CMDTextEdit(QWidget):
 
     def _append_log_slot(self, context: str) -> None:
         self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
-        self.text_edit.insertHtml(context + "<br>")
+        self.text_edit.insertHtml(f"{context}<br>")
+        # 删除多余的空格
         self.text_edit.moveCursor(QTextCursor.MoveOperation.End)
 
     def _ansi2html(self, ansi_content: str) -> str:

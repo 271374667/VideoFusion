@@ -51,7 +51,7 @@ def evenly_distribute_numbers(current_num: int, target_num: int) -> list[int]:
     interval = current_num / diff  # 平均间隔
 
     # 生成初始列表
-    numbers = list(range(1, current_num + 1))
+    numbers = list(range(current_num))
 
     # 移除均匀间隔位置的数字
     for i in range(diff):
@@ -71,7 +71,7 @@ def evenly_interpolate_numbers(current_num: int, target_num: int) -> list[int]:
     interval = (current_num - 1) / (diff + 1)  # 插入位置的平均间隔
 
     # 生成初始列表
-    numbers = list(range(1, current_num + 1))
+    numbers = list(range(current_num))
     new_numbers = []
 
     # 均匀插入数字
@@ -95,7 +95,9 @@ if __name__ == '__main__':
     # print(len(result))
 
     # 插帧示例用法
-    current_num = 20
-    target_num = 30
+    current_num = 1148
+    target_num = 1500
+    start = time.time()
     result = evenly_interpolate_numbers(current_num, target_num)
+    print(time.time() - start)
     print(f"插帧:{result}")
