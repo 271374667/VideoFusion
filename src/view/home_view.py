@@ -2,7 +2,7 @@ from PySide6.QtGui import QAction
 from PySide6.QtWidgets import (QApplication, QComboBox, QCommandLinkButton, QDoubleSpinBox, QLabel, QLineEdit, QMenu,
                                QMessageBox, QProgressBar, QPushButton, QRadioButton, QSpinBox, QTextEdit, QWidget)
 
-from src.about import about_txt
+from src.core.about import about_txt
 from src.core.enums import Orientation, Rotation
 from src.interface.Ui_home_page import Ui_Form
 

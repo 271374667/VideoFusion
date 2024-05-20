@@ -6,7 +6,9 @@ SRC_DIR = ROOT / 'src'
 
 # Path to the data directory
 ASSETS_DIR = ROOT / "assets"
+BIN_DIR = ROOT / "bin"
 TEMP_DIR = Path(r'D:\Temp')
 
 # FILE
 OUTPUT_FILE = TEMP_DIR / "output.mp4"
+FFMPEG_FILE = BIN_DIR / "ffmpeg.exe"
