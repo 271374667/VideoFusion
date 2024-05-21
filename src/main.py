@@ -126,7 +126,7 @@ class VideoMosaic:
             raise ValueError(f'{txt_file} does not exist')
 
         with open(txt_file, 'r', encoding='gbk') as f:
-            video_path_list: List[Path] = [Path(x.strip()) for x in f.readlines()]
+            video_path_list: List[Path] = [Path(x.strip()) for x in f.readlines() if Path(x.strip()).is_file()]
         self.video_path_list = video_path_list
 
     def start(self) -> None:
@@ -150,13 +150,12 @@ class VideoMosaic:
                                        (self._best_width, self._best_height))
         for video_info in video_info_list:
             video = cv2.VideoCapture(str(video_info.video_path))
-            fps: int = int(video.get(cv2.CAP_PROP_FPS))
+            fps: float = video.get(cv2.CAP_PROP_FPS)
             width = video.get(cv2.CAP_PROP_FRAME_WIDTH)
             height = video.get(cv2.CAP_PROP_FRAME_HEIGHT)
             total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
             total_seconds = total_frames / fps
-            target_total_frames = int(total_seconds * self._fps)
-            current_frame_index: int = 0
+            target_total_frames = int(round(total_seconds * self._fps, 3))
 
             # 设置进度条
             loguru.logger.debug(f'正在拼接视频[{video_info.video_path.name}]')
@@ -177,10 +176,9 @@ class VideoMosaic:
                 frame_index_list = evenly_interpolate_numbers(total_frames, target_total_frames)
                 loguru.logger.warning(f'视频拼接:视频帧率为{fps}, 目标帧率为{self._fps}, 采用平滑插帧')
 
-            while True:
+            for current_frame_index in range(total_frames):
                 # 如果当前的 fps 大于目标 fps, 则需要continue跳过一些帧
                 if is_distribute and current_frame_index not in frame_index_list:
-                    current_frame_index += 1
                     self._signal_bus.advance_detail_progress.emit(1)
                     continue
 
@@ -215,7 +213,7 @@ class VideoMosaic:
                         elif self._vertical_rotation == Rotation.UPSIDE_DOWN:
                             frame = rotation_video(frame, 180)
 
-                # 对视频进行缩放(如果视频的分辨率不是最佳分辨率)
+                # 对视频进行缩放(如果视频的分辨不是最佳分辨率)
                 if width != self._best_width or height != self._best_height:
                     frame = resize_video(frame, self._best_width, self._best_height)
 
@@ -228,7 +226,6 @@ class VideoMosaic:
                 else:
                     output_video.write(frame)
 
-                current_frame_index += 1
                 self._signal_bus.advance_detail_progress.emit(1)
             self._signal_bus.advance_total_progress.emit(1)
             video.release()
@@ -240,20 +237,40 @@ class VideoMosaic:
         loguru.logger.info('视频拼接完成,开始拼接音频')
         # 在目标视频的目录下创建一个临时文件夹
         audio_output_file: Path = self._output_file_path.parent / 'audio.mp3'
+        if audio_output_file.exists():
+            audio_output_file.unlink()
+            loguru.logger.warning(f'删除了已经存在的音频文件:{audio_output_file}')
 
         extracted_audios: List[Path] = [x.video_path for x in video_info_list]
         audio_file_path = self._ffmpeg_command.audio_extract(extracted_audios,
                                                              audio_output_file)
         # 合并视频和音频
-        self._ffmpeg_command.merge_video_with_audio(self._output_file_path, audio_file_path)
+        video_with_auido: Path = self._ffmpeg_command.merge_video_with_audio(self._output_file_path, audio_file_path)
 
         # 压缩视频
-        compress_video_path: Path = self._output_file_path.parent / "压缩.mp4"
-        self._ffmpeg_command.compress_video(self._output_file_path, compress_video_path)
+        compress_video_path: Path = self._output_file_path.parent / "compress_video.mp4"
+        self._ffmpeg_command.compress_video(video_with_auido, compress_video_path)
 
-        loguru.logger.info(
+        loguru.logger.success(
                 f'\n视频拼接:视频拼接完成, 输出文件为[{self._output_file_path}], 总共耗时[{time.time() - start_time:.2f}s]\n')
         self._signal_bus.finished.emit()
+
+        # 清理多余的文件
+        # 删除没有声音的输出文件
+        if self._output_file_path.exists():
+            self._output_file_path.unlink()
+            loguru.logger.warning(f'删除了缓存视频文件{self._output_file_path}')
+
+        # 删除输出的音频文件.mp3文件
+        if audio_file_path.exists():
+            audio_output_file.unlink()
+            loguru.logger.warning(f'删除了缓存音频文件{audio_output_file}')
+
+        # 将压缩之后的音频文件改名为设置的视频文件
+        if compress_video_path.exists():
+            compress_video_path.rename(self._output_file_path)
+            loguru.logger.debug(f'将压缩后的视频文件改名为{self._output_file_path.name}')
+
         # 打开输出文件的目录
         os.startfile(self._output_file_path.parent)
 
@@ -280,3 +297,28 @@ class VideoMosaic:
                 return cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE)
             case _:
                 raise ValueError('angle must be 90, 180 or 270')
+
+
+if __name__ == '__main__':
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication([])
+
+    # 绑定信号槽
+    signal_bus = SignalBus()
+    signal_bus.set_detail_progress_reset.connect(lambda: loguru.logger.debug('set_detail_progress_reset'))
+    signal_bus.set_total_progress_reset.connect(lambda: loguru.logger.debug('set_total_progress_reset'))
+    signal_bus.set_total_progress_description.connect(
+            lambda x: loguru.logger.debug(f'set_total_progress_description: {x}'))
+    signal_bus.set_total_progress_max.connect(lambda x: loguru.logger.debug(f'set_total_progress_max: {x}'))
+    signal_bus.set_detail_progress_max.connect(lambda x: loguru.logger.debug(f'set_detail_progress_max: {x}'))
+    signal_bus.set_total_progress_finish.connect(lambda: loguru.logger.debug('set_total_progress_finish'))
+    signal_bus.set_detail_progress_finish.connect(lambda: loguru.logger.debug('set_detail_progress_finish'))
+    signal_bus.finished.connect(lambda: loguru.logger.debug('finished'))
+
+    video_mosaic = VideoMosaic()
+    video_mosaic.sample_rate = 0.1
+    video_mosaic.read_from_txt_file(r"D:\Temp\sort.txt")
+    video_mosaic.start()
+    print('finished')
+    app.exec()

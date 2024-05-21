@@ -5,8 +5,10 @@ from PySide6.QtWidgets import (QApplication, QComboBox, QCommandLinkButton, QDou
 from src.core.about import about_txt
 from src.core.enums import Orientation, Rotation
 from src.interface.Ui_home_page import Ui_Form
+from src.utils import singleton
 
 
+@singleton
 class HomeView(QWidget):
     def __init__(self):
         super().__init__()
@@ -130,6 +132,8 @@ class HomeView(QWidget):
         self.get_total_progress_bar().update()
 
     def advance_total_progress(self, value: int):
+        if self._current_total_progress_value + value > self._current_total_progress_max:
+            return
         self._current_total_progress_value = self._current_total_progress_value + value
         self.get_total_progress_bar().setValue(self._current_total_progress_value)
         self.get_total_progress_bar().update()
@@ -159,6 +163,8 @@ class HomeView(QWidget):
         self.get_detail_progress_bar().update()
 
     def advance_detail_progress(self, value: int):
+        if self._current_detail_progress_value + value > self._current_detail_progress_max:
+            return
         self._current_detail_progress_value = self._current_detail_progress_value + value
         self.get_detail_progress_bar().setValue(self._current_detail_progress_value)
         self.get_detail_progress_bar().update()
