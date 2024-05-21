@@ -10,7 +10,7 @@ import numpy as np
 from src.common.black_remover import BlackRemover
 from src.common.ffmpeg_command import FFmpegCommand
 from src.common.video_info import get_most_compatible_resolution, get_video_info
-from src.core.datacls import VideoInfo
+from src.core.datacls import VideoInfo, VideoScaling
 from src.core.enums import Orientation, Rotation
 from src.core.paths import OUTPUT_FILE
 from src.pipes import crop_video, resize_video, rotation_video
@@ -148,6 +148,8 @@ class VideoMosaic:
         # 开始对视频依次执行[剪裁],[旋转],[缩放],[帧同步],[拼接]操作
         output_video = cv2.VideoWriter(str(self._output_file_path), cv2.VideoWriter.fourcc(*'mp4v'), self._fps,
                                        (self._best_width, self._best_height))
+
+        audio_list: list[VideoScaling] = []
         for video_info in video_info_list:
             video = cv2.VideoCapture(str(video_info.video_path))
             fps: float = video.get(cv2.CAP_PROP_FPS)
@@ -156,10 +158,13 @@ class VideoMosaic:
             total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
             total_seconds = total_frames / fps
             target_total_frames = int(round(total_seconds * self._fps, 3))
+            target_seconds = target_total_frames / self._fps
+            audio_scale = total_seconds / target_seconds
+            audio_list.append(VideoScaling(video_info.video_path, audio_scale))
 
             # 设置进度条
             loguru.logger.debug(f'正在拼接视频[{video_info.video_path.name}]')
-            loguru.logger.debug(f'当前视频时长为{total_seconds}s, 目标视频时长为{target_total_frames / self._fps}s')
+            loguru.logger.debug(f'当前视频时长为{total_seconds}s, 目标视频时长为{target_seconds}s')
             self._signal_bus.set_total_progress_description.emit('拼接视频')
             self._signal_bus.set_detail_progress_reset.emit()
             self._signal_bus.set_detail_progress_max.emit(total_frames)
@@ -241,8 +246,7 @@ class VideoMosaic:
             audio_output_file.unlink()
             loguru.logger.warning(f'删除了已经存在的音频文件:{audio_output_file}')
 
-        extracted_audios: List[Path] = [x.video_path for x in video_info_list]
-        audio_file_path = self._ffmpeg_command.audio_extract(extracted_audios,
+        audio_file_path = self._ffmpeg_command.audio_extract(audio_list,
                                                              audio_output_file)
         # 合并视频和音频
         video_with_auido: Path = self._ffmpeg_command.merge_video_with_audio(self._output_file_path, audio_file_path)

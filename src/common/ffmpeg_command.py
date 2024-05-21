@@ -6,6 +6,7 @@ from pathlib import Path
 import cv2
 import loguru
 
+from src.core.datacls import VideoScaling
 from src.core.paths import FFMPEG_FILE
 from src.signal_bus import SignalBus
 
@@ -21,7 +22,7 @@ class FFmpegCommand:
         if output_file_path.exists():
             output_file_path.unlink()
             loguru.logger.warning(f'已删除已存在的输出文件: {output_file_path}')
-        cmd = f'{self.ffmpeg_bin} -y -hide_banner -i "{input_file_path}" -c:v libx264 -crf 23 -preset slow -qcomp 0.5 -psy-rd 0.3:0 -aq-mode 2 -aq-strength 0.8 -b:a 256k "{output_file_path}"'
+        cmd = f'"{self.ffmpeg_bin}" -y -hide_banner -i "{input_file_path}" -c:v libx264 -crf 23 -preset slow -qcomp 0.5 -psy-rd 0.3:0 -aq-mode 2 -aq-strength 0.8 -b:a 256k "{output_file_path}"'
         self._reset_progress("压缩视频")
         self._signal_bus.set_total_progress_max.emit(1)
         loguru.logger.debug('开始压缩视频')
@@ -29,7 +30,7 @@ class FFmpegCommand:
         self._signal_bus.set_total_progress_finish.emit()
         loguru.logger.success(f'压缩视频完成,输出文件{output_file_path}')
 
-    def audio_extract(self, input_video_path_list: list[str | Path], output_file_path: str | Path) -> Path:
+    def audio_extract(self, input_video_path_list: list[VideoScaling], output_file_path: str | Path) -> Path:
         """
         通过ffmpeg提取视频文件中的音频，并将它们按照传入的顺序合并为单个音频文件。
 
@@ -41,7 +42,7 @@ class FFmpegCommand:
         合并后的音频文件的路径
         """
         self._reset_progress("合并音频")
-        # 确保输出文件路径是Path对象，以便进行操作
+        loguru.logger.debug('开始提取音频')
         output_file_path = Path(output_file_path)
 
         # 生成临时文件路径列表，用于存储每个视频提取出的音频
@@ -56,9 +57,18 @@ class FFmpegCommand:
 
         # 提取每个视频文件中的音频
         for video_path, temp_audio in zip(input_video_path_list, extracted_audios):
-            cmd_extract = f"{self.ffmpeg_bin} -i {video_path} -q:a 0 -map a {temp_audio}"
-            self._run_command(video_path, cmd_extract)
+            loguru.logger.debug(f'正在提取音频:{video_path.video_path}')
+            video_path: VideoScaling
+            cmd_extract = f'"{self.ffmpeg_bin}" -i "{video_path.video_path}" -q:a 0 -map a {temp_audio}'
+            self._run_command(video_path.video_path, cmd_extract)
             self._signal_bus.advance_total_progress.emit(1)
+
+        # 修正音频速度
+        audio_changed_speed = [self.change_audio_speed(x.video_path, x.scale_rate) for x in input_video_path_list]
+        for temp_audio in extracted_audios:
+            temp_audio.unlink()
+        extracted_audios = audio_changed_speed
+        loguru.logger.success('音频速度修正完成')
 
         # 生成ffmpeg合并命令中的输入文件列表部分
         inputs_concat = ' '.join([f'-i "{audio_path}"' for audio_path in extracted_audios])
@@ -67,16 +77,22 @@ class FFmpegCommand:
         filter_complex = f"concat=n={len(extracted_audios)}:v=0:a=1"
 
         # ffmpeg命令合并音频并输出到指定路径
-        cmd_merge = f'ffmpeg {inputs_concat} -filter_complex "{filter_complex}" -y {output_file_path}'
+        cmd_merge = f'"{self.ffmpeg_bin}" {inputs_concat} -filter_complex "{filter_complex}" -y {output_file_path}'
         if output_file_path.exists():
             output_file_path.unlink()
         # 需要彻底等待合并完成，否则会出现文件被占用的情况
-        process = subprocess.Popen(cmd_merge, shell=True,
-                                   universal_newlines=True, encoding='gbk')
-        process.wait()
+        loguru.logger.debug(f'开始合并音频，输出文件: {output_file_path}')
+        process = subprocess.run(cmd_merge, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 universal_newlines=True, encoding='utf-8', check=False)
+        if process.returncode != 0:
+            loguru.logger.error(f"FFmpeg命令运行失败: {cmd_merge}, 错误信息: {process.stderr}")
+            raise subprocess.CalledProcessError(process.returncode, cmd_merge, output=process.stdout,
+                                                stderr=process.stderr)
+        loguru.logger.debug(f'音频合并完成，输出文件: {output_file_path}')
 
         # 完成合并后，删除临时音频文件
         for temp_audio in extracted_audios:
+            loguru.logger.debug(f'正在删除文件{temp_audio}')
             temp_audio.unlink()
 
         self._signal_bus.set_total_progress_finish.emit()
@@ -84,13 +100,47 @@ class FFmpegCommand:
         loguru.logger.success(f'提取音频完成,输出文件: {output_file_path}')
         return output_file_path
 
+    def change_audio_speed(self, audio_path: str | Path, scale_rate: float) -> Path:
+        loguru.logger.debug(f'开始修正音频{audio_path}的速度, 缩放比例为{scale_rate}')
+        audio_path = Path(audio_path)
+        output_path = audio_path.parent / f'{audio_path.stem}_speed_changed.mp3'
+        if output_path.exists():
+            output_path.unlink()
+
+        # Check if the file exists
+        if not audio_path.exists():
+            raise FileNotFoundError(f"The file {audio_path} does not exist.")
+
+        # Check if the file is readable
+        if not os.access(audio_path, os.R_OK):
+            raise PermissionError(f"The file {audio_path} is not readable.")
+
+        if scale_rate < 0.5 or scale_rate > 2:
+            loguru.logger.critical(f'视频的缩放只能在0.5到2.0之间，当前的值为{scale_rate}')
+            raise ValueError(f'视频的缩放只能在0.5到2.0之间，当前的值为{scale_rate}')
+
+        # Construct the ffmpeg command
+        cmd = f'"{self.ffmpeg_bin}" -y -i "{audio_path}" -filter:a "atempo={scale_rate}" "{output_path}"'
+
+        # Run the command
+        process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                                 shell=True, universal_newlines=True, encoding='gbk', check=False)
+
+        # Check the return code
+        if process.returncode != 0:
+            loguru.logger.error(f"FFmpeg命令运行失败: {cmd}, 错误信息: {process.stderr}")
+            raise subprocess.CalledProcessError(process.returncode, cmd, output=process.stdout, stderr=process.stderr)
+        loguru.logger.debug(f'音频速度修正完成，输出文件: {output_path}')
+
+        return output_path
+
     def merge_video_with_audio(self, input_video_path: str | Path, input_audio_path: str | Path) -> Path:
         input_video_path = Path(input_video_path)
         input_audio_path = Path(input_audio_path)
         output_file_path = input_video_path.parent / f"{input_video_path.stem}_merged.mp4"
         if output_file_path.exists():
             output_file_path.unlink()
-        cmd = f'{self.ffmpeg_bin} -y -hide_banner -i "{input_video_path}" -i "{input_audio_path}" -c:v copy -c:a aac -strict experimental "{output_file_path}" -y'
+        cmd = f'"{self.ffmpeg_bin}" -y -hide_banner -i "{input_video_path}" -i "{input_audio_path}" -c:v copy -c:a aac -strict experimental "{output_file_path}" -y'
         self._reset_progress("合并音频")
         self._signal_bus.set_total_progress_max.emit(1)
         self._run_command(input_video_path, cmd)
@@ -120,6 +170,10 @@ class FFmpegCommand:
         total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         self._signal_bus.set_detail_progress_max.emit(total_frames)
         cap.release()
+
+        # 运行ffmpeg命令
+        # process = subprocess.Popen(command, shell=True,
+        #                            universal_newlines=True, encoding='utf-8')
 
         # 运行ffmpeg命令
         process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
@@ -159,6 +213,7 @@ def test_ffmpeg_command():
             lambda current: print(f"Detail progress current: {current}"))
 
     # 调用方法
+    # ffmpeg_command.change_audio_speed(r"D:\Temp\audio.mp3", 0.5)
 
 
 if __name__ == "__main__":

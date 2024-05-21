@@ -19,3 +19,9 @@ class CropInfo:
     y: int
     w: int
     h: int
+
+
+@dataclass(frozen=True, slots=True)
+class VideoScaling:
+    video_path: Path
+    scale_rate: float  # 音频长度缩放比例
