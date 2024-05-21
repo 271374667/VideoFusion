@@ -3,6 +3,7 @@ import subprocess
 from pathlib import Path
 
 import cv2
+import loguru
 
 from src.core.paths import FFMPEG_FILE
 from src.signal_bus import SignalBus
@@ -105,7 +106,10 @@ class FFmpegCommand:
                     break
 
         # 等待子进程完成并读取所有剩余的输出
-        process.communicate()
+        stdout, stderr = process.communicate()
+        if process.returncode != 0:
+            loguru.logger.critical(f"FFmpeg命令运行失败: {command}, 错误信息: {stderr}")
+            raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
 
         # 终止子进程
         process.kill()

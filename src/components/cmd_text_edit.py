@@ -57,7 +57,7 @@ class CMDTextEdit(QWidget):
         self._ansi2html_converter = Ansi2HTMLConverter()
 
         self.text_edit = QTextEdit(self)
-        self.text_edit.setStyleSheet("background-color: black; color: white;")
+        self.text_edit.setStyleSheet("background-color: white;")
         self.text_edit.setReadOnly(True)
         # 设置文本框的颜色css样式
 

@@ -174,7 +174,6 @@ class VideoMosaic:
                 frame_index_list = evenly_distribute_numbers(total_frames, target_total_frames)
                 loguru.logger.warning(f'视频拼接:视频帧率为{fps}, 目标帧率为{self._fps}, 采用平滑抽帧')
             elif is_interpolate:
-                # frame_index_list = evenly_interpolate_numbers(fps, self._fps)
                 frame_index_list = evenly_interpolate_numbers(total_frames, target_total_frames)
                 loguru.logger.warning(f'视频拼接:视频帧率为{fps}, 目标帧率为{self._fps}, 采用平滑插帧')
 
