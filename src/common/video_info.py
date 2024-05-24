@@ -87,6 +87,7 @@ def get_video_info(video_path_list: List[Path], orientation: Orientation, sample
             most_common_coordinates = (x, y, h, w)
         video_info_list.append(
                 VideoInfo(video_path, fps, total_frames, width, height, CropInfo(*most_common_coordinates)))
+        loguru.logger.debug(f'[{video_path.name}]的主体区域坐标为{x, y, w, h}')
     signal_bus.set_total_progress_finish.emit()
     signal_bus.set_detail_progress_finish.emit()
     return video_info_list
@@ -101,11 +102,13 @@ def get_most_compatible_resolution(video_info_list: list[VideoInfo]) -> Tuple[in
             continue
         resolutions.append((each.width, each.height))
 
-    aspect_ratios: list[float] = []
-    for i in resolutions:
-        aspect_ratios.append(i[0] / i[1])
+    aspect_ratios: list[float] = [i[0] / i[1] for i in resolutions]
     most_common_ratio = Counter(aspect_ratios).most_common(1)[0][0]
     compatible_resolutions = [res for res in resolutions if (res[0] / res[1]) == most_common_ratio]
     compatible_resolutions.sort(key=lambda x: (x[0] * x[1]), reverse=True)
     width, height = compatible_resolutions[0][:2]
     return width, height
+
+
+if __name__ == '__main__':
+    get_video_info([Path(r"E:\load\python\Project\VideoMosaic\temp\001.mp4")], Orientation.HORIZONTAL, 0.5)

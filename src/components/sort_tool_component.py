@@ -47,8 +47,7 @@ class DraggableListWidget(QListWidget):
     def dropEvent(self, event: QDropEvent) -> None:
         if event.mimeData().hasUrls():
             for url in event.mimeData().urls():
-                file_path = url.toLocalFile()
-                if file_path:
+                if file_path := url.toLocalFile():
                     # 判断是否是txt文件,如果是则读取文件内的路径
                     if file_path.endswith('.txt'):
                         with open(file_path, 'r') as file:
@@ -83,10 +82,10 @@ class DraggableListWidget(QListWidget):
         context_menu.addAction(del_action)
         action = context_menu.exec_(self.mapToGlobal(event.pos()))
         if action == del_action:
-            current_item = self.currentItem()
-            if current_item:
+            if current_item := self.currentItem():
                 row = self.row(current_item)
                 self.takeItem(row)
+                loguru.logger.debug(f"右键删除了一个文件: {current_item.text()}")
 
 
 class SortToolComponent(QWidget):
@@ -249,16 +248,14 @@ class SortToolComponent(QWidget):
             loguru.logger.debug(f"按字符串倒序排序{len(data)}个文件")
 
     def moveToTop(self):
-        current_item = self._list_widget.currentItem()
-        if current_item:
+        if current_item := self._list_widget.currentItem():
             current_row = self._list_widget.row(current_item)
             self._list_widget.takeItem(current_row)
             self._list_widget.insertItem(0, current_item)
             self._list_widget.setCurrentItem(current_item)
 
     def moveToBottom(self):
-        current_item = self._list_widget.currentItem()
-        if current_item:
+        if current_item := self._list_widget.currentItem():
             current_row = self._list_widget.row(current_item)
             self._list_widget.takeItem(current_row)
             self._list_widget.addItem(current_item)
@@ -286,50 +283,41 @@ class SortToolComponent(QWidget):
                     loguru.logger.debug(f"导出文件: {self._list_widget.item(i).text()}")
 
     def showFirstFrame(self):
-        current_item = self._list_widget.currentItem()
-        if current_item:
-            video_path = current_item.text()
-            cap = cv2.VideoCapture(video_path)
-            # 显示视频中不为黑色的第一帧
-            while True:
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                if not self._black_remover.is_black(frame):
-                    break
+        if not (current_item := self._list_widget.currentItem()):
+            return
+        video_path = current_item.text()
+        cap = cv2.VideoCapture(video_path)
+        # 显示视频中不为黑色的第一帧
+        while True:
             ret, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            cap.release()
-            if ret:
-                self._set_img(frame)
-                loguru.logger.debug(f"显示第一帧: {video_path}")
+            if not ret:
+                break
+            if not self._black_remover.is_black(frame):
+                break
+        self._show_frame_on_label(cap, '显示第一帧: ', video_path)
 
     def showLastFrame(self):
-        current_item = self._list_widget.currentItem()
-        if current_item:
+        if current_item := self._list_widget.currentItem():
             video_path = current_item.text()
             cap = cv2.VideoCapture(video_path)
             cap.set(cv2.CAP_PROP_POS_FRAMES, cap.get(cv2.CAP_PROP_FRAME_COUNT) - 1)
-            ret, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            cap.release()
-            if ret:
-                self._set_img(frame)
-                loguru.logger.debug(f"显示最后一帧: {video_path}")
+            self._show_frame_on_label(cap, '显示最后一帧: ', video_path)
 
     def showRandomFrame(self):
-        current_item = self._list_widget.currentItem()
-        if current_item:
+        if current_item := self._list_widget.currentItem():
             video_path = current_item.text()
             cap = cv2.VideoCapture(video_path)
             total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
             cap.set(cv2.CAP_PROP_POS_FRAMES, random.randint(0, total_frames - 1))
-            ret, frame = cap.read()
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            cap.release()
-            if ret:
-                self._set_img(frame)
-                loguru.logger.debug(f"显示随机帧: {video_path}")
+            self._show_frame_on_label(cap, '显示随机帧: ', video_path)
+
+    def _show_frame_on_label(self, cap, arg1, video_path):
+        ret, frame = cap.read()
+        frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
+        cap.release()
+        if ret:
+            self._set_img(frame)
+            loguru.logger.debug(f"{arg1}{video_path}")
 
     def rotateClockwise(self):
         # 先检查是否有图片

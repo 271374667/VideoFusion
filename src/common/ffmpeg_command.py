@@ -59,16 +59,16 @@ class FFmpegCommand:
         for video_path, temp_audio in zip(input_video_path_list, extracted_audios):
             loguru.logger.debug(f'正在提取音频:{video_path.video_path}')
             video_path: VideoScaling
-            cmd_extract = f'"{self.ffmpeg_bin}" -i "{video_path.video_path}" -q:a 0 -map a {temp_audio}'
+            cmd_extract = f'"{self.ffmpeg_bin}" -i "{video_path.video_path}" -q:a 0 -map a? {temp_audio}'
             self._run_command(video_path.video_path, cmd_extract)
             self._signal_bus.advance_total_progress.emit(1)
 
         # 修正音频速度
-        audio_changed_speed = [self.change_audio_speed(x.video_path, x.scale_rate) for x in input_video_path_list]
-        for temp_audio in extracted_audios:
-            temp_audio.unlink()
-        extracted_audios = audio_changed_speed
-        loguru.logger.success('音频速度修正完成')
+        # audio_changed_speed = [self.change_audio_speed(x.video_path, x.scale_rate) for x in input_video_path_list]
+        # for temp_audio in extracted_audios:
+        #     temp_audio.unlink()
+        # extracted_audios = audio_changed_speed
+        # loguru.logger.success('音频速度修正完成')
 
         # 生成ffmpeg合并命令中的输入文件列表部分
         inputs_concat = ' '.join([f'-i "{audio_path}"' for audio_path in extracted_audios])
@@ -124,7 +124,7 @@ class FFmpegCommand:
 
         # Run the command
         process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                                 shell=True, universal_newlines=True, encoding='gbk', check=False)
+                                 shell=True, universal_newlines=True, encoding='utf-8', check=False)
 
         # Check the return code
         if process.returncode != 0:
@@ -147,6 +147,108 @@ class FFmpegCommand:
         self._signal_bus.set_total_progress_finish.emit()
         loguru.logger.success(f'合并音频完成，输出文件: {output_file_path}')
         return output_file_path
+
+    def copy_audio_to_video(self, video_with_audio: str | Path, video_without_audio: str | Path) -> Path:
+        """将一个视频的音频拷贝到另一个视频"""
+        video_with_audio = Path(video_with_audio)
+        video_without_audio = Path(video_without_audio)
+        output_file_path = video_without_audio.parent / f"{video_without_audio.stem}_with_audio.mp4"
+        if output_file_path.exists():
+            output_file_path.unlink()
+        cmd = f'"{self.ffmpeg_bin}" -y -hide_banner -i "{video_without_audio}" -i "{video_with_audio}" -c:v copy -c:a aac -strict experimental "{output_file_path}"'
+        self._reset_progress("合并音频")
+        self._signal_bus.set_total_progress_max.emit(1)
+        self._run_command(video_without_audio, cmd)
+        self._signal_bus.set_total_progress_finish.emit()
+        loguru.logger.success(f'合并音频完成，输出文件: {output_file_path}')
+        return output_file_path
+
+    def run(self):
+        input_file = "input.mp4"
+        output_file = "output.mp4"
+
+        # 控制标志
+        light_flow_enable = False
+        has_crop = False
+        has_rotate = True
+        has_scale = True
+        has_noise_reduction = True  # 降噪控制标志
+        has_audio_normalization = True  # 音频标准化控制标志
+        # 其他控制标志如视频平滑、稳定、修复等...
+
+        frame_rate = "60"
+        filters = []
+
+        # 帧率调整
+        if light_flow_enable:
+            filters.append(
+                "[0:v]scale=-2:-2[v];[v]minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={frame_rate}'")
+        else:
+            filters.append(f"fps=fps={frame_rate}")
+
+        # 视频剪裁
+        if has_crop:
+            crop_x = "xxxx"  # 加入具体的参数值
+            crop_y = "yyyy"
+            crop_width = "wwww"
+            crop_height = "hhhh"
+            filters.append(f"crop={crop_width}:{crop_height}:{crop_x}:{crop_y}")
+
+        # 视频旋转
+        if has_rotate:
+            rotate_angle = "PLACEHOLDER_ROTATE_ANGLE"
+            filters.append(f"rotate={rotate_angle}*PI/180")
+
+        # 视频缩放
+        if has_scale:
+            scale_width = "1920"
+            scale_height = "1080"
+            filters.append(f"scale={scale_width}:{scale_height}:force_original_aspect_ratio=decrease")
+            filters.append(f"pad={scale_width}:{scale_height}:(ow-iw)/2:(oh-ih)/2:black")
+
+        # 构建FFmpeg命令
+        commands = [
+                "ffmpeg",
+                "-i", input_file,
+                ]
+
+        # 添加帧率调整到命令
+        if not light_flow_enable:
+            commands += ["-r", frame_rate]
+
+        # 过滤器链
+        if filters:
+            filter_chain = ",".join(filters)
+            commands += ["-filter_complex", filter_chain]
+
+        # 降噪处理
+        if has_noise_reduction:
+            pass  # 假设降噪滤镜已在 filters 列表中指定
+        # 音频标准化
+        audio_filters = []
+        if has_audio_normalization:
+            audio_filters.append("loudnorm=i=-24.0:lra=7.0:tp=-2.0:")
+
+        # 将音频滤镜加入命令
+        if audio_filters:
+            audio_filter_chain = ",".join(audio_filters)
+            commands += ["-af", audio_filter_chain]
+
+        # 添加编码参数到命令
+        commands += [
+                "-map", "0:v",
+                "-map", "0:a?",
+                "-c:v", "libx264",
+                "-crf", "23",
+                "-preset", "slow",
+                # 音频标准化后不需要这里再拷贝视频编码
+                "-b:a", "256k",
+                "-max_muxing_queue_size", "1024",
+                output_file
+                ]
+
+        # 生成最终命令字符串
+        final_command = ' '.join(commands)
 
     def _reset_progress(self, total_progress_desc: str):
         self._signal_bus.set_total_progress_reset.emit()
@@ -172,20 +274,20 @@ class FFmpegCommand:
         cap.release()
 
         # 运行ffmpeg命令
-        # process = subprocess.Popen(command, shell=True,
-        #                            universal_newlines=True, encoding='utf-8')
-
-        # 运行ffmpeg命令
-        process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        process = subprocess.Popen(command, shell=True,
                                    universal_newlines=True, encoding='utf-8')
 
-        # 更新进度条
-        for line in iter(process.stdout.readline, ''):
-            if match := re.search(r'frame=\s*(\d+)', line):
-                current_frame = int(match[1])
-                self._signal_bus.set_detail_progress_current.emit(current_frame)
-                if current_frame >= total_frames:
-                    break
+        # # 运行ffmpeg命令
+        # process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+        #                            universal_newlines=True, encoding='utf-8')
+        #
+        # # 更新进度条
+        # for line in iter(process.stdout.readline, ''):
+        #     if match := re.search(r'frame=\s*(\d+)', line):
+        #         current_frame = int(match[1])
+        #         self._signal_bus.set_detail_progress_current.emit(current_frame)
+        #         if current_frame >= total_frames:
+        #             break
 
         # 等待子进程完成并读取所有剩余的输出
         stdout, stderr = process.communicate()
@@ -214,6 +316,7 @@ def test_ffmpeg_command():
 
     # 调用方法
     # ffmpeg_command.change_audio_speed(r"D:\Temp\audio.mp3", 0.5)
+
 
 
 if __name__ == "__main__":

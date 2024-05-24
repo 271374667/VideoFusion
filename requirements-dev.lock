@@ -6,6 +6,7 @@
 #   features: []
 #   all-features: false
 #   with-sources: false
+#   generate-hashes: false
 
 -e file:.
 ansi2html==1.9.1
@@ -14,16 +15,13 @@ colorama==0.4.6
     # via loguru
 colored==2.2.4
     # via gooey
+darkdetect==0.8.0
+    # via pyside6-fluent-widgets
 gooey==1.0.8.1
-    # via videomosaic
 loguru==0.7.2
     # via videomosaic
-markdown-it-py==3.0.0
-    # via rich
-mdurl==0.1.2
-    # via markdown-it-py
 nuitka==2.2.3
-numpy==1.26.4
+numpy==1.23.1
     # via opencv-python
     # via videomosaic
     # via wxpython
@@ -37,19 +35,22 @@ pillow==10.3.0
     # via wxpython
 psutil==5.9.8
     # via gooey
-pygments==2.18.0
-    # via rich
 pygtrie==2.5.0
     # via gooey
 pyside6==6.7.0
+    # via pyside6-fluent-widgets
     # via videomosaic
 pyside6-addons==6.7.0
     # via pyside6
 pyside6-essentials==6.7.0
     # via pyside6
     # via pyside6-addons
-rich==13.7.1
+pyside6-fluent-widgets==1.5.6
     # via videomosaic
+pysidesix-frameless-window==0.3.12
+    # via pyside6-fluent-widgets
+pywin32==306
+    # via pysidesix-frameless-window
 shiboken6==6.7.0
     # via pyside6
     # via pyside6-addons

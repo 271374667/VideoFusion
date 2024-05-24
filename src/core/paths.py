@@ -10,5 +10,6 @@ BIN_DIR = ROOT / "bin"
 TEMP_DIR = Path(r'D:\Temp')
 
 # FILE
-OUTPUT_FILE = TEMP_DIR / "output.mp4"
+OUTPUT_FILE = ROOT / "output.mp4"
 FFMPEG_FILE = BIN_DIR / "ffmpeg.exe"
+CONFIG_FILE = ROOT / "config.json"

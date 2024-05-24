@@ -103,6 +103,9 @@ class VideoMosaic:
         self._vertical_rotation = vertical_rotation
         loguru.logger.debug(f'视频拼接:垂直视频的旋转方向为{self._vertical_rotation}')
 
+    def append_video_path(self, video_path: Path | str):
+        self._video_path_list.append(Path(video_path))
+
     def add_video_dir(self, video_dir: Path | str, mode: str = '*.mp4') -> None:
         """添加视频文件夹"""
         if self._video_path_list:
@@ -158,8 +161,8 @@ class VideoMosaic:
             total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
             total_seconds = total_frames / fps
             target_total_frames = int(round(total_seconds * self._fps, 3))
-            target_seconds = target_total_frames / self._fps
-            audio_scale = total_seconds / target_seconds
+            target_seconds = (total_seconds * self._fps) / self._fps
+            audio_scale = round(total_seconds / target_seconds, 3)
             audio_list.append(VideoScaling(video_info.video_path, audio_scale))
 
             # 设置进度条
@@ -322,7 +325,8 @@ if __name__ == '__main__':
 
     video_mosaic = VideoMosaic()
     video_mosaic.sample_rate = 0.1
-    video_mosaic.read_from_txt_file(r"D:\Temp\sort.txt")
+    # video_mosaic.read_from_txt_file(r"D:\Temp\sort.txt")
+    video_mosaic.append_video_path(r"E:\load\python\Project\VideoMosaic\测试\video\audioVideo.mp4")
     video_mosaic.start()
     print('finished')
     app.exec()

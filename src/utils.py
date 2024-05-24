@@ -1,7 +1,11 @@
+import shutil
 import time
 from functools import wraps
+from pathlib import Path
 
 import loguru
+
+from src.core.paths import TEMP_DIR
 
 
 def singleton(cls):
@@ -87,6 +91,32 @@ def evenly_interpolate_numbers(current_num: int, target_num: int) -> list[int]:
             insert_index += 1
 
     return new_numbers
+
+
+@singleton
+class TempDir:
+    def __init__(self, temp_dir: Path = TEMP_DIR):
+        self.path = temp_dir
+        self._is_exists: bool = False
+
+    def get_temp_dir(self) -> Path:
+        if self._is_exists:
+            return self.path
+        self.delete_dir()
+
+        self.path.mkdir(parents=True, exist_ok=True)
+        loguru.logger.debug(f"创建临时文件夹:{self.path}")
+        return self.path
+
+    def delete_dir(self) -> None:
+        if not self.path.exists():
+            raise OSError(f'文件夹不存在:{self.path},无法删除')
+
+        shutil.rmtree(self.path, ignore_errors=True)
+        loguru.logger.debug(f"删除临时文件夹:{self.path}")
+
+    def __del__(self):
+        self.delete_dir()
 
 
 if __name__ == '__main__':
