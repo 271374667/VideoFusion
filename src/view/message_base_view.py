@@ -195,7 +195,10 @@ class MessageBaseView(QWidget):
     def resizeEvent(self, event):
         # 每次窗口大小改变的时候，都要重新计算一下tooltip的位置
         if hasattr(self, "state_tooltip"):
-            self.state_tooltip.move(self.state_tooltip.getSuitablePos())
+            try:
+                self.state_tooltip.move(self.state_tooltip.getSuitablePos())
+            except RuntimeError:
+                return
 
 
 if __name__ == "__main__":

@@ -8,12 +8,14 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFileDialog, QLi
                                QVBoxLayout, QWidget)
 from qfluentwidgets import Action, FluentIcon, MenuAnimationType
 from qfluentwidgets.components import RoundMenu
+from src.signal_bus import SignalBus
 
+signal_bus = SignalBus()
 WINDOW_RENAME_FILE_REGEX = re.compile(r'.*?\((\d+)\)\..*?')
 TIME_FILE_REGEX = re.compile(r'.*?([1-2]\d{3}).([0-1]\d).([0-3]\d).*?')
 
 
-class DraggableListWidget(QListWidget):
+class DraggableListWidgetView(QListWidget):
     def __init__(self, parent=None):
         super().__init__(parent=None)
         self.setAcceptDrops(True)
@@ -52,9 +54,11 @@ class DraggableListWidget(QListWidget):
                         with open(file_path, 'r') as file:
                             for line in file:
                                 self.addFileItem(line.strip())
+                                signal_bus.file_droped.emit(line.strip())
                                 loguru.logger.debug(f"拖拽添加了一个文件: {line.strip()}")
                     elif file_path.endswith(tuple(self.video_suffix)):
                         self.addFileItem(file_path)
+                        signal_bus.file_droped.emit(file_path)
                         loguru.logger.debug(f"拖拽添加了一个文件: {file_path}")
             self.sortItems(Qt.SortOrder.AscendingOrder)
             event.acceptProposedAction()
@@ -87,11 +91,11 @@ class DraggableListWidget(QListWidget):
                 loguru.logger.debug(f"右键删除了一个文件: {current_item.text()}")
 
 
-class SortToolComponent(QWidget):
-    def __init__(self):
-        super().__init__()
-        sort_message: str = "自动排序支持下列形式: 数字, window重命名后缀, 日期,如果均无法匹配则使用字符串排序"
-        self._list_widget = DraggableListWidget()
+class DraggableListWidget(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent=None)
+        self.sort_message: str = "自动排序支持下列形式: 数字, window重命名后缀, 日期,如果均无法匹配则使用字符串排序"
+        self._list_widget = DraggableListWidgetView()
 
         # 初始化视频列表框的右键菜单
         self.list_menu = RoundMenu(self._list_widget)
@@ -139,6 +143,24 @@ class SortToolComponent(QWidget):
         self.main_layout = QVBoxLayout()
         self.main_layout.addWidget(self._list_widget)
         self.setLayout(self.main_layout)
+
+    def get_draggable_list_view(self) -> DraggableListWidgetView:
+        return self._list_widget
+
+    def get_current_item_text(self) -> str:
+        if self._list_widget.currentItem():
+            return self._list_widget.currentItem().text()
+        return ""
+
+    def currentItem(self) -> QListWidgetItem:
+        return self._list_widget.currentItem()
+
+    def add_items(self, items: list[str]) -> None:
+        for item in items:
+            self._list_widget.addFileItem(item)
+
+    def set_items(self, items: list[str]) -> None:
+        self._list_widget.set_items(items)
 
     def show_context_menu(self, point):
         global_pos = self._list_widget.mapToGlobal(point)
@@ -236,11 +258,26 @@ class SortToolComponent(QWidget):
                     file.write(self._list_widget.item(i).text() + '\n')
                     loguru.logger.debug(f"导出文件: {self._list_widget.item(i).text()}")
 
+    def setFrameShape(self, shape):
+        self._list_widget.setFrameShape(shape)
+
+    def setFrameShadow(self, shadow):
+        self._list_widget.setFrameShadow(shadow)
+
+    def setLineWidth(self, width):
+        self._list_widget.setLineWidth(width)
+
+    def setMidLineWidth(self, width):
+        self._list_widget.setMidLineWidth(width)
+
+    def setDragEnabled(self, enable):
+        self._list_widget.setDragEnabled(enable)
+
 
 if __name__ == '__main__':
     import sys
 
     app = QApplication(sys.argv)
-    widget = SortToolComponent()
+    widget = DraggableListWidget()
     widget.show()
     sys.exit(app.exec())

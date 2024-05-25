@@ -7,7 +7,7 @@ class Orientation(Enum):
 
 
 class Rotation(Enum):
-    CLOCKWISE = 0
-    COUNTERCLOCKWISE = 1
-    UPSIDE_DOWN = 2
-    NOTHING = 3
+    CLOCKWISE = 90
+    COUNTERCLOCKWISE = 270
+    UPSIDE_DOWN = 180
+    NOTHING = 0

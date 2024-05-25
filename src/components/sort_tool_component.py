@@ -323,28 +323,25 @@ class SortToolComponent(QWidget):
         # 先检查是否有图片
         if self._img.pixmap():
             self.current_rotation = (self.current_rotation + 90) % 360
-            pixmap = self._img.pixmap()
-            pixmap = pixmap.transformed(QTransform().rotate(90))
-            self._img.setPixmap(pixmap)
-            loguru.logger.debug(f"顺时针旋转图片, 当前角度: {self.current_rotation}")
+            self._rotate_img(90, '顺时针旋转图片, 当前角度: ')
 
     def rotateCounterclockwise(self):
         # 先检查是否有图片
         if self._img.pixmap():
             self.current_rotation = (self.current_rotation - 90) % 360
-            pixmap = self._img.pixmap()
-            pixmap = pixmap.transformed(QTransform().rotate(-90))
-            self._img.setPixmap(pixmap)
-            loguru.logger.debug(f"逆时针旋转图片, 当前角度: {self.current_rotation}")
+            self._rotate_img(-90, '逆时针旋转图片, 当前角度: ')
 
     def rotateUpsideDown(self):
         # 先检查是否有图片
         if self._img.pixmap():
             self.current_rotation = (self.current_rotation + 180) % 360
-            pixmap = self._img.pixmap()
-            pixmap = pixmap.transformed(QTransform().rotate(180))
-            self._img.setPixmap(pixmap)
-            loguru.logger.debug(f"上下翻转图片, 当前角度: {self.current_rotation}")
+            self._rotate_img(180, '上下翻转图片, 当前角度: ')
+
+    def _rotate_img(self, angle, log_title):
+        pixmap = self._img.pixmap()
+        pixmap = pixmap.transformed(QTransform().rotate(angle))
+        self._img.setPixmap(pixmap)
+        loguru.logger.debug(f"{log_title}{self.current_rotation}")
 
     def _set_img(self, frame):
         # 是否启用去除黑边

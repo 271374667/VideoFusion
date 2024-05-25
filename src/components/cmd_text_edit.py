@@ -54,6 +54,7 @@ class CMDTextEdit(QWidget):
 
     def __init__(self, parent=None):
         super().__init__()
+        self.setObjectName("cmd_text_edit")
         self._ansi2html_converter = Ansi2HTMLConverter()
 
         self.text_edit = QTextEdit(self)

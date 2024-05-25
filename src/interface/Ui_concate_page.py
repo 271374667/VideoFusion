@@ -22,7 +22,7 @@ from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
 from qfluentwidgets import (BodyLabel, CardWidget, ComboBox, Pivot,
     PrimaryPushButton, ProgressBar, PushButton, RadioButton,
     SegmentedWidget, SimpleCardWidget, StrongBodyLabel, VerticalSeparator)
-from src.components.sort_tool_component import DraggableListWidget
+from src.components.draggable_list_widget import DraggableListWidget
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -31,14 +31,18 @@ class Ui_Form(object):
         Form.resize(1100, 650)
         Form.setStyleSheet(u"background-color: rgba(0, 0, 0);")
         self.verticalLayout_7 = QVBoxLayout(Form)
+        self.verticalLayout_7.setSpacing(15)
         self.verticalLayout_7.setObjectName(u"verticalLayout_7")
+        self.verticalLayout_7.setContentsMargins(15, 15, 15, 15)
         self.horizontalLayout_7 = QHBoxLayout()
         self.horizontalLayout_7.setObjectName(u"horizontalLayout_7")
         self.SimpleCardWidget = SimpleCardWidget(Form)
         self.SimpleCardWidget.setObjectName(u"SimpleCardWidget")
         self.SimpleCardWidget.setStyleSheet(u"")
         self.verticalLayout_5 = QVBoxLayout(self.SimpleCardWidget)
+        self.verticalLayout_5.setSpacing(15)
         self.verticalLayout_5.setObjectName(u"verticalLayout_5")
+        self.verticalLayout_5.setContentsMargins(15, 15, 15, 15)
         self.StrongBodyLabel = StrongBodyLabel(self.SimpleCardWidget)
         self.StrongBodyLabel.setObjectName(u"StrongBodyLabel")
         sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
@@ -136,7 +140,9 @@ class Ui_Form(object):
         self.SimpleCardWidget_2.setObjectName(u"SimpleCardWidget_2")
         self.SimpleCardWidget_2.setStyleSheet(u"background-color: rgba(0, 0, 0, 0);")
         self.verticalLayout_2 = QVBoxLayout(self.SimpleCardWidget_2)
+        self.verticalLayout_2.setSpacing(15)
         self.verticalLayout_2.setObjectName(u"verticalLayout_2")
+        self.verticalLayout_2.setContentsMargins(15, 15, 15, 15)
         self.verticalLayout_4 = QVBoxLayout()
         self.verticalLayout_4.setObjectName(u"verticalLayout_4")
         self.SegmentedWidget = SegmentedWidget(self.SimpleCardWidget_2)
@@ -149,7 +155,9 @@ class Ui_Form(object):
         self.page = QWidget()
         self.page.setObjectName(u"page")
         self.verticalLayout_3 = QVBoxLayout(self.page)
+        self.verticalLayout_3.setSpacing(15)
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
+        self.verticalLayout_3.setContentsMargins(15, 15, 15, 15)
         self.label = QLabel(self.page)
         self.label.setObjectName(u"label")
         sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
@@ -203,7 +211,9 @@ class Ui_Form(object):
         self.CardWidget = CardWidget(Form)
         self.CardWidget.setObjectName(u"CardWidget")
         self.verticalLayout_6 = QVBoxLayout(self.CardWidget)
+        self.verticalLayout_6.setSpacing(15)
         self.verticalLayout_6.setObjectName(u"verticalLayout_6")
+        self.verticalLayout_6.setContentsMargins(15, 15, 15, 15)
         self.horizontalLayout_3 = QHBoxLayout()
         self.horizontalLayout_3.setObjectName(u"horizontalLayout_3")
         self.BodyLabel_2 = BodyLabel(self.CardWidget)
@@ -213,21 +223,33 @@ class Ui_Form(object):
 
         self.ProgressBar_2 = ProgressBar(self.CardWidget)
         self.ProgressBar_2.setObjectName(u"ProgressBar_2")
+        sizePolicy2.setHeightForWidth(self.ProgressBar_2.sizePolicy().hasHeightForWidth())
+        self.ProgressBar_2.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.ProgressBar_2)
 
+        self.horizontalSpacer_2 = QSpacerItem(15, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
+
         self.BodyLabel_4 = BodyLabel(self.CardWidget)
         self.BodyLabel_4.setObjectName(u"BodyLabel_4")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_4.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_4.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_4)
 
         self.BodyLabel_10 = BodyLabel(self.CardWidget)
         self.BodyLabel_10.setObjectName(u"BodyLabel_10")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_10.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_10.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_10)
 
         self.BodyLabel_6 = BodyLabel(self.CardWidget)
         self.BodyLabel_6.setObjectName(u"BodyLabel_6")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_6.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_6.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_6)
 
@@ -238,6 +260,8 @@ class Ui_Form(object):
 
         self.BodyLabel_8 = BodyLabel(self.CardWidget)
         self.BodyLabel_8.setObjectName(u"BodyLabel_8")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_8.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_8.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_8)
 
@@ -256,18 +280,28 @@ class Ui_Form(object):
 
         self.horizontalLayout_4.addWidget(self.ProgressBar)
 
+        self.horizontalSpacer_3 = QSpacerItem(15, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_4.addItem(self.horizontalSpacer_3)
+
         self.BodyLabel_5 = BodyLabel(self.CardWidget)
         self.BodyLabel_5.setObjectName(u"BodyLabel_5")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_5.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_5.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_5)
 
         self.BodyLabel_11 = BodyLabel(self.CardWidget)
         self.BodyLabel_11.setObjectName(u"BodyLabel_11")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_11.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_11.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_11)
 
         self.BodyLabel_7 = BodyLabel(self.CardWidget)
         self.BodyLabel_7.setObjectName(u"BodyLabel_7")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_7.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_7.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_7)
 
@@ -278,6 +312,8 @@ class Ui_Form(object):
 
         self.BodyLabel_9 = BodyLabel(self.CardWidget)
         self.BodyLabel_9.setObjectName(u"BodyLabel_9")
+        sizePolicy1.setHeightForWidth(self.BodyLabel_9.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_9.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_9)
 
@@ -297,7 +333,7 @@ class Ui_Form(object):
         self.ProgressBar_2.valueChanged.connect(self.BodyLabel_4.setNum)
         self.ProgressBar.valueChanged.connect(self.BodyLabel_5.setNum)
 
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
 
 
         QMetaObject.connectSlotsByName(Form)

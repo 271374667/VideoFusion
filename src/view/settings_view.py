@@ -15,6 +15,7 @@ from src.view.message_base_view import MessageBaseView
 class SettingView(MessageBaseView):
     def __init__(self, parent=None):
         super().__init__(parent=parent)
+        self.setObjectName("setting_view")
         self.main_layout = QVBoxLayout()
         self.smooth_scroll_area = SmoothScrollArea()
 
@@ -43,7 +44,7 @@ class SettingView(MessageBaseView):
         self.ffmpeg_file_card = PushSettingCard("FFmpeg路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置FFmpeg的路径",
                                                 "您可以选择您自己编译的ffmpeg.exe,该软件仅使用了基础的ffmpeg,可能对某些视频格式不支持",
                                                 self.general_group)
-        self.temp_dir_card = PushSettingCard("临时目录", Icon(FluentIcon.CHEVRON_RIGHT), "设置临时目录",
+        self.temp_dir_card = PushSettingCard("选择目录", Icon(FluentIcon.CHEVRON_RIGHT), "设置临时目录",
                                              "软件在运行的过程中会产生过程文件，请确保目标目录有足够的空间",
                                              self.general_group)
         self.delete_temp_dir_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "删除临时目录",
@@ -137,8 +138,8 @@ class SettingView(MessageBaseView):
         self.setLayout(self.main_layout)
 
         # 这里因为背景色不一样,我手动打个补丁
-        self.setStyleSheet("background-color: #fcfcfc")
-        self.smooth_scroll_area.setStyleSheet("background-color: #fcfcfc")
+        self.setStyleSheet("background-color: #f9f9f9")
+        self.smooth_scroll_area.setStyleSheet("background-color: #f9f9f9")
 
         for each in self.findChildren(QWidget):
             each.installEventFilter(ToolTipFilter(each, 200))

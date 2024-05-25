@@ -75,7 +75,7 @@ class Config(QConfig):
     # 视频质量
     output_file_path = ConfigItem("Video", "输出文件路径", str(OUTPUT_FILE), OutputFileValidator())
     noise_reduction = ConfigItem("Video", "视频降噪", True, BoolValidator())
-    audio_normalization = ConfigItem("Video", "音频响度标准化", True, BoolValidator())
+    audio_normalization = ConfigItem("Video", "音频响度标准化", False, BoolValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_rate = RangeConfigItem("Video", "黑边采样率", 5, RangeValidator(0, 10))
@@ -90,9 +90,10 @@ class Config(QConfig):
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())
     temp_dir = ConfigItem("General", "临时目录", str(TEMP_DIR), FolderValidator())
     delete_temp_dir = ConfigItem("General", "完成后删除临时目录", True, BoolValidator())
-    preview_video_remove_black = ConfigItem("General", "预览视频是否去黑边", True, BoolValidator())
+    preview_video_remove_black = ConfigItem("General", "预览视频是否去黑边", False, BoolValidator())
     preview_frame = OptionsConfigItem("General", "预览视频帧", PreviewFrame.FirstFrame, OptionsValidator(PreviewFrame),
                                       EnumSerializer(PreviewFrame))
+    preview_auto_play = ConfigItem("General", "预览视频自动播放", False, BoolValidator())
 
 
 cfg = Config()
