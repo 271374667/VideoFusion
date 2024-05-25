@@ -24,3 +24,12 @@ class FileDragAndDropLineEdit(QLineEdit):
             self.setText(url.toLocalFile())
             signal_bus.file_droped.emit(url.toLocalFile())
             event.acceptProposedAction()
+
+
+if __name__ == '__main__':
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication([])
+    window = FileDragAndDropLineEdit()
+    window.show()
+    app.exec()

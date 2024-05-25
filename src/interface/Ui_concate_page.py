@@ -16,12 +16,13 @@ from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
     QImage, QKeySequence, QLinearGradient, QPainter,
     QPalette, QPixmap, QRadialGradient, QTransform)
 from PySide6.QtWidgets import (QApplication, QFrame, QHBoxLayout, QLabel,
-    QListWidget, QListWidgetItem, QSizePolicy, QSpacerItem,
-    QStackedWidget, QVBoxLayout, QWidget)
+    QListWidgetItem, QSizePolicy, QSpacerItem, QStackedWidget,
+    QVBoxLayout, QWidget)
 
 from qfluentwidgets import (BodyLabel, CardWidget, ComboBox, Pivot,
     PrimaryPushButton, ProgressBar, PushButton, RadioButton,
     SegmentedWidget, SimpleCardWidget, StrongBodyLabel, VerticalSeparator)
+from src.components.sort_tool_component import DraggableListWidget
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -49,9 +50,7 @@ class Ui_Form(object):
 
         self.verticalLayout_5.addWidget(self.StrongBodyLabel)
 
-        self.listWidget = QListWidget(self.SimpleCardWidget)
-        QListWidgetItem(self.listWidget)
-        QListWidgetItem(self.listWidget)
+        self.listWidget = DraggableListWidget(self.SimpleCardWidget)
         self.listWidget.setObjectName(u"listWidget")
         self.listWidget.setFrameShape(QFrame.Box)
         self.listWidget.setFrameShadow(QFrame.Sunken)
@@ -75,10 +74,6 @@ class Ui_Form(object):
         self.verticalLayout.setObjectName(u"verticalLayout")
         self.horizontalLayout = QHBoxLayout()
         self.horizontalLayout.setObjectName(u"horizontalLayout")
-        self.horizontalSpacer_7 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
-
-        self.horizontalLayout.addItem(self.horizontalSpacer_7)
-
         self.BodyLabel_12 = BodyLabel(self.SimpleCardWidget)
         self.BodyLabel_12.setObjectName(u"BodyLabel_12")
 
@@ -106,13 +101,27 @@ class Ui_Form(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.BodyLabel = BodyLabel(self.SimpleCardWidget)
         self.BodyLabel.setObjectName(u"BodyLabel")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.BodyLabel.sizePolicy().hasHeightForWidth())
+        self.BodyLabel.setSizePolicy(sizePolicy1)
 
         self.horizontalLayout_2.addWidget(self.BodyLabel)
 
         self.ComboBox_2 = ComboBox(self.SimpleCardWidget)
         self.ComboBox_2.setObjectName(u"ComboBox_2")
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.ComboBox_2.sizePolicy().hasHeightForWidth())
+        self.ComboBox_2.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_2.addWidget(self.ComboBox_2)
+
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
+
+        self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
 
         self.verticalLayout.addLayout(self.horizontalLayout_2)
@@ -143,11 +152,11 @@ class Ui_Form(object):
         self.verticalLayout_3.setObjectName(u"verticalLayout_3")
         self.label = QLabel(self.page)
         self.label.setObjectName(u"label")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy1)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy3)
         self.label.setScaledContents(True)
         self.label.setAlignment(Qt.AlignCenter)
 
@@ -176,6 +185,8 @@ class Ui_Form(object):
         self.stackedWidget.addWidget(self.page)
         self.page_2 = QWidget()
         self.page_2.setObjectName(u"page_2")
+        self.verticalLayout_8 = QVBoxLayout(self.page_2)
+        self.verticalLayout_8.setObjectName(u"verticalLayout_8")
         self.stackedWidget.addWidget(self.page_2)
 
         self.verticalLayout_4.addWidget(self.stackedWidget)
@@ -295,15 +306,6 @@ class Ui_Form(object):
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
         self.StrongBodyLabel.setText(QCoreApplication.translate("Form", u"\u89c6\u9891\u6587\u4ef6\u5217\u8868", None))
-
-        __sortingEnabled = self.listWidget.isSortingEnabled()
-        self.listWidget.setSortingEnabled(False)
-        ___qlistwidgetitem = self.listWidget.item(0)
-        ___qlistwidgetitem.setText(QCoreApplication.translate("Form", u"123", None));
-        ___qlistwidgetitem1 = self.listWidget.item(1)
-        ___qlistwidgetitem1.setText(QCoreApplication.translate("Form", u"321", None));
-        self.listWidget.setSortingEnabled(__sortingEnabled)
-
         self.PushButton.setText(QCoreApplication.translate("Form", u"\u9009\u62e9\u89c6\u9891", None))
         self.BodyLabel_12.setText(QCoreApplication.translate("Form", u"\u60a8\u5e0c\u671b\u5c06\u89c6\u9891\u8f93\u51fa\u4e3a", None))
         self.RadioButton_2.setText(QCoreApplication.translate("Form", u"\u7ad6\u5c4f\u89c6\u9891", None))
