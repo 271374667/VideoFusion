@@ -17,3 +17,5 @@ wheels/
 /vm2.py
 /video_mosaic/
 /config.json
+/output/
+/doc/

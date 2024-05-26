@@ -6,8 +6,9 @@ from typing import Union
 import loguru
 from PySide6.QtCore import QThread, Signal
 from PySide6.QtGui import QTextCursor
-from PySide6.QtWidgets import QApplication, QTextEdit, QVBoxLayout, QWidget
+from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
 from ansi2html import Ansi2HTMLConverter
+from qfluentwidgets.components import TextEdit
 
 
 class CmdRunnerThread(QThread):
@@ -57,7 +58,7 @@ class CMDTextEdit(QWidget):
         self.setObjectName("cmd_text_edit")
         self._ansi2html_converter = Ansi2HTMLConverter()
 
-        self.text_edit = QTextEdit(self)
+        self.text_edit = TextEdit()
         self.text_edit.setStyleSheet("background-color: white;")
         self.text_edit.setReadOnly(True)
         # 设置文本框的颜色css样式

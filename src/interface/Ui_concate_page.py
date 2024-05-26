@@ -23,6 +23,7 @@ from qfluentwidgets import (BodyLabel, CardWidget, ComboBox, Pivot,
     PrimaryPushButton, ProgressBar, PushButton, RadioButton,
     SegmentedWidget, SimpleCardWidget, StrongBodyLabel, VerticalSeparator)
 from src.components.draggable_list_widget import DraggableListWidget
+import resource_rc
 
 class Ui_Form(object):
     def setupUi(self, Form):
@@ -68,6 +69,10 @@ class Ui_Form(object):
         self.horizontalLayout_6.setObjectName(u"horizontalLayout_6")
         self.PushButton = PushButton(self.SimpleCardWidget)
         self.PushButton.setObjectName(u"PushButton")
+        icon = QIcon()
+        icon.addFile(u":/images/images/add.ico", QSize(), QIcon.Normal, QIcon.Off)
+        self.PushButton.setIcon(icon)
+        self.PushButton.setIconSize(QSize(16, 16))
 
         self.horizontalLayout_6.addWidget(self.PushButton)
 
@@ -322,6 +327,10 @@ class Ui_Form(object):
 
         self.PrimaryPushButton = PrimaryPushButton(self.CardWidget)
         self.PrimaryPushButton.setObjectName(u"PrimaryPushButton")
+        icon1 = QIcon()
+        icon1.addFile(u":/images/images/start_merge.ico", QSize(), QIcon.Normal, QIcon.Off)
+        self.PrimaryPushButton.setIcon(icon1)
+        self.PrimaryPushButton.setIconSize(QSize(16, 16))
 
         self.verticalLayout_6.addWidget(self.PrimaryPushButton)
 

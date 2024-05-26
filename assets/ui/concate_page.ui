@@ -97,6 +97,16 @@
             <property name="text">
              <string>选择视频</string>
             </property>
+            <property name="icon">
+             <iconset resource="../resource.qrc">
+              <normaloff>:/images/images/add.ico</normaloff>:/images/images/add.ico</iconset>
+            </property>
+            <property name="iconSize">
+             <size>
+              <width>16</width>
+              <height>16</height>
+             </size>
+            </property>
            </widget>
           </item>
          </layout>
@@ -502,6 +512,16 @@
         <property name="text">
          <string>开始合并</string>
         </property>
+        <property name="icon">
+         <iconset resource="../resource.qrc">
+          <normaloff>:/images/images/start_merge.ico</normaloff>:/images/images/start_merge.ico</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>16</width>
+          <height>16</height>
+         </size>
+        </property>
        </widget>
       </item>
      </layout>
@@ -578,7 +598,9 @@
    <header>src.components.draggable_list_widget</header>
   </customwidget>
  </customwidgets>
- <resources/>
+ <resources>
+  <include location="../resource.qrc"/>
+ </resources>
  <connections>
   <connection>
    <sender>ProgressBar_2</sender>

@@ -13,36 +13,23 @@ ansi2html==1.9.1
     # via videomosaic
 colorama==0.4.6
     # via loguru
-colored==2.2.4
-    # via gooey
 darkdetect==0.8.0
     # via pyside6-fluent-widgets
-gooey==1.0.8.1
 loguru==0.7.2
     # via videomosaic
 nuitka==2.2.3
-numpy==1.23.1
+numpy==1.26.4
     # via opencv-python
     # via videomosaic
-    # via wxpython
 opencv-python==4.9.0.80
     # via videomosaic
 ordered-set==4.1.0
     # via nuitka
-pillow==10.3.0
-    # via gooey
-    # via videomosaic
-    # via wxpython
-psutil==5.9.8
-    # via gooey
-pygtrie==2.5.0
-    # via gooey
-pyside6==6.7.0
+pyside6==6.7.1
     # via pyside6-fluent-widgets
-    # via videomosaic
-pyside6-addons==6.7.0
+pyside6-addons==6.7.1
     # via pyside6
-pyside6-essentials==6.7.0
+pyside6-essentials==6.7.1
     # via pyside6
     # via pyside6-addons
 pyside6-fluent-widgets==1.5.6
@@ -51,15 +38,11 @@ pysidesix-frameless-window==0.3.12
     # via pyside6-fluent-widgets
 pywin32==306
     # via pysidesix-frameless-window
-shiboken6==6.7.0
+shiboken6==6.7.1
     # via pyside6
     # via pyside6-addons
     # via pyside6-essentials
-six==1.16.0
-    # via wxpython
 win32-setctime==1.1.0
     # via loguru
-wxpython==4.2.1
-    # via gooey
 zstandard==0.22.0
     # via nuitka

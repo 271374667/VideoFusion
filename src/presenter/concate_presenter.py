@@ -70,9 +70,6 @@ class ConcatePresenter:
         output_path = cfg.get(cfg.output_file_path)
         self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件为: {output_path}")
 
-        # 让窗口闪烁
-        QApplication.alert(self.get_view())
-
     def get_all_video_files(self) -> list[str]:
         return self.get_view().get_video_file_list().get_draggable_list_view().get_all_items()
 

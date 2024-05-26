@@ -1,15 +1,12 @@
-# coding:utf-8
-import sys
-
-from PySide6.QtCore import QUrl
-from PySide6.QtGui import QDesktopServices, QIcon
+from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 from qfluentwidgets import FluentIcon as FIF
-from qfluentwidgets import FluentWindow, MessageBox, NavigationItemPosition
+from qfluentwidgets import FluentWindow, NavigationItemPosition, TextEdit
 
+from src.components.cmd_text_edit import CMDTextEdit
+from src.core.about import about_txt
 from src.view.concate_view import ConcateView
 from src.view.settings_view import SettingView
-from src.components.cmd_text_edit import CMDTextEdit
 
 
 class MainView(FluentWindow):
@@ -19,6 +16,9 @@ class MainView(FluentWindow):
         # create sub interface
         self.concate_interface = concate_view
         self.cmd_interface = CMDTextEdit()
+        self.about_interface = TextEdit()
+        self.about_interface.setHtml(about_txt)
+        self.about_interface.setObjectName("about")
         self.setting_interface = setting_view
 
         self.initNavigation()
@@ -28,12 +28,13 @@ class MainView(FluentWindow):
         self.addSubInterface(self.concate_interface, FIF.HOME, '主页')
         self.addSubInterface(self.cmd_interface, FIF.COMMAND_PROMPT, '日志')
 
+        self.addSubInterface(self.about_interface, FIF.CHAT, '关于', NavigationItemPosition.BOTTOM)
         self.addSubInterface(self.setting_interface, FIF.SETTING, '设置', NavigationItemPosition.BOTTOM)
 
     def initWindow(self):
         self.resize(1100, 750)
-        self.setWindowIcon(QIcon(':/qfluentwidgets/images/logo.png'))
-        self.setWindowTitle('PyQt-Fluent-Widgets')
+        self.setWindowIcon(QIcon(':/images/images/logo.ico'))
+        self.setWindowTitle('VideoMosaic')
 
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()
@@ -41,9 +42,7 @@ class MainView(FluentWindow):
 
 
 if __name__ == '__main__':
-    # setTheme(Theme.DARK)
-
-    app = QApplication(sys.argv)
+    app = QApplication([])
     w = MainView(ConcateView(), SettingView())
     w.show()
     app.exec()
