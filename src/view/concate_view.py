@@ -1,6 +1,7 @@
 import re
 
 from PySide6.QtWidgets import QApplication, QLabel, QStackedWidget, QWidget
+from qfluentwidgets import ToolTipFilter
 from qfluentwidgets.components import (BodyLabel, ComboBox, PrimaryPushButton, ProgressBar, PushButton,
                                        RadioButton, SegmentedWidget)
 from qfluentwidgets.multimedia import VideoWidget
@@ -248,6 +249,9 @@ class ConcateView(MessageBaseView):
         cb: ComboBox = self.get_rotate_video_cb()
         cb.addItems(self._rotation2cn.values())
         cb.setCurrentIndex(0)
+
+        for each in self.findChildren(QWidget):
+            each.installEventFilter(ToolTipFilter(each, 200))
 
 
 if __name__ == '__main__':

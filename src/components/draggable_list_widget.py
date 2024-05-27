@@ -51,11 +51,11 @@ class DraggableListWidgetView(QListWidget):
                 if file_path := url.toLocalFile():
                     # 判断是否是txt文件,如果是则读取文件内的路径
                     if file_path.endswith('.txt'):
-                        with open(file_path, 'r') as file:
-                            for line in file:
-                                self.addFileItem(line.strip())
-                                signal_bus.file_droped.emit(line.strip())
-                                loguru.logger.debug(f"拖拽添加了一个文件: {line.strip()}")
+                        txt = Path(file_path).read_text(encoding='utf-8').splitlines()
+                        for line in txt:
+                            self.addFileItem(line.strip().replace('"', ''))  # 去除引号
+                            signal_bus.file_droped.emit(line.strip())
+                            loguru.logger.debug(f"拖拽添加了一个文件: {line.strip()}")
                     elif file_path.endswith(tuple(self.video_suffix)):
                         self.addFileItem(file_path)
                         signal_bus.file_droped.emit(file_path)

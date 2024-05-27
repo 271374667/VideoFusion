@@ -63,16 +63,26 @@
             <verstretch>0</verstretch>
            </sizepolicy>
           </property>
+          <property name="toolTip">
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将视频拖放到下方列表中,右键有更多选项&lt;/p&gt;&lt;p&gt;(Tip: 可以通过拖放一个每一行一个视频路径的txt放置大量视频文件,此方式比直接拖动视频更快)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+          </property>
           <property name="text">
            <string>视频文件列表</string>
           </property>
           <property name="alignment">
            <set>Qt::AlignCenter</set>
           </property>
+          <property name="buddy">
+           <cstring>listWidget</cstring>
+          </property>
          </widget>
         </item>
         <item>
          <widget class="DraggableListWidget" name="listWidget">
+          <property name="toolTip">
+           <string>将视频拖放到下方列表中,右键有更多选项
+(Tip: 可以通过拖放一个每一行一个视频路径的txt放置大量视频文件,此方式比直接拖动视频更快)</string>
+          </property>
           <property name="frameShape">
            <enum>QFrame::Box</enum>
           </property>
@@ -94,6 +104,9 @@
          <layout class="QHBoxLayout" name="horizontalLayout_6">
           <item>
            <widget class="PushButton" name="PushButton">
+            <property name="toolTip">
+             <string>选择需要被合成的视频</string>
+            </property>
             <property name="text">
              <string>选择视频</string>
             </property>
@@ -117,13 +130,22 @@
            <layout class="QHBoxLayout" name="horizontalLayout">
             <item>
              <widget class="BodyLabel" name="BodyLabel_12">
+              <property name="toolTip">
+               <string>您最终希望导出的视频是横屏视频还是竖屏视频</string>
+              </property>
               <property name="text">
                <string>您希望将视频输出为</string>
+              </property>
+              <property name="buddy">
+               <cstring>RadioButton_2</cstring>
               </property>
              </widget>
             </item>
             <item>
              <widget class="RadioButton" name="RadioButton_2">
+              <property name="toolTip">
+               <string>您最终希望导出的视频是横屏视频还是竖屏视频</string>
+              </property>
               <property name="text">
                <string>竖屏视频</string>
               </property>
@@ -134,6 +156,9 @@
             </item>
             <item>
              <widget class="RadioButton" name="RadioButton">
+              <property name="toolTip">
+               <string>您最终希望导出的视频是横屏视频还是竖屏视频</string>
+              </property>
               <property name="text">
                <string>横屏视频</string>
               </property>
@@ -164,8 +189,14 @@
                 <verstretch>0</verstretch>
                </sizepolicy>
               </property>
+              <property name="toolTip">
+               <string>如果您的视频经过检测之后发现不符合你上面的选项你要如何处理?</string>
+              </property>
               <property name="text">
                <string>不符合朝向如何调整</string>
+              </property>
+              <property name="buddy">
+               <cstring>ComboBox_2</cstring>
               </property>
              </widget>
             </item>
@@ -176,6 +207,9 @@
                 <horstretch>0</horstretch>
                 <verstretch>0</verstretch>
                </sizepolicy>
+              </property>
+              <property name="toolTip">
+               <string>如果您的视频经过检测之后发现不符合你上面的选项你要如何处理?</string>
               </property>
              </widget>
             </item>
@@ -223,7 +257,11 @@
         <item>
          <layout class="QVBoxLayout" name="verticalLayout_4">
           <item>
-           <widget class="SegmentedWidget" name="SegmentedWidget"/>
+           <widget class="SegmentedWidget" name="SegmentedWidget">
+            <property name="toolTip">
+             <string>选择不同的预览方式</string>
+            </property>
+           </widget>
           </item>
           <item>
            <widget class="QStackedWidget" name="stackedWidget">
@@ -255,6 +293,9 @@
                   <verstretch>0</verstretch>
                  </sizepolicy>
                 </property>
+                <property name="toolTip">
+                 <string>可以在设置页面设置默认展示哪一个画面(默认为不为黑色的第一帧)</string>
+                </property>
                 <property name="text">
                  <string>这里显示图片</string>
                 </property>
@@ -270,6 +311,9 @@
                <layout class="QHBoxLayout" name="horizontalLayout_5">
                 <item>
                  <widget class="PushButton" name="PushButton_2">
+                  <property name="toolTip">
+                   <string/>
+                  </property>
                   <property name="text">
                    <string>顺时针旋转90°</string>
                   </property>
@@ -327,6 +371,9 @@
        <layout class="QHBoxLayout" name="horizontalLayout_3">
         <item>
          <widget class="BodyLabel" name="BodyLabel_2">
+          <property name="toolTip">
+           <string/>
+          </property>
           <property name="text">
            <string>总进度</string>
           </property>
@@ -509,6 +556,9 @@
       </item>
       <item>
        <widget class="PrimaryPushButton" name="PrimaryPushButton">
+        <property name="toolTip">
+         <string>点击此处直接开始合并，您可以通过在设置页面定义输出文件位置</string>
+        </property>
         <property name="text">
          <string>开始合并</string>
         </property>
@@ -598,6 +648,17 @@
    <header>src.components.draggable_list_widget</header>
   </customwidget>
  </customwidgets>
+ <tabstops>
+  <tabstop>listWidget</tabstop>
+  <tabstop>PushButton</tabstop>
+  <tabstop>RadioButton_2</tabstop>
+  <tabstop>RadioButton</tabstop>
+  <tabstop>ComboBox_2</tabstop>
+  <tabstop>PushButton_2</tabstop>
+  <tabstop>PushButton_3</tabstop>
+  <tabstop>PushButton_4</tabstop>
+  <tabstop>PrimaryPushButton</tabstop>
+ </tabstops>
  <resources>
   <include location="../resource.qrc"/>
  </resources>
@@ -609,12 +670,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>118</x>
-     <y>670</y>
+     <x>197</x>
+     <y>526</y>
     </hint>
     <hint type="destinationlabel">
-     <x>838</x>
-     <y>667</y>
+     <x>951</x>
+     <y>534</y>
     </hint>
    </hints>
   </connection>
@@ -625,12 +686,12 @@
    <slot>setNum(int)</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>162</x>
-     <y>695</y>
+     <x>255</x>
+     <y>563</y>
     </hint>
     <hint type="destinationlabel">
-     <x>826</x>
-     <y>697</y>
+     <x>951</x>
+     <y>571</y>
     </hint>
    </hints>
   </connection>

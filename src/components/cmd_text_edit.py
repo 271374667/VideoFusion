@@ -10,6 +10,8 @@ from PySide6.QtWidgets import QApplication, QVBoxLayout, QWidget
 from ansi2html import Ansi2HTMLConverter
 from qfluentwidgets.components import TextEdit
 
+from src.utils import singleton
+
 
 class CmdRunnerThread(QThread):
     append_signal = Signal(str)
@@ -35,6 +37,7 @@ class CmdRunnerThread(QThread):
                 self.append_signal.emit(output.strip())
 
 
+@singleton
 class CMDTextEdit(QWidget):
     """
     一个支持ANSI颜色代码的文本框
@@ -93,7 +96,6 @@ class CMDTextEdit(QWidget):
             ansi_color_text = json.loads(str(message))
             self.append_log(ansi_color_text['text'])
 
-        loguru.logger.remove()
         loguru.logger.add(sink, colorize=True, serialize=True)
 
     def _append_log_slot(self, context: str) -> None:

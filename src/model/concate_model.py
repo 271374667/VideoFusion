@@ -1,5 +1,5 @@
 import os
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import Future, ThreadPoolExecutor
 from pathlib import Path
 
 import loguru
@@ -31,7 +31,9 @@ class Worker(QObject):
         video_info_list: list[VideoInfo] = []
         for each in video_list:
             loguru.logger.debug(f'正在分析视频:{each.name}')
-            video_info = get_video_info(each, video_orientation, sample_rate=cfg.get(cfg.video_sample_rate))
+            sample_rate: int = cfg.get(cfg.video_sample_rate)
+            sample: float = max(min(sample_rate / 10, 0), 1)
+            video_info = get_video_info(each, sample_rate=sample)
             video_info_list.append(video_info)
             signal_bus.advance_total_progress.emit(1)
             loguru.logger.debug(f'视频分析{each.name}分析完成:{video_info}')
@@ -42,7 +44,7 @@ class Worker(QObject):
         signal_bus.set_total_progress_description.emit("调优参数")
         signal_bus.set_total_progress_reset.emit()
         signal_bus.set_detail_progress_reset.emit()
-        best_width, best_height = get_most_compatible_resolution(video_info_list)
+        best_width, best_height = get_most_compatible_resolution(video_info_list, video_orientation)
         loguru.logger.info(f'最佳分辨率获取完成,最佳分辨率为: {best_width}x{best_height}')
 
         # 生成ffmpeg命令
@@ -69,7 +71,8 @@ class Worker(QObject):
             if output_path.exists():
                 output_path.unlink()
             output_video_list.append(output_path)
-            loguru.logger.debug(f'视频{each.video_path.name}的参数为: {each.crop},{best_width=},{best_height=},{rotate_angle=}')
+            loguru.logger.debug(
+                    f'视频{each.video_path.name}的参数为: {each.crop},{best_width=},{best_height=},{rotate_angle=}')
             command = generate_ffmpeg_command(input_file=each.video_path, output_file_path=output_path,
                                               crop_position=each.crop, width=best_width, height=best_height,
                                               rotation_angle=rotate_angle)
@@ -108,9 +111,31 @@ class Worker(QObject):
 
 class ConcateModel:
     def __init__(self):
-        self._pool = ThreadPoolExecutor(3)
+        self._pool: ThreadPoolExecutor = ThreadPoolExecutor(3)
         self._worker = Worker()
 
     def start(self, video_list: list[str | Path], video_orientation: Orientation, video_rotation: Rotation):
-        self._pool.submit(self._worker.start, video_list, video_orientation, video_rotation)
+        f: Future = self._pool.submit(self._worker.start, video_list, video_orientation, video_rotation)
         loguru.logger.debug(f'程序开始执行,参数如下: {video_orientation}, {video_rotation}, 视频列表为:{video_list}')
+
+
+if __name__ == '__main__':
+    # 绑定信号
+    signal_bus.set_detail_progress_current.connect(lambda x: print(f'当前进度为{x}'))
+    signal_bus.set_detail_progress_max.connect(lambda x: print(f'最大进度为{x}'))
+    signal_bus.set_detail_progress_description.connect(lambda x: print(f'描述为{x}'))
+    signal_bus.set_total_progress_current.connect(lambda x: print(f'总进度为{x}'))
+    signal_bus.set_total_progress_max.connect(lambda x: print(f'总最大进度为{x}'))
+    signal_bus.set_total_progress_description.connect(lambda x: print(f'总描述为{x}'))
+    signal_bus.set_total_progress_reset.connect(lambda: print('总进度重置'))
+    signal_bus.set_detail_progress_reset.connect(lambda: print('详细进度重置'))
+    signal_bus.set_total_progress_finish.connect(lambda: print('总进度完成'))
+    signal_bus.set_detail_progress_finish.connect(lambda: print('详细进度完成'))
+    signal_bus.advance_total_progress.connect(lambda x: print(f'总进度增加{x}'))
+    signal_bus.advance_detail_progress.connect(lambda x: print(f'详细进度增加{x}'))
+    signal_bus.finished.connect(lambda: print('完成'))
+
+    video_list = Path(r"E:\load\python\Project\VideoMosaic\测试\t.txt").read_text(
+            encoding="utf-8").replace('"', '').splitlines()
+    model = ConcateModel()
+    model.start(video_list, Orientation.HORIZONTAL, Rotation.CLOCKWISE)

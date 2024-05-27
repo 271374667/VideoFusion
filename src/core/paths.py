@@ -17,3 +17,4 @@ CONFIG_FILE = ROOT / "config.json"
 LOGO_IMAGE_FILE = IMAGES_DIR / 'logo.ico'
 QRC_FILE = ASSETS_DIR / "resource.qrc"
 QRC_PY_FILE = ROOT / "resource_rc.py"
+LOG_FILE = ROOT / "log.log"

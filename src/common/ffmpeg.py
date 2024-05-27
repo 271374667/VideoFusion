@@ -6,7 +6,7 @@ from pathlib import Path
 import cv2
 import loguru
 
-from src.config import FrameRateAdjustment, ScalingQuality, cfg, VideoCodec
+from src.config import FrameRateAdjustment, ScalingQuality, VideoCodec, cfg
 from src.core.datacls import CropInfo
 from src.signal_bus import SignalBus
 
@@ -52,9 +52,10 @@ def generate_ffmpeg_command(input_file: str | Path,
 
     if rotation_angle == 180:
         filters.append("transpose=2,transpose=2")
-
     elif rotation_angle in {90, 270}:
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
+
+    # 缩放
     filters.append(
             f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
 
@@ -90,7 +91,25 @@ def merge_videos(video_list: list[str | Path], output_path: str | Path):
     loguru.logger.debug(f'视频合并文件列表: {video_merge_txt}')
     ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
     ffmpeg_command = f'"{ffmpeg_exe}" -y -hide_banner -vsync 0 -safe 0 -f concat -i {video_merge_txt} -c:v copy -af aresample=async=1 "{output_path}"'
-    subprocess.run(ffmpeg_command, shell=True, encoding='utf-8', universal_newlines=True)
+
+    # 运行ffmpeg命令
+    process = subprocess.Popen(ffmpeg_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               universal_newlines=True, encoding='utf-8')
+
+    # 读取并记录stdout和stderr
+    for line in iter(process.stdout.readline, ''):
+        loguru.logger.debug(line.strip())
+
+    # 等待子进程完成
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        loguru.logger.critical(f"FFmpeg命令运行失败: {ffmpeg_command}, 错误信息: {stderr}")
+        raise subprocess.CalledProcessError(process.returncode, ffmpeg_command, output=stdout, stderr=stderr)
+
+    # 终止子进程
+    process.kill()
+
+    # subprocess.run(ffmpeg_command, shell=True, encoding='utf-8', universal_newlines=True)
     loguru.logger.success(f"视频合并完成, 输出文件: {output_path}")
 
 
@@ -122,6 +141,7 @@ def run_command(input_file_path: str | Path, command: str):
 
     # 更新进度条
     for line in iter(process.stdout.readline, ''):
+        loguru.logger.debug(line.strip())
         if match := re.search(r'frame=\s*(\d+)', line):
             current_frame = int(match[1])
             signal_bus.set_detail_progress_current.emit(current_frame)

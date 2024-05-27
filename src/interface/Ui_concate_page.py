@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'concate_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.7.0
+## Created by: Qt User Interface Compiler version 6.7.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -337,6 +337,19 @@ class Ui_Form(object):
 
         self.verticalLayout_7.addWidget(self.CardWidget)
 
+#if QT_CONFIG(shortcut)
+        self.StrongBodyLabel.setBuddy(self.listWidget)
+        self.BodyLabel_12.setBuddy(self.RadioButton_2)
+        self.BodyLabel.setBuddy(self.ComboBox_2)
+#endif // QT_CONFIG(shortcut)
+        QWidget.setTabOrder(self.listWidget, self.PushButton)
+        QWidget.setTabOrder(self.PushButton, self.RadioButton_2)
+        QWidget.setTabOrder(self.RadioButton_2, self.RadioButton)
+        QWidget.setTabOrder(self.RadioButton, self.ComboBox_2)
+        QWidget.setTabOrder(self.ComboBox_2, self.PushButton_2)
+        QWidget.setTabOrder(self.PushButton_2, self.PushButton_3)
+        QWidget.setTabOrder(self.PushButton_3, self.PushButton_4)
+        QWidget.setTabOrder(self.PushButton_4, self.PrimaryPushButton)
 
         self.retranslateUi(Form)
         self.ProgressBar_2.valueChanged.connect(self.BodyLabel_4.setNum)
@@ -350,16 +363,53 @@ class Ui_Form(object):
 
     def retranslateUi(self, Form):
         Form.setWindowTitle(QCoreApplication.translate("Form", u"Form", None))
+#if QT_CONFIG(tooltip)
+        self.StrongBodyLabel.setToolTip(QCoreApplication.translate("Form", u"<html><head/><body><p>\u5c06\u89c6\u9891\u62d6\u653e\u5230\u4e0b\u65b9\u5217\u8868\u4e2d,\u53f3\u952e\u6709\u66f4\u591a\u9009\u9879</p><p>(Tip: \u53ef\u4ee5\u901a\u8fc7\u62d6\u653e\u4e00\u4e2a\u6bcf\u4e00\u884c\u4e00\u4e2a\u89c6\u9891\u8def\u5f84\u7684txt\u653e\u7f6e\u5927\u91cf\u89c6\u9891\u6587\u4ef6,\u6b64\u65b9\u5f0f\u6bd4\u76f4\u63a5\u62d6\u52a8\u89c6\u9891\u66f4\u5feb)</p></body></html>", None))
+#endif // QT_CONFIG(tooltip)
         self.StrongBodyLabel.setText(QCoreApplication.translate("Form", u"\u89c6\u9891\u6587\u4ef6\u5217\u8868", None))
+#if QT_CONFIG(tooltip)
+        self.listWidget.setToolTip(QCoreApplication.translate("Form", u"\u5c06\u89c6\u9891\u62d6\u653e\u5230\u4e0b\u65b9\u5217\u8868\u4e2d,\u53f3\u952e\u6709\u66f4\u591a\u9009\u9879\n"
+"(Tip: \u53ef\u4ee5\u901a\u8fc7\u62d6\u653e\u4e00\u4e2a\u6bcf\u4e00\u884c\u4e00\u4e2a\u89c6\u9891\u8def\u5f84\u7684txt\u653e\u7f6e\u5927\u91cf\u89c6\u9891\u6587\u4ef6,\u6b64\u65b9\u5f0f\u6bd4\u76f4\u63a5\u62d6\u52a8\u89c6\u9891\u66f4\u5feb)", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.PushButton.setToolTip(QCoreApplication.translate("Form", u"\u9009\u62e9\u9700\u8981\u88ab\u5408\u6210\u7684\u89c6\u9891", None))
+#endif // QT_CONFIG(tooltip)
         self.PushButton.setText(QCoreApplication.translate("Form", u"\u9009\u62e9\u89c6\u9891", None))
+#if QT_CONFIG(tooltip)
+        self.BodyLabel_12.setToolTip(QCoreApplication.translate("Form", u"\u60a8\u6700\u7ec8\u5e0c\u671b\u5bfc\u51fa\u7684\u89c6\u9891\u662f\u6a2a\u5c4f\u89c6\u9891\u8fd8\u662f\u7ad6\u5c4f\u89c6\u9891", None))
+#endif // QT_CONFIG(tooltip)
         self.BodyLabel_12.setText(QCoreApplication.translate("Form", u"\u60a8\u5e0c\u671b\u5c06\u89c6\u9891\u8f93\u51fa\u4e3a", None))
+#if QT_CONFIG(tooltip)
+        self.RadioButton_2.setToolTip(QCoreApplication.translate("Form", u"\u60a8\u6700\u7ec8\u5e0c\u671b\u5bfc\u51fa\u7684\u89c6\u9891\u662f\u6a2a\u5c4f\u89c6\u9891\u8fd8\u662f\u7ad6\u5c4f\u89c6\u9891", None))
+#endif // QT_CONFIG(tooltip)
         self.RadioButton_2.setText(QCoreApplication.translate("Form", u"\u7ad6\u5c4f\u89c6\u9891", None))
+#if QT_CONFIG(tooltip)
+        self.RadioButton.setToolTip(QCoreApplication.translate("Form", u"\u60a8\u6700\u7ec8\u5e0c\u671b\u5bfc\u51fa\u7684\u89c6\u9891\u662f\u6a2a\u5c4f\u89c6\u9891\u8fd8\u662f\u7ad6\u5c4f\u89c6\u9891", None))
+#endif // QT_CONFIG(tooltip)
         self.RadioButton.setText(QCoreApplication.translate("Form", u"\u6a2a\u5c4f\u89c6\u9891", None))
+#if QT_CONFIG(tooltip)
+        self.BodyLabel.setToolTip(QCoreApplication.translate("Form", u"\u5982\u679c\u60a8\u7684\u89c6\u9891\u7ecf\u8fc7\u68c0\u6d4b\u4e4b\u540e\u53d1\u73b0\u4e0d\u7b26\u5408\u4f60\u4e0a\u9762\u7684\u9009\u9879\u4f60\u8981\u5982\u4f55\u5904\u7406?", None))
+#endif // QT_CONFIG(tooltip)
         self.BodyLabel.setText(QCoreApplication.translate("Form", u"\u4e0d\u7b26\u5408\u671d\u5411\u5982\u4f55\u8c03\u6574", None))
+#if QT_CONFIG(tooltip)
+        self.ComboBox_2.setToolTip(QCoreApplication.translate("Form", u"\u5982\u679c\u60a8\u7684\u89c6\u9891\u7ecf\u8fc7\u68c0\u6d4b\u4e4b\u540e\u53d1\u73b0\u4e0d\u7b26\u5408\u4f60\u4e0a\u9762\u7684\u9009\u9879\u4f60\u8981\u5982\u4f55\u5904\u7406?", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.SegmentedWidget.setToolTip(QCoreApplication.translate("Form", u"\u9009\u62e9\u4e0d\u540c\u7684\u9884\u89c8\u65b9\u5f0f", None))
+#endif // QT_CONFIG(tooltip)
+#if QT_CONFIG(tooltip)
+        self.label.setToolTip(QCoreApplication.translate("Form", u"\u53ef\u4ee5\u5728\u8bbe\u7f6e\u9875\u9762\u8bbe\u7f6e\u9ed8\u8ba4\u5c55\u793a\u54ea\u4e00\u4e2a\u753b\u9762(\u9ed8\u8ba4\u4e3a\u4e0d\u4e3a\u9ed1\u8272\u7684\u7b2c\u4e00\u5e27)", None))
+#endif // QT_CONFIG(tooltip)
         self.label.setText(QCoreApplication.translate("Form", u"\u8fd9\u91cc\u663e\u793a\u56fe\u7247", None))
+#if QT_CONFIG(tooltip)
+        self.PushButton_2.setToolTip("")
+#endif // QT_CONFIG(tooltip)
         self.PushButton_2.setText(QCoreApplication.translate("Form", u"\u987a\u65f6\u9488\u65cb\u8f6c90\u00b0", None))
         self.PushButton_3.setText(QCoreApplication.translate("Form", u"\u9006\u65f6\u9488\u65cb\u8f6c90\u00b0", None))
         self.PushButton_4.setText(QCoreApplication.translate("Form", u"\u4e0a\u4e0b\u98a0\u5012", None))
+#if QT_CONFIG(tooltip)
+        self.BodyLabel_2.setToolTip("")
+#endif // QT_CONFIG(tooltip)
         self.BodyLabel_2.setText(QCoreApplication.translate("Form", u"\u603b\u8fdb\u5ea6", None))
         self.ProgressBar_2.setFormat(QCoreApplication.translate("Form", u"(%v/%m) %p%", None))
         self.BodyLabel_4.setText(QCoreApplication.translate("Form", u"\u5f53\u524d\u8fdb\u5ea6", None))
@@ -372,6 +422,9 @@ class Ui_Form(object):
         self.BodyLabel_11.setText(QCoreApplication.translate("Form", u"/", None))
         self.BodyLabel_7.setText(QCoreApplication.translate("Form", u"\u603b\u8fdb\u5ea6", None))
         self.BodyLabel_9.setText(QCoreApplication.translate("Form", u"\u767e\u5206\u6bd4", None))
+#if QT_CONFIG(tooltip)
+        self.PrimaryPushButton.setToolTip(QCoreApplication.translate("Form", u"\u70b9\u51fb\u6b64\u5904\u76f4\u63a5\u5f00\u59cb\u5408\u5e76\uff0c\u60a8\u53ef\u4ee5\u901a\u8fc7\u5728\u8bbe\u7f6e\u9875\u9762\u5b9a\u4e49\u8f93\u51fa\u6587\u4ef6\u4f4d\u7f6e", None))
+#endif // QT_CONFIG(tooltip)
         self.PrimaryPushButton.setText(QCoreApplication.translate("Form", u"\u5f00\u59cb\u5408\u5e76", None))
     # retranslateUi
 

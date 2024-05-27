@@ -55,7 +55,8 @@ class SettingView(MessageBaseView):
                                                                  cfg.preview_video_remove_black,
                                                                  self.general_group)
         self.preview_frame_card = ComboBoxSettingCard(cfg.preview_frame, Icon(FluentIcon.CHEVRON_RIGHT), "预览视频帧",
-                                                        "设置预览视频的封面为第几帧的图片", ["第一帧", "最后一帧", "随机帧"], self.general_group)
+                                                      "设置预览视频的封面为第几帧的图片",
+                                                      ["第一帧", "最后一帧", "随机帧"], self.general_group)
 
         # 视频质量
         self.output_file_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
@@ -74,7 +75,8 @@ class SettingView(MessageBaseView):
         self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
                                                        "去黑边采样率",
                                                        "视频黑边的采样率,默认为5", self.video_group)
-        self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT), "分辨率缩放算法",
+        self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                        "分辨率缩放算法",
                                                         "调整视频分辨率的时候使用的算法",
                                                         ["速度最快,效果最差", "速度中等,效果中等", "速度最慢,效果最好"],
                                                         self.video_group)
@@ -90,8 +92,28 @@ class SettingView(MessageBaseView):
                                                      self.video_group)
 
     def _set_up_tooltip(self):
-        
-        ...
+        ffmpeg_file_path = cfg.get(cfg.ffmpeg_file)
+        self.ffmpeg_file_card.setToolTip(f'当前FFmpeg路径为: {ffmpeg_file_path}')
+        temp_dir_path = cfg.get(cfg.temp_dir)
+        self.temp_dir_card.setToolTip(f'当前临时目录为: {temp_dir_path}')
+        self.delete_temp_dir_card.setToolTip(
+            "软件在完成后是否删除临时目录(软件退出之后才会删除,该方法删除的文件无法恢复)")
+        self.preview_video_remove_black_card.setToolTip(
+            "如果您发现您的画面黑边,请尝试勾选此选项,但是单帧画面效果不是很好,请通过预览视频查看效果")
+        self.preview_frame_card.setToolTip("设置预览视频的封面为第几帧的图片")
+
+        output_file_path = cfg.get(cfg.output_file_path)
+        self.output_file_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
+        self.noise_reduction_card.setToolTip("使用ffmpeg的hqdn3d默认参数对视频进行降噪")
+        self.audio_normalization_card.setToolTip("小概率会出现音频爆响")
+        self.shake_card.setToolTip("实验性功能")
+        self.video_fps_card.setToolTip(
+            "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
+        self.video_sample_rate_card.setToolTip(
+            "视频黑边的采样率,默认为5,如果您发现视频依然有黑边,或者黑边去除过多,请尝试加大该选项的值")
+        self.scaling_quality_card.setToolTip("调整视频分辨率的时候使用的算法")
+        self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
+        self.output_codec_card.setToolTip("调整视频编码的算法,默认推荐经过优化的H264算法")
 
     def _set_up_layout(self):
         """设置布局"""
