@@ -1,12 +1,14 @@
+from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QWidget
 from qfluentwidgets import (ComboBoxSettingCard, FluentIcon, Icon, PushSettingCard, RangeSettingCard, SettingCardGroup,
-                            SwitchSettingCard, ToolTipFilter)
+                            SwitchSettingCard, ToolTipFilter, BodyLabel)
 from qfluentwidgets.components import (
     ExpandLayout,
     LargeTitleLabel,
     SmoothScrollArea,
 
     )
+from src.core.version import __version__
 
 from src.config import cfg
 from src.view.message_base_view import MessageBaseView
@@ -28,6 +30,10 @@ class SettingView(MessageBaseView):
 
         self.setting_title = LargeTitleLabel()
         self.setting_title.setText("设置")
+
+        self.version_lb: BodyLabel = BodyLabel()
+        self.version_lb.setText(f'当前软件版本: {__version__}')
+        self.version_lb.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         self._create_card_group()
         self._create_card()
@@ -157,6 +163,7 @@ class SettingView(MessageBaseView):
 
         self.main_layout.addWidget(self.setting_title)
         self.main_layout.addWidget(self.smooth_scroll_area)
+        self.main_layout.addWidget(self.version_lb)
         self.setLayout(self.main_layout)
 
         # 这里因为背景色不一样,我手动打个补丁

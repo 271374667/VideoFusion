@@ -8,7 +8,7 @@ SRC_DIR = ROOT / 'src'
 ASSETS_DIR = ROOT / "assets"
 IMAGES_DIR = ASSETS_DIR / "images"
 BIN_DIR = ROOT / "bin"
-TEMP_DIR = Path(r'D:\Temp')
+TEMP_DIR = ROOT / "Temp"
 
 # FILE
 OUTPUT_FILE = ROOT / "output.mp4"

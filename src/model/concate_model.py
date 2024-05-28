@@ -32,7 +32,12 @@ class Worker(QObject):
         for each in video_list:
             loguru.logger.debug(f'正在分析视频:{each.name}')
             sample_rate: int = cfg.get(cfg.video_sample_rate)
-            sample: float = max(min(sample_rate / 10, 0), 1)
+            sample = sample_rate / 10
+            # sample 要在0到1之间, 0为不采样, 1为全部采样
+            if sample < 0:
+                sample = 0
+            elif sample > 1:
+                sample = 1
             video_info = get_video_info(each, sample_rate=sample)
             video_info_list.append(video_info)
             signal_bus.advance_total_progress.emit(1)
@@ -115,7 +120,7 @@ class ConcateModel:
         self._worker = Worker()
 
     def start(self, video_list: list[str | Path], video_orientation: Orientation, video_rotation: Rotation):
-        f: Future = self._pool.submit(self._worker.start, video_list, video_orientation, video_rotation)
+        self._pool.submit(self._worker.start, video_list, video_orientation, video_rotation)
         loguru.logger.debug(f'程序开始执行,参数如下: {video_orientation}, {video_rotation}, 视频列表为:{video_list}')
 
 

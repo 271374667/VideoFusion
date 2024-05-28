@@ -125,7 +125,7 @@ if __name__ == '__main__':
     # target_num = 150000
     # result = evenly_distribute_numbers(current_num, target_num)
     # print(f"抽帧:{result}")
-    # print(len(result))
+    # print(len(result)) [0, 0, 1, 2, 2, 3]
 
     # 插帧示例用法
     current_num = 1148

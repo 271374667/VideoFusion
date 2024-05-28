@@ -52,6 +52,7 @@ def generate_ffmpeg_command(input_file: str | Path,
 
     if rotation_angle == 180:
         filters.append("transpose=2,transpose=2")
+
     elif rotation_angle in {90, 270}:
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
 
@@ -76,41 +77,35 @@ def generate_ffmpeg_command(input_file: str | Path,
 
 
 def merge_videos(video_list: list[str | Path], output_path: str | Path):
-    # Convert output_path to a Path object
-    loguru.logger.debug(f'视频输出路径为:{output_path}, 视频列表为:{video_list}')
-    output_path = Path(output_path)
+    def convert_to_ts(input_file: str | Path, output_file: str | Path):
+        loguru.logger.debug(f'正在将视频{input_file}转换为TS格式')
+        ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
+        command = f'"{ffmpeg_exe}" -fflags +genpts -i "{input_file}" -c copy -bsf:v h264_mp4toannexb -f mpegts "{output_file}" -y'
+        run_command(input_file, command)
+
+    def merge_ts_files(ts_files: list[str | Path], output_file: str | Path):
+        loguru.logger.debug(f'正在将{ts_files}TS文件合并至->{output_file}')
+        ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
+        input_files = '|'.join(str(file) for file in ts_files)
+        command = f'"{ffmpeg_exe}" -i "concat:{input_files}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
+        run_command_without_progress(command)
+
     temp_dir: Path = Path(cfg.get(cfg.temp_dir))
-    video_merge_txt = temp_dir / 'video_merge.txt'
-    video_merge_txt.touch(exist_ok=True)
-    loguru.logger.debug(f'正在创建视频合并文件列表txt: {video_merge_txt}')
+    ts_files = []
 
-    # Create fileList.txt
-    with open(video_merge_txt, 'w') as f:
-        for video in video_list:
-            f.write(f"file '{video}'\n")
-    loguru.logger.debug(f'视频合并文件列表: {video_merge_txt}')
-    ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
-    ffmpeg_command = f'"{ffmpeg_exe}" -y -hide_banner -vsync 0 -safe 0 -f concat -i {video_merge_txt} -c:v copy -af aresample=async=1 "{output_path}"'
+    # Convert each video to TS format and store the paths in ts_files
+    ts_dir = temp_dir / 'ts_files'
+    if not ts_dir.exists():
+        ts_dir.mkdir(parents=True, exist_ok=True)
+        loguru.logger.debug(f'创建临时目录{ts_dir}成功')
 
-    # 运行ffmpeg命令
-    process = subprocess.Popen(ffmpeg_command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
-                               universal_newlines=True, encoding='utf-8')
+    for video in video_list:
+        ts_file = ts_dir / f'{Path(video).stem}.ts'
+        convert_to_ts(video, ts_file)
+        ts_files.append(ts_file)
 
-    # 读取并记录stdout和stderr
-    for line in iter(process.stdout.readline, ''):
-        loguru.logger.debug(line.strip())
-
-    # 等待子进程完成
-    stdout, stderr = process.communicate()
-    if process.returncode != 0:
-        loguru.logger.critical(f"FFmpeg命令运行失败: {ffmpeg_command}, 错误信息: {stderr}")
-        raise subprocess.CalledProcessError(process.returncode, ffmpeg_command, output=stdout, stderr=stderr)
-
-    # 终止子进程
-    process.kill()
-
-    # subprocess.run(ffmpeg_command, shell=True, encoding='utf-8', universal_newlines=True)
-    loguru.logger.success(f"视频合并完成, 输出文件: {output_path}")
+    # Merge the TS files
+    merge_ts_files(ts_files, output_path)
 
 
 def run_command(input_file_path: str | Path, command: str):
@@ -159,10 +154,37 @@ def run_command(input_file_path: str | Path, command: str):
     signal_bus.set_detail_progress_finish.emit()
 
 
+def run_command_without_progress(command: str):
+    # 运行ffmpeg命令
+    # process = subprocess.Popen(command, shell=True,
+    #                            universal_newlines=True, encoding='utf-8')
+
+    # 运行ffmpeg命令
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+                               universal_newlines=True, encoding='utf-8')
+
+    # 更新进度条
+    for line in iter(process.stdout.readline, ''):
+        loguru.logger.debug(line.strip())
+
+    # 等待子进程完成并读取所有剩余的输出
+    stdout, stderr = process.communicate()
+    if process.returncode != 0:
+        loguru.logger.critical(f"FFmpeg命令运行失败: {command}, 错误信息: {stderr}")
+        raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
+
+    # 终止子进程
+    process.kill()
+
+
 if __name__ == '__main__':
-    print(generate_ffmpeg_command(input_file=Path('test.mp4'),
-                                  output_file_path=Path('output.mp4'),
-                                  crop_position=CropInfo(0, 0, 1920, 1080),
-                                  width=1920,
-                                  height=1080,
-                                  rotation_angle=0))
+    # print(generate_ffmpeg_command(input_file=Path('test.mp4'),
+    #                               output_file_path=Path('output.mp4'),
+    #                               crop_position=CropInfo(0, 0, 1920, 1080),
+    #                               width=1920,
+    #                               height=1080,
+    #                               rotation_angle=0))
+    video_list = Path(r"E:\load\python\Project\VideoMosaic\测试\video\2.txt").read_text(
+            encoding="utf-8").replace('"', '').splitlines()
+    merge_videos(video_list,
+                 r"E:\load\python\Project\VideoMosaic\测试\video\output1.mp4")

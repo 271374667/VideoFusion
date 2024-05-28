@@ -53,7 +53,11 @@ class BlackRemover:
         # 转换为灰度图像
         gray = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
-        _, binary = cv2.threshold(gray, self.threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        # 计算平均亮度阈值
+        # mean_threshold = np.mean(gray)
+
+        # _, binary = cv2.threshold(gray, self.threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
         kernel = np.ones((5, 5), np.uint8)
 
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)
@@ -93,6 +97,14 @@ class BlackRemover:
             left_top_y = y
             right_bottom_x = x + w
             right_bottom_y = y + h
+
+        # 绘图显示
+        # cv2.rectangle(img, (left_top_x, left_top_y), (right_bottom_x, right_bottom_y), (0, 0, 255), 15)
+        # 保持横纵比的情况下将图片缩放到720p
+        # img = cv2.resize(img, (480, 720))
+        # cv2.imshow('img', img)
+        # cv2.imwrite(r"E:\load\python\Project\VideoMosaic\temp\dy\temp.png", img)
+        # cv2.waitKey(0)
         return left_top_x, left_top_y, right_bottom_x, right_bottom_y
 
     def has_black_border(self, img: np.ndarray) -> bool:
@@ -140,3 +152,8 @@ class BlackRemover:
         else:
             return False
 
+
+if __name__ == '__main__':
+    b = BlackRemover()
+    img = r"E:\load\python\Project\VideoMosaic\temp\dy\%WO1_0EOKLVMBZUZ8I0VYMB.jpg"
+    b.start(img)

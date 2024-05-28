@@ -3,7 +3,7 @@ import re
 from PySide6.QtWidgets import QApplication, QLabel, QStackedWidget, QWidget
 from qfluentwidgets import ToolTipFilter
 from qfluentwidgets.components import (BodyLabel, ComboBox, PrimaryPushButton, ProgressBar, PushButton,
-                                       RadioButton, SegmentedWidget)
+                                       RadioButton, SegmentedWidget, SimpleCardWidget)
 from qfluentwidgets.multimedia import VideoWidget
 
 from src.components.draggable_list_widget import DraggableListWidget
@@ -59,6 +59,9 @@ class ConcateView(MessageBaseView):
         self._signal_bus.set_detail_progress_description.connect(self.set_detail_progress_description)
         self._signal_bus.set_detail_progress_finish.connect(self.finish_detail_progress)
         self._signal_bus.set_detail_progress_reset.connect(self.reset_detail_progress)
+
+    def get_video_file_list_simple_card_widget(self) -> SimpleCardWidget:
+        return self.ui.SimpleCardWidget
 
     def get_video_file_list(self) -> DraggableListWidget:
         return self.ui.listWidget

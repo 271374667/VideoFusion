@@ -36,7 +36,9 @@ class ConcatePresenter:
         return self._model
 
     def start(self):
+        self._signal_bus.started.emit()
         self.get_view().get_start_btn().setEnabled(False)
+        self.get_view().get_video_file_list_simple_card_widget().setEnabled(False)
         video_list = self.get_all_video_files()
         if not video_list:
             loguru.logger.warning("请先选择视频文件")
@@ -65,10 +67,11 @@ class ConcatePresenter:
 
     def finished(self):
         self.get_view().get_start_btn().setEnabled(True)
-        self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{time.time() - self.start_time:.2f}",
+        self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
+        self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{time.time() - self.start_time:.2f}秒",
                                           duration=-1, is_closable=True)
         output_path = cfg.get(cfg.output_file_path)
-        self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件为: {output_path}")
+        self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件至: {output_path}")
 
     def get_all_video_files(self) -> list[str]:
         return self.get_view().get_video_file_list().get_draggable_list_view().get_all_items()
@@ -138,8 +141,11 @@ class ConcatePresenter:
             return
         video_path = current_item.text()
         cap = cv2.VideoCapture(video_path)
+        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
         # 显示视频中不为黑色的第一帧
-        while True:
+        for i in range(total_frame):
+            # 设置视频的位置
+            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
             ret, frame = cap.read()
             if not ret:
                 break

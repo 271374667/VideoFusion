@@ -5,6 +5,7 @@ from src.utils import singleton
 
 @singleton
 class SignalBus(QObject):
+    started = Signal()
     finished = Signal()
 
     file_droped = Signal(str)
