@@ -2,8 +2,10 @@ import shutil
 import time
 from functools import wraps
 from pathlib import Path
+from typing import Callable, Optional
 
 import loguru
+from PySide6.QtCore import QObject, QThread, Signal
 
 from src.core.paths import TEMP_DIR
 
@@ -117,6 +119,68 @@ class TempDir:
 
     def __del__(self):
         self.delete_dir()
+
+
+class WorkThread(QObject):
+    finished_signal = Signal()
+    result = Signal(object)
+
+    def __init__(self):
+        super().__init__()
+        self.kwargs = None
+        self.args = None
+        self.func: Callable
+
+    def set_start_func(self, func, *args, **kwargs):
+        self.func = func
+        self.args = args
+        self.kwargs = kwargs
+
+    def start(self):
+        if self.args or self.kwargs:
+            func_return = self.func(*self.args, **self.kwargs)
+        else:
+            func_return = self.func()
+        self.result.emit(func_return)
+        self.finished_signal.emit()
+
+
+class RunInThread(QObject):
+    def __init__(self):
+        super().__init__()
+        self.finished_func: Optional[Callable] = None
+        self.worker = WorkThread()
+        self.mythread = QThread()
+        self.worker.moveToThread(self.mythread)
+
+        self.mythread.started.connect(self.worker.start)
+        self.worker.finished_signal.connect(self.worker.deleteLater)
+        self.worker.destroyed.connect(self.mythread.quit)
+        self.mythread.finished.connect(self.mythread.deleteLater)
+        self.mythread.destroyed.connect(self.deleteLater)
+
+    def start(self):
+        """当函数设置完毕之后调用start即可"""
+        self.mythread.start()
+
+    def set_start_func(self, func, *args, **kwargs):
+        """设置一个开始函数
+
+        这部分就是多线程运行的地方，里面可以是爬虫，可以是其他IO或者阻塞主线程的函数
+
+        """
+        self.worker.set_start_func(func, *args, **kwargs)
+
+    def set_finished_func(self, func):
+        """设置线程结束后的回调函数"""
+        self.finished_func = func
+        self.worker.result.connect(self._done_callback)
+
+    def _done_callback(self, *args, **kwargs):
+        if args != (None,) or kwargs:
+            self.finished_func(*args, **kwargs)
+        else:
+            self.finished_func()
 
 
 if __name__ == '__main__':

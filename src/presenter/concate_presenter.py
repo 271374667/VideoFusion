@@ -12,9 +12,10 @@ from PySide6.QtWidgets import QFileDialog
 from src.common.black_remover import BlackRemover
 from src.config import PreviewFrame, cfg
 from src.core.enums import Orientation, Rotation
-from src.core.paths import TEMP_DIR
+from src.core.paths import FFMPEG_FILE, TEMP_DIR
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
+from src.utils import RunInThread
 from src.view.concate_view import ConcateView
 
 
@@ -36,6 +37,12 @@ class ConcatePresenter:
         return self._model
 
     def start(self):
+        if not FFMPEG_FILE.exists():
+            self.get_view().show_error_infobar("错误",
+                                               "ffmpeg文件不存在无法进行视频合成,请检查bin目录下是否有ffmpeg.exe文件",
+                                               is_closable=True)
+            return
+
         self._signal_bus.started.emit()
         self.get_view().get_start_btn().setEnabled(False)
         self.get_view().get_video_file_list_simple_card_widget().setEnabled(False)
@@ -137,36 +144,52 @@ class ConcatePresenter:
 
     # 图片预览
     def _show_first_frame(self):
+        def frame_selector(cap):
+            total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            # 显示视频中不为黑色的第一帧
+            for i in range(total_frame):
+                # 设置视频的位置
+                cap.set(cv2.CAP_PROP_POS_FRAMES, i)
+                ret, frame = cap.read()
+                if not ret:
+                    break
+                if not self._black_remover.is_black(frame):
+                    break
+
+        self._show_frame(frame_selector)
+
+    def _show_last_frame(self):
+        def frame_selector(cap):
+            cap.set(cv2.CAP_PROP_POS_FRAMES, cap.get(cv2.CAP_PROP_FRAME_COUNT) - 1)
+
+        self._show_frame(frame_selector)
+
+    def _show_random_frame(self):
+        def frame_selector(cap):
+            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            cap.set(cv2.CAP_PROP_POS_FRAMES, random.randint(0, total_frames - 1))
+
+        self._show_frame(frame_selector)
+
+    def _show_frame(self, frame_selector):
         if not (current_item := self.get_view().get_video_file_list().currentItem()):
             return
         video_path = current_item.text()
-        cap = cv2.VideoCapture(video_path)
-        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        # 显示视频中不为黑色的第一帧
-        for i in range(total_frame):
-            # 设置视频的位置
-            cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-            ret, frame = cap.read()
-            if not ret:
-                break
-            if not self._black_remover.is_black(frame):
-                break
-        self._show_frame_on_label(cap, '显示第一帧: ', video_path)
+        self.get_view().get_video_file_list().setEnabled(False)
 
-    def _show_last_frame(self):
-        if current_item := self.get_view().get_video_file_list().currentItem():
-            video_path = current_item.text()
+        def start():
             cap = cv2.VideoCapture(video_path)
-            cap.set(cv2.CAP_PROP_POS_FRAMES, cap.get(cv2.CAP_PROP_FRAME_COUNT) - 1)
-            self._show_frame_on_label(cap, '显示最后一帧: ', video_path)
+            frame_selector(cap)
+            return cap
 
-    def _show_random_frame(self):
-        if current_item := self.get_view().get_video_file_list().currentItem():
-            video_path = current_item.text()
-            cap = cv2.VideoCapture(video_path)
-            total_frames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            cap.set(cv2.CAP_PROP_POS_FRAMES, random.randint(0, total_frames - 1))
-            self._show_frame_on_label(cap, '显示随机帧: ', video_path)
+        def finished(cap):
+            self._show_frame_on_label(cap, '显示帧: ', video_path)
+            self.get_view().get_video_file_list().setEnabled(True)
+
+        self._run_in_thread = RunInThread()
+        self._run_in_thread.set_start_func(start)
+        self._run_in_thread.set_finished_func(finished)
+        self._run_in_thread.start()
 
     def _rotate_clockwise(self):
         # 先检查是否有图片
