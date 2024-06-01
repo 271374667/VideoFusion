@@ -15,8 +15,10 @@ from src.core.enums import Orientation, Rotation
 from src.core.paths import FFMPEG_FILE, TEMP_DIR
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
-from src.utils import RunInThread
+from src.utils import RunInThread, TempDir
 from src.view.concate_view import ConcateView
+
+temp_dir = TempDir()
 
 
 class ConcatePresenter:
@@ -292,6 +294,10 @@ class ConcatePresenter:
         self.get_view().get_cancle_btn().clicked.connect(self.cancle_worker)
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
+
+    def __del__(self):
+        temp_dir.delete_dir()
+        loguru.logger.warning(f'删除临时目录{temp_dir.get_temp_dir()}')
 
 
 if __name__ == '__main__':

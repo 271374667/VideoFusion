@@ -12,6 +12,7 @@ from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
 from src.utils import TempDir
 
+signal_bus = SignalBus()
 temp_dir = TempDir()
 TEMP_DIR = temp_dir.get_temp_dir()
 
@@ -239,3 +240,4 @@ if __name__ == '__main__':
             ).replace('"', '').splitlines()
     model = ConcateModel()
     model.start(video_list, Orientation.HORIZONTAL, Rotation.CLOCKWISE)
+
