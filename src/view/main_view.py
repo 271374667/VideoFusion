@@ -34,7 +34,7 @@ class MainView(FluentWindow):
     def initWindow(self):
         self.resize(1100, 750)
         self.setWindowIcon(QIcon(':/images/images/logo.ico'))
-        self.setWindowTitle('VideoMosaic')
+        self.setWindowTitle('VideoFusion')
 
         desktop = QApplication.screens()[0].availableGeometry()
         w, h = desktop.width(), desktop.height()

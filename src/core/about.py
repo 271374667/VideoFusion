@@ -8,8 +8,8 @@ about_txt: str = """
 </head>
 
 <body>
-<h1 style="text-align: center;">VideoMosaic</h1>
-<p style="text-align: center;">一个简陋但不简单的视频拼接工具</p>
+<h1 style="text-align: center;">VideoFusion</h1>
+<p style="text-align: center;">一站式短视频合成工具</p>
 <p style="text-align: center; ">支持多种视频格式，
     支持多个视频拼接，
     <strong>自研去黑边算法，能自动去除边角Logo，字幕，动态图标等，
