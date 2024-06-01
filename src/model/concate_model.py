@@ -12,7 +12,6 @@ from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
 from src.utils import TempDir
 
-signal_bus = SignalBus()
 temp_dir = TempDir()
 TEMP_DIR = temp_dir.get_temp_dir()
 
@@ -192,6 +191,10 @@ class Worker(QObject):
     def set_running(self, flag: bool):
         self.is_running = flag
 
+    def __del__(self):
+        temp_dir.delete_dir()
+        loguru.logger.warning(f'运行完成,删除临时文件夹{temp_dir.get_temp_dir()}')
+
 
 class ConcateModel:
     def __init__(self):
@@ -217,6 +220,7 @@ class ConcateModel:
 
 if __name__ == '__main__':
     # 绑定信号
+    signal_bus = SignalBus()
     signal_bus.set_detail_progress_current.connect(lambda x: print(f'当前进度为{x}'))
     signal_bus.set_detail_progress_max.connect(lambda x: print(f'最大进度为{x}'))
     signal_bus.set_detail_progress_description.connect(lambda x: print(f'描述为{x}'))

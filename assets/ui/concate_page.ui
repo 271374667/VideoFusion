@@ -79,6 +79,18 @@
         </item>
         <item>
          <widget class="DraggableListWidget" name="listWidget">
+          <property name="sizePolicy">
+           <sizepolicy hsizetype="Minimum" vsizetype="Expanding">
+            <horstretch>0</horstretch>
+            <verstretch>0</verstretch>
+           </sizepolicy>
+          </property>
+          <property name="minimumSize">
+           <size>
+            <width>500</width>
+            <height>0</height>
+           </size>
+          </property>
           <property name="toolTip">
            <string>将视频拖放到下方列表中,右键有更多选项
 (Tip: 可以通过拖放一个每一行一个视频路径的txt放置大量视频文件,此方式比直接拖动视频更快)</string>
@@ -288,10 +300,16 @@
               <item>
                <widget class="QLabel" name="label">
                 <property name="sizePolicy">
-                 <sizepolicy hsizetype="Preferred" vsizetype="Expanding">
+                 <sizepolicy hsizetype="Maximum" vsizetype="Expanding">
                   <horstretch>0</horstretch>
                   <verstretch>0</verstretch>
                  </sizepolicy>
+                </property>
+                <property name="maximumSize">
+                 <size>
+                  <width>600</width>
+                  <height>16777215</height>
+                 </size>
                 </property>
                 <property name="toolTip">
                  <string>可以在设置页面设置默认展示哪一个画面(默认为不为黑色的第一帧)</string>

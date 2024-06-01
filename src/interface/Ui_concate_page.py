@@ -57,6 +57,12 @@ class Ui_Form(object):
 
         self.listWidget = DraggableListWidget(self.SimpleCardWidget)
         self.listWidget.setObjectName(u"listWidget")
+        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy1.setHorizontalStretch(0)
+        sizePolicy1.setVerticalStretch(0)
+        sizePolicy1.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
+        self.listWidget.setSizePolicy(sizePolicy1)
+        self.listWidget.setMinimumSize(QSize(500, 0))
         self.listWidget.setFrameShape(QFrame.Box)
         self.listWidget.setFrameShadow(QFrame.Sunken)
         self.listWidget.setLineWidth(1)
@@ -110,21 +116,21 @@ class Ui_Form(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.BodyLabel = BodyLabel(self.SimpleCardWidget)
         self.BodyLabel.setObjectName(u"BodyLabel")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
-        sizePolicy1.setHorizontalStretch(0)
-        sizePolicy1.setVerticalStretch(0)
-        sizePolicy1.setHeightForWidth(self.BodyLabel.sizePolicy().hasHeightForWidth())
-        self.BodyLabel.setSizePolicy(sizePolicy1)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy2.setHorizontalStretch(0)
+        sizePolicy2.setVerticalStretch(0)
+        sizePolicy2.setHeightForWidth(self.BodyLabel.sizePolicy().hasHeightForWidth())
+        self.BodyLabel.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_2.addWidget(self.BodyLabel)
 
         self.ComboBox_2 = ComboBox(self.SimpleCardWidget)
         self.ComboBox_2.setObjectName(u"ComboBox_2")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
-        sizePolicy2.setHorizontalStretch(0)
-        sizePolicy2.setVerticalStretch(0)
-        sizePolicy2.setHeightForWidth(self.ComboBox_2.sizePolicy().hasHeightForWidth())
-        self.ComboBox_2.setSizePolicy(sizePolicy2)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy3.setHorizontalStretch(0)
+        sizePolicy3.setVerticalStretch(0)
+        sizePolicy3.setHeightForWidth(self.ComboBox_2.sizePolicy().hasHeightForWidth())
+        self.ComboBox_2.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_2.addWidget(self.ComboBox_2)
 
@@ -165,11 +171,12 @@ class Ui_Form(object):
         self.verticalLayout_3.setContentsMargins(15, 15, 15, 15)
         self.label = QLabel(self.page)
         self.label.setObjectName(u"label")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Expanding)
-        sizePolicy3.setHorizontalStretch(0)
-        sizePolicy3.setVerticalStretch(0)
-        sizePolicy3.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
-        self.label.setSizePolicy(sizePolicy3)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Expanding)
+        sizePolicy4.setHorizontalStretch(0)
+        sizePolicy4.setVerticalStretch(0)
+        sizePolicy4.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
+        self.label.setSizePolicy(sizePolicy4)
+        self.label.setMaximumSize(QSize(600, 16777215))
         self.label.setScaledContents(True)
         self.label.setAlignment(Qt.AlignCenter)
 
@@ -228,8 +235,8 @@ class Ui_Form(object):
 
         self.ProgressBar_2 = ProgressBar(self.CardWidget)
         self.ProgressBar_2.setObjectName(u"ProgressBar_2")
-        sizePolicy2.setHeightForWidth(self.ProgressBar_2.sizePolicy().hasHeightForWidth())
-        self.ProgressBar_2.setSizePolicy(sizePolicy2)
+        sizePolicy3.setHeightForWidth(self.ProgressBar_2.sizePolicy().hasHeightForWidth())
+        self.ProgressBar_2.setSizePolicy(sizePolicy3)
 
         self.horizontalLayout_3.addWidget(self.ProgressBar_2)
 
@@ -239,22 +246,22 @@ class Ui_Form(object):
 
         self.BodyLabel_4 = BodyLabel(self.CardWidget)
         self.BodyLabel_4.setObjectName(u"BodyLabel_4")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_4.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_4.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_4.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_4.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_4)
 
         self.BodyLabel_10 = BodyLabel(self.CardWidget)
         self.BodyLabel_10.setObjectName(u"BodyLabel_10")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_10.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_10.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_10.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_10.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_10)
 
         self.BodyLabel_6 = BodyLabel(self.CardWidget)
         self.BodyLabel_6.setObjectName(u"BodyLabel_6")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_6.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_6.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_6.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_6.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_6)
 
@@ -265,8 +272,8 @@ class Ui_Form(object):
 
         self.BodyLabel_8 = BodyLabel(self.CardWidget)
         self.BodyLabel_8.setObjectName(u"BodyLabel_8")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_8.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_8.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_8.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_8.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_3.addWidget(self.BodyLabel_8)
 
@@ -291,22 +298,22 @@ class Ui_Form(object):
 
         self.BodyLabel_5 = BodyLabel(self.CardWidget)
         self.BodyLabel_5.setObjectName(u"BodyLabel_5")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_5.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_5.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_5.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_5.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_5)
 
         self.BodyLabel_11 = BodyLabel(self.CardWidget)
         self.BodyLabel_11.setObjectName(u"BodyLabel_11")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_11.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_11.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_11.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_11.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_11)
 
         self.BodyLabel_7 = BodyLabel(self.CardWidget)
         self.BodyLabel_7.setObjectName(u"BodyLabel_7")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_7.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_7.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_7.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_7.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_7)
 
@@ -317,8 +324,8 @@ class Ui_Form(object):
 
         self.BodyLabel_9 = BodyLabel(self.CardWidget)
         self.BodyLabel_9.setObjectName(u"BodyLabel_9")
-        sizePolicy1.setHeightForWidth(self.BodyLabel_9.sizePolicy().hasHeightForWidth())
-        self.BodyLabel_9.setSizePolicy(sizePolicy1)
+        sizePolicy2.setHeightForWidth(self.BodyLabel_9.sizePolicy().hasHeightForWidth())
+        self.BodyLabel_9.setSizePolicy(sizePolicy2)
 
         self.horizontalLayout_4.addWidget(self.BodyLabel_9)
 
