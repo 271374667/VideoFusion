@@ -45,6 +45,8 @@ class ConcatePresenter:
 
         self._signal_bus.started.emit()
         self.get_view().get_start_btn().setEnabled(False)
+        self.get_view().get_start_btn().setVisible(False)
+        self.get_view().get_cancle_btn().setVisible(True)
         self.get_view().get_video_file_list_simple_card_widget().setEnabled(False)
         video_list = self.get_all_video_files()
         if not video_list:
@@ -74,11 +76,30 @@ class ConcatePresenter:
 
     def finished(self):
         self.get_view().get_start_btn().setEnabled(True)
+        self.get_view().get_start_btn().setVisible(True)
+        self.get_view().get_cancle_btn().setVisible(False)
         self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
         self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{time.time() - self.start_time:.2f}秒",
                                           duration=-1, is_closable=True)
         output_path = cfg.get(cfg.output_file_path)
         self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件至: {output_path}")
+
+    def cancle_worker(self):
+        if self.get_model().is_merging:
+            self.get_view().show_warning_infobar("警告", "合并操作正在进行中,合并过程中无法取消任务,请等待合并完成")
+            return
+
+        self.get_model().set_running(False)
+
+        self.get_view().get_start_btn().setEnabled(True)
+        self.get_view().get_start_btn().setVisible(True)
+        self.get_view().get_cancle_btn().setVisible(False)
+        self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
+        self.get_view().finish_state_tooltip("取消", "合并操作已取消")
+        self._signal_bus.set_total_progress_finish.emit()
+        self._signal_bus.set_detail_progress_finish.emit()
+        self._signal_bus.set_total_progress_description.emit("处理完成")
+        self._signal_bus.finished.emit()
 
     def get_all_video_files(self) -> list[str]:
         return self.get_view().get_video_file_list().get_draggable_list_view().get_all_items()
@@ -117,12 +138,15 @@ class ConcatePresenter:
             self._show_random_frame()
 
         # 设置视频播放器的视频
-        video_widget = self.get_view().get_video_player()
-        preview_auto_play: bool = cfg.get(cfg.preview_auto_play)
-        video_widget.setVideo(QUrl.fromLocalFile(current_item))
-        if preview_auto_play:
-            video_widget.play()
-        loguru.logger.debug(f"设置视频播放器的视频: {current_item}")
+        try:
+            video_widget = self.get_view().get_video_player()
+            preview_auto_play: bool = cfg.get(cfg.preview_auto_play)
+            video_widget.setVideo(QUrl.fromLocalFile(current_item))
+            if preview_auto_play:
+                video_widget.play()
+            loguru.logger.debug(f"设置视频播放器的视频: {current_item}")
+        except Exception as e:
+            loguru.logger.error(f"设置视频播放器的视频失败: {e}")
 
     def _on_video_drop(self):
         # 获取列表中的第一个视频文件
@@ -265,6 +289,7 @@ class ConcatePresenter:
         self.get_view().get_counterclockwise_rotate_btn().clicked.connect(self._rotate_counterclockwise)
         self.get_view().get_upside_down_rotate_btn().clicked.connect(self._rotate_upsidedown)
         self.get_view().get_start_btn().clicked.connect(self.start)
+        self.get_view().get_cancle_btn().clicked.connect(self.cancle_worker)
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
 

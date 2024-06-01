@@ -25,6 +25,9 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     signal_bus.set_detail_progress_reset.emit()
     signal_bus.set_detail_progress_max.emit(total_frames)
 
+    if sample_rate == 0:
+        return VideoInfo(video_path, fps, total_frames, width, height, None)
+
     # 先判断是否有黑边(获取视频中随机的10帧)
     random_frames = random.sample(range(total_frames), 10)
     is_black = False
@@ -114,5 +117,4 @@ def get_most_compatible_resolution(video_info_list: list[VideoInfo],
 
 
 if __name__ == '__main__':
-    print(get_video_info(Path(r"E:\load\python\Project\VideoMosaic\测试\video\audioVideo.mp4"), Orientation.HORIZONTAL,
-                         0.5))
+    print(get_video_info(Path(r"E:\load\python\Project\VideoFusion\测试\video\audioVideo.mp4"), 0))

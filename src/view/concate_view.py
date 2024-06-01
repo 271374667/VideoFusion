@@ -140,6 +140,9 @@ class ConcateView(MessageBaseView):
     def get_start_btn(self) -> PrimaryPushButton:
         return self.ui.PrimaryPushButton
 
+    def get_cancle_btn(self) -> PushButton:
+        return self.ui.PushButton_5
+
     # 进度条相关
     def set_total_progress_value(self, value: int):
         self.get_total_progress_bar().setValue(value)
@@ -255,6 +258,9 @@ class ConcateView(MessageBaseView):
 
         for each in self.findChildren(QWidget):
             each.installEventFilter(ToolTipFilter(each, 200))
+
+        # 默认不显示取消按钮
+        self.get_cancle_btn().setVisible(False)
 
 
 if __name__ == '__main__':

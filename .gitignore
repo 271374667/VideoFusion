@@ -20,3 +20,5 @@ wheels/
 /output/
 /doc/
 /log.log
+/assets/images/cancel.ico
+/assets/images/cancel_256.png

@@ -1,5 +1,6 @@
 <RCC>
   <qresource prefix="images">
+    <file>images/cancel.ico</file>
     <file>images/logo.ico</file>
     <file>images/add.ico</file>
     <file>images/start_merge.ico</file>
