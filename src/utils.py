@@ -7,7 +7,7 @@ from typing import Callable, Optional
 import loguru
 from PySide6.QtCore import QObject, QThread, Signal
 
-from src.core.paths import TEMP_DIR
+from src.config import cfg
 
 
 def singleton(cls):
@@ -97,8 +97,8 @@ def evenly_interpolate_numbers(current_num: int, target_num: int) -> list[int]:
 
 @singleton
 class TempDir:
-    def __init__(self, temp_dir: Path = TEMP_DIR):
-        self.path = temp_dir
+    def __init__(self, temp_dir: Path | None = None):
+        self.path = temp_dir or Path(cfg.get(cfg.temp_dir))
         self._is_exists: bool = False
 
     def get_temp_dir(self) -> Path:

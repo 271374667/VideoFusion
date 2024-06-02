@@ -6,7 +6,7 @@ from pathlib import Path
 import cv2
 import loguru
 
-from src.config import FrameRateAdjustment, ScalingQuality, VideoCodec, cfg
+from src.config import FrameRateAdjustment, ScalingQuality, VideoCodec, cfg, AudioNormalization
 from src.core.datacls import CropInfo
 from src.signal_bus import SignalBus
 
@@ -27,7 +27,7 @@ def generate_ffmpeg_command(input_file: str | Path,
     frame_rate_adjustment_type = cfg.get(cfg.rate_adjustment_type)
     framerate = cfg.get(cfg.video_fps)
     has_noise_reduction = cfg.get(cfg.noise_reduction)
-    has_audio_normalization = cfg.get(cfg.audio_normalization)
+    audio_normalization: AudioNormalization = cfg.get(cfg.audio_normalization)
     has_shake = cfg.get(cfg.shake)
     output_codec: VideoCodec = cfg.get(cfg.output_codec).value
     target_resolution = f"{width}:{height}"
@@ -61,8 +61,8 @@ def generate_ffmpeg_command(input_file: str | Path,
             f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
 
     audio_filters = []
-    if has_audio_normalization:
-        audio_filters.append("loudnorm=i=-24.0:lra=7.0:tp=-2.0:")
+    if audio_normalization != AudioNormalization.DISABLE:
+        audio_filters.append(audio_normalization.value)
 
     video_filter_chain = ','.join(filters)
     command = f'"{ffmpeg_path}" -i "{input_file}" -filter_complex "{video_filter_chain}"'

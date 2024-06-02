@@ -18,9 +18,9 @@ darkdetect==0.8.0
 loguru==0.7.2
     # via videomosaic
 numpy==1.26.4
-    # via opencv-python
+    # via opencv-contrib-python
     # via videomosaic
-opencv-python==4.9.0.80
+opencv-contrib-python==4.9.0.80
     # via videomosaic
 pyside6==6.7.1
     # via pyside6-fluent-widgets

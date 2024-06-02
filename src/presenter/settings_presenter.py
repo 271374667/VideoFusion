@@ -28,9 +28,9 @@ class SettingsPresenter:
         self.get_view().show_error_infobar("错误", "请选择一个有效的FFmpeg路径", duration=3000, is_closable=True)
 
     def _select_temp_dir(self):
-        # 选择临时目录的路径
-        dir_path = QFileDialog.getExistingDirectory(self._view, "选择临时目录", "")
-        if dir_path:
+        if dir_path := QFileDialog.getExistingDirectory(
+            self._view, "选择临时目录", ""
+        ):
             cfg.set(cfg.temp_dir, dir_path)
             loguru.logger.info(f"选择了临时目录: {dir_path}")
             return

@@ -9,6 +9,14 @@ from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, OUTPUT_FILE, TEMP_DIR)
 __version__ = "0.4.3"
 
 
+# 音频响度标准化标准
+class AudioNormalization(Enum):
+    DISABLE = ""
+    RADIO = "loudnorm=i=-15.0:lra=2.0:tp=-1.0:"
+    TV = "loudnorm=i=-24.0:lra=2.0:tp=-1.0:"
+    MOVIE = "loudnorm=i=-24.0:lra=7.0:tp=-2.0:"
+
+
 # 补帧策略
 class FrameRateAdjustment(Enum):
     NORMAL = 1
@@ -75,10 +83,11 @@ class Config(QConfig):
     # 视频质量
     output_file_path = ConfigItem("Video", "输出文件路径", str(OUTPUT_FILE), OutputFileValidator())
     noise_reduction = ConfigItem("Video", "视频降噪", True, BoolValidator())
-    audio_normalization = ConfigItem("Video", "音频响度标准化", False, BoolValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_rate = RangeConfigItem("Video", "黑边采样率", 5, RangeValidator(0, 10))
+    audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
+                                            OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
     scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.BEST, OptionsValidator(ScalingQuality),
                                         EnumSerializer(ScalingQuality))
     rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.NORMAL,

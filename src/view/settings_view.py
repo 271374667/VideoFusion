@@ -1,16 +1,16 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QWidget
-from qfluentwidgets import (ComboBoxSettingCard, FluentIcon, Icon, PushSettingCard, RangeSettingCard, SettingCardGroup,
-                            SwitchSettingCard, ToolTipFilter, BodyLabel)
+from qfluentwidgets import (BodyLabel, ComboBoxSettingCard, FluentIcon, Icon, PushSettingCard, RangeSettingCard,
+                            SettingCardGroup, SwitchSettingCard, ToolTipFilter)
 from qfluentwidgets.components import (
     ExpandLayout,
     LargeTitleLabel,
     SmoothScrollArea,
 
     )
-from src.core.version import __version__
 
 from src.config import cfg
+from src.core.version import __version__
 from src.view.message_base_view import MessageBaseView
 
 
@@ -70,9 +70,6 @@ class SettingView(MessageBaseView):
         self.noise_reduction_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频降噪",
                                                       "使用ffmpeg的hqdn3d默认参数对视频进行降噪",
                                                       cfg.noise_reduction, self.video_group)
-        self.audio_normalization_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频音量自动调整",
-                                                          "将声音过大或者过小的视频音频自动调整到合适的响度",
-                                                          cfg.audio_normalization, self.video_group)
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
@@ -81,6 +78,12 @@ class SettingView(MessageBaseView):
         self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
                                                        "去黑边采样率",
                                                        "视频黑边的采样率,默认为5", self.video_group)
+        self.audio_normalization_card = ComboBoxSettingCard(cfg.audio_normalization, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                            "视频音量自动调整",
+                                                            "将声音过大或者过小的视频音频自动调整到合适的响度",
+                                                            ["关闭", "电台(嘈杂环境)", "TV(普通环境)",
+                                                                    "电影(安静环境)"],
+                                                            self.video_group)
         self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT),
                                                         "分辨率缩放算法",
                                                         "调整视频分辨率的时候使用的算法",
@@ -103,9 +106,9 @@ class SettingView(MessageBaseView):
         temp_dir_path = cfg.get(cfg.temp_dir)
         self.temp_dir_card.setToolTip(f'当前临时目录为: {temp_dir_path}')
         self.delete_temp_dir_card.setToolTip(
-            "软件在完成后是否删除临时目录(软件退出之后才会删除,该方法删除的文件无法恢复)")
+                "软件在完成后是否删除临时目录(软件退出之后才会删除,该方法删除的文件无法恢复)")
         self.preview_video_remove_black_card.setToolTip(
-            "如果您发现您的画面黑边,请尝试勾选此选项,但是单帧画面效果不是很好,请通过预览视频查看效果")
+                "如果您发现您的画面黑边,请尝试勾选此选项,但是单帧画面效果不是很好,请通过预览视频查看效果")
         self.preview_frame_card.setToolTip("设置预览视频的封面为第几帧的图片")
 
         output_file_path = cfg.get(cfg.output_file_path)
@@ -114,9 +117,9 @@ class SettingView(MessageBaseView):
         self.audio_normalization_card.setToolTip("小概率会出现音频爆响")
         self.shake_card.setToolTip("实验性功能")
         self.video_fps_card.setToolTip(
-            "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
+                "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
-            "视频黑边的采样率,默认为5,如果您发现视频依然有黑边,或者黑边去除过多,请尝试加大该选项的值")
+                "视频黑边的采样率,默认为5,如果您发现视频依然有黑边,或者黑边去除过多,请尝试加大该选项的值")
         self.scaling_quality_card.setToolTip("调整视频分辨率的时候使用的算法")
         self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
         self.output_codec_card.setToolTip("调整视频编码的算法,默认推荐经过优化的H264算法")
@@ -142,10 +145,10 @@ class SettingView(MessageBaseView):
         self.video_group.addSettingCards([
                 self.output_file_path_card,
                 self.noise_reduction_card,
-                self.audio_normalization_card,
                 self.shake_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
+                self.audio_normalization_card,
                 self.scaling_quality_card,
                 self.rate_adjustment_type_card,
                 self.output_codec_card,
