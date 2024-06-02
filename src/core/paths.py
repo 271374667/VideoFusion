@@ -13,6 +13,7 @@ TEMP_DIR = ROOT / "Temp"
 # FILE
 OUTPUT_FILE = ROOT / "output.mp4"
 FFMPEG_FILE = BIN_DIR / "ffmpeg.exe"
+NOISE_REDUCE_MODEL_FILE = BIN_DIR / "cb.rnnn"  # ffmpeg的降噪模型
 CONFIG_FILE = ROOT / "config.json"
 LOGO_IMAGE_FILE = IMAGES_DIR / 'logo.ico'
 QRC_FILE = ASSETS_DIR / "resource.qrc"

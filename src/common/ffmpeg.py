@@ -6,7 +6,8 @@ from pathlib import Path
 import cv2
 import loguru
 
-from src.config import FrameRateAdjustment, ScalingQuality, VideoCodec, cfg, AudioNormalization
+from src.config import (AudioNoiseReduction, AudioNormalization, FrameRateAdjustment, ScalingQuality, VideoCodec,
+                        VideoNoiseReduction, cfg)
 from src.core.datacls import CropInfo
 from src.signal_bus import SignalBus
 
@@ -26,7 +27,8 @@ def generate_ffmpeg_command(input_file: str | Path,
     input_file = str(input_file)
     frame_rate_adjustment_type = cfg.get(cfg.rate_adjustment_type)
     framerate = cfg.get(cfg.video_fps)
-    has_noise_reduction = cfg.get(cfg.noise_reduction)
+    video_noise_reduction: VideoNoiseReduction = cfg.get(cfg.video_noise_reduction)
+    audio_noise_reduction: AudioNoiseReduction = cfg.get(cfg.audio_noise_reduction)
     audio_normalization: AudioNormalization = cfg.get(cfg.audio_normalization)
     has_shake = cfg.get(cfg.shake)
     output_codec: VideoCodec = cfg.get(cfg.output_codec).value
@@ -41,8 +43,8 @@ def generate_ffmpeg_command(input_file: str | Path,
     elif frame_rate_adjustment_type == FrameRateAdjustment.MOTION_INTERPOLATION:
         filters.append(f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
 
-    if has_noise_reduction:
-        filters.append("hqdn3d")
+    if video_noise_reduction != VideoNoiseReduction.DISABLE:
+        filters.append(video_noise_reduction.value)
 
     if has_shake:
         filters.append("deshake")
@@ -61,8 +63,13 @@ def generate_ffmpeg_command(input_file: str | Path,
             f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
 
     audio_filters = []
+    # 音频标准化
     if audio_normalization != AudioNormalization.DISABLE:
         audio_filters.append(audio_normalization.value)
+
+    # 音频降噪
+    if audio_noise_reduction != AudioNoiseReduction.DISABLE:
+        audio_filters.append(audio_noise_reduction.value.replace("\\", "/"))
 
     video_filter_chain = ','.join(filters)
     command = f'"{ffmpeg_path}" -i "{input_file}" -filter_complex "{video_filter_chain}"'
@@ -178,13 +185,15 @@ def run_command_without_progress(command: str):
 
 
 if __name__ == '__main__':
-    # print(generate_ffmpeg_command(input_file=Path('test.mp4'),
-    #                               output_file_path=Path('output.mp4'),
-    #                               crop_position=CropInfo(0, 0, 1920, 1080),
-    #                               width=1920,
-    #                               height=1080,
-    #                               rotation_angle=0))
-    video_list = Path(r"E:\load\python\Project\VideoMosaic\测试\video\2.txt").read_text(
-            encoding="utf-8").replace('"', '').splitlines()
-    merge_videos(video_list,
-                 r"E:\load\python\Project\VideoMosaic\测试\video\output1.mp4")
+    input_file = r"E:\load\python\Project\VideoFusion\测试\video\video_2024-03-04_16-55-16.mp4"
+    output_file = r"E:\load\python\Project\VideoFusion\测试\video\output3.mp4"
+    print(generate_ffmpeg_command(input_file=Path(input_file),
+                                  output_file_path=Path(output_file),
+                                  crop_position=CropInfo(0, 0, 1920, 1080),
+                                  width=1920,
+                                  height=1080,
+                                  rotation_angle=0))
+    # video_list = Path(r"E:\load\python\Project\VideoMosaic\测试\video\2.txt").read_text(
+    #         encoding="utf-8").replace('"', '').splitlines()
+    # merge_videos(video_list,
+    #              r"E:\load\python\Project\VideoMosaic\测试\video\output1.mp4")
