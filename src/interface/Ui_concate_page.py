@@ -3,7 +3,7 @@
 ################################################################################
 ## Form generated from reading UI file 'concate_page.ui'
 ##
-## Created by: Qt User Interface Compiler version 6.4.2
+## Created by: Qt User Interface Compiler version 6.7.1
 ##
 ## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
@@ -46,7 +46,7 @@ class Ui_Form(object):
         self.verticalLayout_5.setContentsMargins(15, 15, 15, 15)
         self.StrongBodyLabel = StrongBodyLabel(self.SimpleCardWidget)
         self.StrongBodyLabel.setObjectName(u"StrongBodyLabel")
-        sizePolicy = QSizePolicy(QSizePolicy.Preferred, QSizePolicy.Fixed)
+        sizePolicy = QSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
         sizePolicy.setHeightForWidth(self.StrongBodyLabel.sizePolicy().hasHeightForWidth())
@@ -57,7 +57,7 @@ class Ui_Form(object):
 
         self.listWidget = DraggableListWidget(self.SimpleCardWidget)
         self.listWidget.setObjectName(u"listWidget")
-        sizePolicy1 = QSizePolicy(QSizePolicy.Minimum, QSizePolicy.Expanding)
+        sizePolicy1 = QSizePolicy(QSizePolicy.Policy.Minimum, QSizePolicy.Policy.Expanding)
         sizePolicy1.setHorizontalStretch(0)
         sizePolicy1.setVerticalStretch(0)
         sizePolicy1.setHeightForWidth(self.listWidget.sizePolicy().hasHeightForWidth())
@@ -105,7 +105,7 @@ class Ui_Form(object):
 
         self.horizontalLayout.addWidget(self.RadioButton)
 
-        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer_6 = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout.addItem(self.horizontalSpacer_6)
 
@@ -116,7 +116,7 @@ class Ui_Form(object):
         self.horizontalLayout_2.setObjectName(u"horizontalLayout_2")
         self.BodyLabel = BodyLabel(self.SimpleCardWidget)
         self.BodyLabel.setObjectName(u"BodyLabel")
-        sizePolicy2 = QSizePolicy(QSizePolicy.Fixed, QSizePolicy.Preferred)
+        sizePolicy2 = QSizePolicy(QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Preferred)
         sizePolicy2.setHorizontalStretch(0)
         sizePolicy2.setVerticalStretch(0)
         sizePolicy2.setHeightForWidth(self.BodyLabel.sizePolicy().hasHeightForWidth())
@@ -126,7 +126,7 @@ class Ui_Form(object):
 
         self.ComboBox_2 = ComboBox(self.SimpleCardWidget)
         self.ComboBox_2.setObjectName(u"ComboBox_2")
-        sizePolicy3 = QSizePolicy(QSizePolicy.Expanding, QSizePolicy.Fixed)
+        sizePolicy3 = QSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         sizePolicy3.setHorizontalStretch(0)
         sizePolicy3.setVerticalStretch(0)
         sizePolicy3.setHeightForWidth(self.ComboBox_2.sizePolicy().hasHeightForWidth())
@@ -134,7 +134,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_2.addWidget(self.ComboBox_2)
 
-        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Expanding, QSizePolicy.Minimum)
+        self.horizontalSpacer = QSpacerItem(40, 20, QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_2.addItem(self.horizontalSpacer)
 
@@ -171,7 +171,7 @@ class Ui_Form(object):
         self.verticalLayout_3.setContentsMargins(15, 15, 15, 15)
         self.label = QLabel(self.page)
         self.label.setObjectName(u"label")
-        sizePolicy4 = QSizePolicy(QSizePolicy.Maximum, QSizePolicy.Expanding)
+        sizePolicy4 = QSizePolicy(QSizePolicy.Policy.Maximum, QSizePolicy.Policy.Expanding)
         sizePolicy4.setHorizontalStretch(0)
         sizePolicy4.setVerticalStretch(0)
         sizePolicy4.setHeightForWidth(self.label.sizePolicy().hasHeightForWidth())
@@ -240,7 +240,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_3.addWidget(self.ProgressBar_2)
 
-        self.horizontalSpacer_2 = QSpacerItem(15, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_2 = QSpacerItem(15, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_3.addItem(self.horizontalSpacer_2)
 
@@ -292,7 +292,7 @@ class Ui_Form(object):
 
         self.horizontalLayout_4.addWidget(self.ProgressBar)
 
-        self.horizontalSpacer_3 = QSpacerItem(15, 20, QSizePolicy.Fixed, QSizePolicy.Minimum)
+        self.horizontalSpacer_3 = QSpacerItem(15, 20, QSizePolicy.Policy.Fixed, QSizePolicy.Policy.Minimum)
 
         self.horizontalLayout_4.addItem(self.horizontalSpacer_3)
 

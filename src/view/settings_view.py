@@ -67,9 +67,6 @@ class SettingView(MessageBaseView):
         # 视频质量
         self.output_file_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
                                                      "设置输出文件路径", self.video_group)
-        self.noise_reduction_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频降噪",
-                                                      "使用ffmpeg的hqdn3d默认参数对视频进行降噪",
-                                                      cfg.noise_reduction, self.video_group)
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
@@ -84,10 +81,18 @@ class SettingView(MessageBaseView):
                                                             ["关闭", "电台(嘈杂环境)", "TV(普通环境)",
                                                                     "电影(安静环境)"],
                                                             self.video_group)
+        self.audio_noise_reduction_card = ComboBoxSettingCard(cfg.audio_noise_reduction, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                            "音频降噪",
+                                                            "降低音频中的底噪,杂音,爆音等异常声音",
+                                                              ["关闭", "静态分析(速度快)", "AI模型分析(效果好)"],
+                                                              self.video_group)
+        self.video_noise_reduction_card = ComboBoxSettingCard(cfg.video_noise_reduction, Icon(FluentIcon.CHEVRON_RIGHT), "视频降噪",
+                                                      "降低视频中的噪点,杂点,闪缩的各种异常杂斑等异常画面",
+                                                              ["关闭", "hqdn3d(快速降噪)", "nlmeans(效果好,速度慢)"], self.video_group)
         self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT),
                                                         "分辨率缩放算法",
                                                         "调整视频分辨率的时候使用的算法",
-                                                        ["速度最快,效果最差", "速度中等,效果中等", "速度最慢,效果最好"],
+                                                        ["nearest速度最快,效果最差", "bilinear速度中等,效果中等", "lanczos速度最慢,效果最好"],
                                                         self.video_group)
         self.rate_adjustment_type_card = ComboBoxSettingCard(cfg.rate_adjustment_type, Icon(FluentIcon.CHEVRON_RIGHT),
                                                              "视频补帧算法",
@@ -113,7 +118,8 @@ class SettingView(MessageBaseView):
 
         output_file_path = cfg.get(cfg.output_file_path)
         self.output_file_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
-        self.noise_reduction_card.setToolTip("使用ffmpeg的hqdn3d默认参数对视频进行降噪")
+        self.audio_noise_reduction_card.setToolTip("降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
+        self.video_noise_reduction_card.setToolTip("请注意nlmeans速度非常慢,开始和结束都会有一段时间进度条为0,请耐心等待,如果日志持续在输出则表示没有卡死")
         self.audio_normalization_card.setToolTip("小概率会出现音频爆响")
         self.shake_card.setToolTip("实验性功能")
         self.video_fps_card.setToolTip(
@@ -144,11 +150,12 @@ class SettingView(MessageBaseView):
                 ])
         self.video_group.addSettingCards([
                 self.output_file_path_card,
-                self.noise_reduction_card,
                 self.shake_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
                 self.audio_normalization_card,
+                self.audio_noise_reduction_card,
+                self.video_noise_reduction_card,
                 self.scaling_quality_card,
                 self.rate_adjustment_type_card,
                 self.output_codec_card,
