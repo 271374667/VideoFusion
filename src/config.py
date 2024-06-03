@@ -37,9 +37,11 @@ class FrameRateAdjustment(Enum):
 
 # 缩放质量
 class ScalingQuality(Enum):
-    FASTEST = 'nearest'
-    MEDIUM = 'bilinear'
-    BEST = 'lanczos'
+    NEAREST = 'neighbor'
+    BILINEAR = 'bilinear'
+    BICUBIC = 'bicubic'
+    LANCZOS = 'lanczos'
+    SINC = "sinc"
 
 
 # 视频编码策略
@@ -96,6 +98,7 @@ class Config(QConfig):
     output_file_path = ConfigItem("Video", "输出文件路径", str(OUTPUT_FILE), OutputFileValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
+    deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_rate = RangeConfigItem("Video", "黑边采样率", 5, RangeValidator(0, 10))
     audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
@@ -105,7 +108,7 @@ class Config(QConfig):
     video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.DISABLE,
                                               OptionsValidator(VideoNoiseReduction),
                                               EnumSerializer(VideoNoiseReduction))
-    scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.BEST, OptionsValidator(ScalingQuality),
+    scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.SINC, OptionsValidator(ScalingQuality),
                                         EnumSerializer(ScalingQuality))
     rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.NORMAL,
                                              OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))

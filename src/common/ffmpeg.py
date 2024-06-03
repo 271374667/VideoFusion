@@ -32,6 +32,7 @@ def generate_ffmpeg_command(input_file: str | Path,
     audio_normalization: AudioNormalization = cfg.get(cfg.audio_normalization)
     has_shake = cfg.get(cfg.shake)
     deband: bool = cfg.get(cfg.deband)
+    deblock: bool = cfg.get(cfg.deblock)
     output_codec: VideoCodec = cfg.get(cfg.output_codec).value
     target_resolution = f"{width}:{height}"
     ffmpeg_path = cfg.get(cfg.ffmpeg_file)
@@ -52,6 +53,9 @@ def generate_ffmpeg_command(input_file: str | Path,
 
     if deband:
         filters.append("deband")
+
+    if deblock:
+        filters.append("deblock=alpha=1:beta=1")
 
     if crop_position:
         filters.append(f"crop={crop_position.w}:{crop_position.h}:{crop_position.x}:{crop_position.y}")

@@ -6,6 +6,8 @@
     <file>images/start_merge.ico</file>
   </qresource>
   <qresource prefix="tooltip">
+    <file>images/tooltip/upscale.png</file>
+    <file>images/tooltip/Deblocking.png</file>
     <file>images/tooltip/debanding.png</file>
   </qresource>
 </RCC>
