@@ -5,4 +5,7 @@
     <file>images/add.ico</file>
     <file>images/start_merge.ico</file>
   </qresource>
+  <qresource prefix="tooltip">
+    <file>images/tooltip/debanding.png</file>
+  </qresource>
 </RCC>

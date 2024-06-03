@@ -6,9 +6,9 @@ from qfluentwidgets.components import (
     ExpandLayout,
     LargeTitleLabel,
     SmoothScrollArea,
-
     )
 
+import resource_rc  # noqa: F401
 from src.config import cfg
 from src.core.version import __version__
 from src.view.message_base_view import MessageBaseView
@@ -70,6 +70,9 @@ class SettingView(MessageBaseView):
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
+        self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
+                                             "如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
+                                             cfg.deband, self.video_group)
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
@@ -82,17 +85,20 @@ class SettingView(MessageBaseView):
                                                                     "电影(安静环境)"],
                                                             self.video_group)
         self.audio_noise_reduction_card = ComboBoxSettingCard(cfg.audio_noise_reduction, Icon(FluentIcon.CHEVRON_RIGHT),
-                                                            "音频降噪",
-                                                            "降低音频中的底噪,杂音,爆音等异常声音",
+                                                              "音频降噪",
+                                                              "降低音频中的底噪,杂音,爆音等异常声音",
                                                               ["关闭", "静态分析(速度快)", "AI模型分析(效果好)"],
                                                               self.video_group)
-        self.video_noise_reduction_card = ComboBoxSettingCard(cfg.video_noise_reduction, Icon(FluentIcon.CHEVRON_RIGHT), "视频降噪",
-                                                      "降低视频中的噪点,杂点,闪缩的各种异常杂斑等异常画面",
-                                                              ["关闭", "hqdn3d(快速降噪)", "nlmeans(效果好,速度慢)"], self.video_group)
+        self.video_noise_reduction_card = ComboBoxSettingCard(cfg.video_noise_reduction, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                              "视频降噪",
+                                                              "降低视频中的噪点,杂点,闪缩的各种异常杂斑等异常画面",
+                                                              ["关闭", "hqdn3d(快速降噪)", "nlmeans(效果好,速度慢)"],
+                                                              self.video_group)
         self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT),
                                                         "分辨率缩放算法",
                                                         "调整视频分辨率的时候使用的算法",
-                                                        ["nearest速度最快,效果最差", "bilinear速度中等,效果中等", "lanczos速度最慢,效果最好"],
+                                                        ["nearest速度最快,效果最差", "bilinear速度中等,效果中等",
+                                                                "lanczos速度最慢,效果最好"],
                                                         self.video_group)
         self.rate_adjustment_type_card = ComboBoxSettingCard(cfg.rate_adjustment_type, Icon(FluentIcon.CHEVRON_RIGHT),
                                                              "视频补帧算法",
@@ -118,10 +124,14 @@ class SettingView(MessageBaseView):
 
         output_file_path = cfg.get(cfg.output_file_path)
         self.output_file_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
-        self.audio_noise_reduction_card.setToolTip("降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
-        self.video_noise_reduction_card.setToolTip("请注意nlmeans速度非常慢,开始和结束都会有一段时间进度条为0,请耐心等待,如果日志持续在输出则表示没有卡死")
+        self.audio_noise_reduction_card.setToolTip(
+            "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
+        self.video_noise_reduction_card.setToolTip(
+            "请注意nlmeans速度非常慢,开始和结束都会有一段时间进度条为0,请耐心等待,如果日志持续在输出则表示没有卡死")
         self.audio_normalization_card.setToolTip("小概率会出现音频爆响")
         self.shake_card.setToolTip("实验性功能")
+        self.deband_card.setToolTip(
+            '<html><head/><body><p><img src=":/tooltip/images/tooltip/debanding.png"/></p></body></html>')
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
@@ -151,6 +161,7 @@ class SettingView(MessageBaseView):
         self.video_group.addSettingCards([
                 self.output_file_path_card,
                 self.shake_card,
+                self.deband_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
                 self.audio_normalization_card,
