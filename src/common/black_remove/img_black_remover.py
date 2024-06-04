@@ -26,16 +26,13 @@ class BlackRemover:
             raise ValueError('img_path and img_array cannot be None at the same time')
         elif img_path is not None and img_array is not None:
             raise ValueError('img_path and img_array cannot be set at the same time')
-        elif img_path is not None and img_array is None:
+        elif img_path is not None:
             if isinstance(img_path, Path):
                 img_path = str(img_path)
             # 读取图像
             img = cv2.imread(img_path)
-        elif img_path is None and img_array is not None:
-            img = img_array
         else:
-            raise ValueError('img_path and img_array did not meet the requirements')
-
+            img = img_array
         # 获取图片的长和宽
         img_height: int = img.shape[0]
         img_width: int = img.shape[1]
@@ -98,12 +95,13 @@ class BlackRemover:
             right_bottom_x = x + w
             right_bottom_y = y + h
 
-        # 绘图显示
+        # # 绘图显示
         # cv2.rectangle(img, (left_top_x, left_top_y), (right_bottom_x, right_bottom_y), (0, 0, 255), 15)
-        # 保持横纵比的情况下将图片缩放到720p
+        # # 保持横纵比的情况下将图片缩放到720p
         # img = cv2.resize(img, (480, 720))
+        # cv2.imshow('new_binary', new_binary)
         # cv2.imshow('img', img)
-        # cv2.imwrite(r"E:\load\python\Project\VideoMosaic\temp\dy\temp.png", img)
+        # # cv2.imwrite(r"E:\load\python\Project\VideoMosaic\temp\dy\temp.png", img)
         # cv2.waitKey(0)
         return left_top_x, left_top_y, right_bottom_x, right_bottom_y
 
@@ -147,13 +145,10 @@ class BlackRemover:
         """
         img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
         threshold = self.threshold
-        if np.mean(img) < threshold:
-            return True
-        else:
-            return False
+        return np.mean(img) < threshold
 
 
 if __name__ == '__main__':
     b = BlackRemover()
-    img = r"E:\load\python\Project\VideoMosaic\temp\dy\%WO1_0EOKLVMBZUZ8I0VYMB.jpg"
-    b.start(img)
+    img = r"E:\load\python\Project\VideoFusion\TempAndTest\dy\Clip_2024-06-03_15-23-02.png"
+    b.start(img_path=img)

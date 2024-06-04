@@ -9,7 +9,7 @@ from PySide6.QtCore import QSize, QUrl, Qt
 from PySide6.QtGui import QImage, QPixmap, QTransform
 from PySide6.QtWidgets import QFileDialog
 
-from src.common.black_remover import BlackRemover
+from src.common.black_remove.img_black_remover import BlackRemover
 from src.config import PreviewFrame, cfg
 from src.core.enums import Orientation, Rotation
 from src.core.paths import FFMPEG_FILE, TEMP_DIR

@@ -6,45 +6,24 @@ from typing import Tuple
 import cv2
 import loguru
 
-from src.common.black_remover import BlackRemover
+from src.common.black_remove.img_black_remover import BlackRemover
+from src.common.black_remove.video_remover import VideoRemover
 from src.core.datacls import CropInfo, VideoInfo
 from src.core.enums import Orientation
 from src.signal_bus import SignalBus
 
 black_remover = BlackRemover()
+video_remover = VideoRemover()
 signal_bus = SignalBus()
 
 
-def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
-    video = cv2.VideoCapture(str(video_path))
-    fps = int(video.get(cv2.CAP_PROP_FPS))
-    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
-    loguru.logger.debug(f'正在获取视频信息[{video_path.name}]')
-    signal_bus.set_detail_progress_reset.emit()
-    signal_bus.set_detail_progress_max.emit(total_frames)
-
-    if sample_rate == 0:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
-
-    # 先判断是否有黑边(获取视频中随机的10帧)
-    random_frames = random.sample(range(total_frames), 10)
-    is_black = False
-    for i in random_frames:
-        video.set(cv2.CAP_PROP_POS_FRAMES, i)
-        ret, frame = video.read()
-        if not ret:
-            break
-        if black_remover.has_black_border(frame):
-            is_black = True
-            break
-    if not is_black:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
-    video.release()
-
+def _img_black_remover_start(video_path: Path, sample_rate: float) -> VideoInfo:
     # 重新获取视频信息
     video = cv2.VideoCapture(str(video_path))
+    total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    width: int = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height: int = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    fps = int(video.get(cv2.CAP_PROP_FPS))
     # 如果有黑边则需要获取主体区域坐标(只获取部分百比分帧)
     sample_frames = int(total_frames * sample_rate)
     # 计算每次需要跳过的帧数
@@ -95,6 +74,55 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     return VideoInfo(video_path, fps, total_frames, width, height, CropInfo(*most_common_coordinates))
 
 
+def _video_black_remover_start(video_path: Path) -> VideoInfo:
+    video = cv2.VideoCapture(str(video_path))
+    total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = int(video.get(cv2.CAP_PROP_FPS))
+    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
+    # 获取结果
+    x, y, w, h = video_remover.start(video_path)
+
+    if w == width and h == height:
+        return VideoInfo(video_path, fps, total_frames, width, height, None)
+    return VideoInfo(video_path, fps, total_frames, width, height, CropInfo(x, y, w, h))
+
+
+def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
+    video = cv2.VideoCapture(str(video_path))
+    total_frames = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
+    fps = int(video.get(cv2.CAP_PROP_FPS))
+    width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
+    height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    loguru.logger.debug(f'正在获取视频信息[{video_path.name}]')
+    signal_bus.set_detail_progress_reset.emit()
+    signal_bus.set_detail_progress_max.emit(total_frames)
+
+    if sample_rate == 0:
+        return VideoInfo(video_path, fps, total_frames, width, height, None)
+
+    # 先判断是否有黑边(获取视频中随机的10帧)
+    random_frames = random.sample(range(total_frames), 10)
+    is_black = False
+    for i in random_frames:
+        video.set(cv2.CAP_PROP_POS_FRAMES, i)
+        ret, frame = video.read()
+        if not ret:
+            break
+        if black_remover.has_black_border(frame):
+            is_black = True
+            break
+    if not is_black:
+        return VideoInfo(video_path, fps, total_frames, width, height, None)
+    video.release()
+
+    if sample_rate != 1:
+        return _img_black_remover_start(video_path, sample_rate)
+    else:
+        return _video_black_remover_start(video_path)
+
+
 def get_most_compatible_resolution(video_info_list: list[VideoInfo],
                                    orientation: Orientation = Orientation.VERTICAL) -> Tuple[int, int]:
     """获取最合适的视频分辨率"""
@@ -117,4 +145,4 @@ def get_most_compatible_resolution(video_info_list: list[VideoInfo],
 
 
 if __name__ == '__main__':
-    print(get_video_info(Path(r"E:\load\python\Project\VideoFusion\测试\video\audioVideo.mp4"), 0))
+    print(get_video_info(Path(r"E:\load\python\Project\VideoFusion\测试\dy\b7bb97e21600b07f66c21e7932cb7550.mp4"), 0.5))

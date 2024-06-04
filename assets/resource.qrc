@@ -7,6 +7,7 @@
   </qresource>
   <qresource prefix="tooltip">
     <file>images/tooltip/upscale.png</file>
+    <file>images/tooltip/black_remover.png</file>
     <file>images/tooltip/Deblocking.png</file>
     <file>images/tooltip/debanding.png</file>
   </qresource>

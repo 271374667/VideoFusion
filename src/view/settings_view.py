@@ -71,8 +71,8 @@ class SettingView(MessageBaseView):
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
                                              cfg.deband, self.video_group)
         self.deblock_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色块",
-                                             "色块是指画面中出现的一种颜色块,如果视频本身画面有色块,请尝试勾选此选项,否则可能会导致画面失真",
-                                             cfg.deblock, self.video_group)
+                                              "色块是指画面中出现的一种颜色块,如果视频本身画面有色块,请尝试勾选此选项,否则可能会导致画面失真",
+                                              cfg.deblock, self.video_group)
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
@@ -80,7 +80,8 @@ class SettingView(MessageBaseView):
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
                                                        "去黑边采样率",
-                                                       "视频黑边的采样率,默认为5", self.video_group)
+                                                       "通过算法去除视频的黑边或者logo等,留下视频的主体画面",
+                                                       self.video_group)
         self.audio_normalization_card = ComboBoxSettingCard(cfg.audio_normalization, Icon(FluentIcon.CHEVRON_RIGHT),
                                                             "视频音量自动调整",
                                                             "将声音过大或者过小的视频音频自动调整到合适的响度",
@@ -100,7 +101,8 @@ class SettingView(MessageBaseView):
         self.scaling_quality_card = ComboBoxSettingCard(cfg.scaling_quality, Icon(FluentIcon.CHEVRON_RIGHT),
                                                         "分辨率缩放算法",
                                                         "调整视频分辨率的时候使用的算法",
-                                                        ["nearest可能会出现锯齿和块状伪影,图像质量不高", "bilinear可能会出现模糊,不适合细节要求高的场景",
+                                                        ["nearest可能会出现锯齿和块状伪影,图像质量不高",
+                                                                "bilinear可能会出现模糊,不适合细节要求高的场景",
                                                                 'bicubic计算量较大,图像质量较好,适合大多数场景',
                                                                 "lanczos计算量大,速度很慢,图像质量很高",
                                                                 "sinc计算量极大,图像质量最高"
@@ -131,21 +133,25 @@ class SettingView(MessageBaseView):
         output_file_path = cfg.get(cfg.output_file_path)
         self.output_file_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
         self.audio_noise_reduction_card.setToolTip(
-            "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
+                "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
         self.video_noise_reduction_card.setToolTip(
-            "请注意nlmeans速度非常慢,开始和结束都会有一段时间进度条为0,请耐心等待,如果日志持续在输出则表示没有卡死")
+                "请注意nlmeans速度非常慢,开始和结束都会有一段时间进度条为0,请耐心等待,如果日志持续在输出则表示没有卡死")
         self.audio_normalization_card.setToolTip("小概率会出现音频爆响")
         self.deband_card.setToolTip(
-            '<html><head/><body><p><img src=":/tooltip/images/tooltip/debanding.png"/></p></body></html>')
-        self.deblock_card.setToolTip('<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
+                '<html><head/><body><p><img src=":/tooltip/images/tooltip/debanding.png"/></p></body></html>')
+        self.deblock_card.setToolTip(
+            '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
-                "视频黑边的采样率,默认为5,如果您发现视频依然有黑边,或者黑边去除过多,请尝试加大该选项的值")
-        self.scaling_quality_card.setToolTip('<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
+            '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
+            '</p><p>值为0则不启用去除黑边,0~1之间使用静态去黑边,为1则开启动态去黑边模式</p></body></html>')
+        self.scaling_quality_card.setToolTip(
+            '<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
         self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
-        self.output_codec_card.setToolTip("调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
+        self.output_codec_card.setToolTip(
+            "调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
 
     def _set_up_layout(self):
         """设置布局"""
