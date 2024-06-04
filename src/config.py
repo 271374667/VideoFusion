@@ -100,7 +100,7 @@ class Config(QConfig):
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
-    video_sample_rate = RangeConfigItem("Video", "黑边采样率", 5, RangeValidator(0, 10))
+    video_sample_rate = RangeConfigItem("Video", "黑边采样率", 10, RangeValidator(0, 10))
     audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
                                             OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
     audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
