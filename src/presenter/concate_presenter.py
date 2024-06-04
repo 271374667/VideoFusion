@@ -15,7 +15,7 @@ from src.core.enums import Orientation, Rotation
 from src.core.paths import FFMPEG_FILE, TEMP_DIR
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
-from src.utils import RunInThread, TempDir
+from src.utils import RunInThread, TempDir, trans_second_to_human_time
 from src.view.concate_view import ConcateView
 
 temp_dir = TempDir()
@@ -81,7 +81,8 @@ class ConcatePresenter:
         self.get_view().get_start_btn().setVisible(True)
         self.get_view().get_cancle_btn().setVisible(False)
         self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
-        self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{time.time() - self.start_time:.2f}秒",
+        used_time: int = int(time.time() - self.start_time)
+        self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{trans_second_to_human_time(used_time)}",
                                           duration=-1, is_closable=True)
         output_path = cfg.get(cfg.output_file_path)
         self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件至: {output_path}")
@@ -240,6 +241,13 @@ class ConcatePresenter:
 
     def _show_frame_on_label(self, cap, info_title: str, video_path: str):
         ret, frame = cap.read()
+        if frame is None:
+            self.get_view().show_error_infobar("错误",
+                                               f"当前视频无法播放,请检查视频文件是否损坏或者尝试重新转码为H264格式视频\n{video_path}",
+                                               duration=6000,
+                                               is_closable=True)
+            loguru.logger.error(f'当前视频无法播放,请检查视频文件是否损坏或者尝试重新转码为H264格式视频\n{video_path}')
+            return
         frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
         cap.release()
         if ret:

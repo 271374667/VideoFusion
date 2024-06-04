@@ -95,6 +95,23 @@ def evenly_interpolate_numbers(current_num: int, target_num: int) -> list[int]:
     return new_numbers
 
 
+def trans_second_to_human_time(second: int) -> str:
+    """
+    感谢'0<0'童鞋写本开源项目做出的共享
+    """
+    if second // 60 == 0:
+        return f"{second}秒"
+    elif second // 60 < 60:
+        minute = second // 60
+        second %= 60
+        return f"{str(minute)}分{second}秒"
+    else:
+        hour = second // 3600
+        minute = (second - hour * 60 * 60) // 60
+        second = second - hour * 3600 - minute * 60
+        return f"{str(hour)}小时{str(minute)}分{second}秒"
+
+
 @singleton
 class TempDir:
     def __init__(self, temp_dir: Path | None = None):

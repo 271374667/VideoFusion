@@ -115,6 +115,11 @@ class DraggableListWidget(QWidget):
         self.move2bottom_action.setIcon(FluentIcon.REMOVE)
         self.move2bottom_action.setText("置底")
         self.move2bottom_action.triggered.connect(self.moveToBottom)
+        self.remove_action = Action()
+        self.remove_action.setIcon(FluentIcon.CLOSE)
+        self.remove_action.triggered.connect(self.removeCurrent)
+
+        self.remove_action.setText("删除")
         self.clear_list_action = Action()
         self.clear_list_action.setIcon(FluentIcon.DELETE)
         self.clear_list_action.setText("清空")
@@ -132,6 +137,7 @@ class DraggableListWidget(QWidget):
         self.list_menu.addAction(self.desc_action)
         self.list_menu.addAction(self.move2top_action)
         self.list_menu.addAction(self.move2bottom_action)
+        self.list_menu.addAction(self.remove_action)
         self.list_menu.addAction(self.clear_list_action)
         self.list_menu.addSeparator()
         self.list_menu.addAction(self.export_list_action)
@@ -236,6 +242,12 @@ class DraggableListWidget(QWidget):
 
     def clearList(self):
         self._list_widget.clear()
+
+    def removeCurrent(self):
+        if current_item := self._list_widget.currentItem():
+            row = self._list_widget.row(current_item)
+            self._list_widget.takeItem(row)
+            loguru.logger.debug(f"删除了一个文件: {current_item.text()}")
 
     def importFromFile(self):
         file_path, _ = QFileDialog.getOpenFileName(self, "Open File", "", "Text Files (*.txt)")
