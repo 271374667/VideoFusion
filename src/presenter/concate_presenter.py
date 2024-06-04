@@ -46,10 +46,7 @@ class ConcatePresenter:
             return
 
         self._signal_bus.started.emit()
-        self.get_view().get_start_btn().setEnabled(False)
-        self.get_view().get_start_btn().setVisible(False)
-        self.get_view().get_cancle_btn().setVisible(True)
-        self.get_view().get_video_file_list_simple_card_widget().setEnabled(False)
+        self._set_btns_enable(False, True)
         video_list = self.get_all_video_files()
         if not video_list:
             loguru.logger.warning("请先选择视频文件")
@@ -77,10 +74,7 @@ class ConcatePresenter:
         self.get_view().show_state_tooltip("运行中……", "请耐心等待,程序正在运行")
 
     def finished(self):
-        self.get_view().get_start_btn().setEnabled(True)
-        self.get_view().get_start_btn().setVisible(True)
-        self.get_view().get_cancle_btn().setVisible(False)
-        self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
+        self._set_btns_enable(True, False)
         used_time: int = int(time.time() - self.start_time)
         self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{trans_second_to_human_time(used_time)}",
                                           duration=-1, is_closable=True)
@@ -94,15 +88,18 @@ class ConcatePresenter:
 
         self.get_model().set_running(False)
 
-        self.get_view().get_start_btn().setEnabled(True)
-        self.get_view().get_start_btn().setVisible(True)
-        self.get_view().get_cancle_btn().setVisible(False)
-        self.get_view().get_video_file_list_simple_card_widget().setEnabled(True)
+        self._set_btns_enable(True, False)
         self.get_view().finish_state_tooltip("取消", "合并操作已取消")
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
         self._signal_bus.set_total_progress_description.emit("处理完成")
         self._signal_bus.finished.emit()
+
+    def _set_btns_enable(self, start_btn_enable, cancle_btn_enable):
+        self.get_view().get_start_btn().setEnabled(start_btn_enable)
+        self.get_view().get_start_btn().setVisible(start_btn_enable)
+        self.get_view().get_cancle_btn().setVisible(cancle_btn_enable)
+        self.get_view().get_video_file_list_simple_card_widget().setEnabled(start_btn_enable)
 
     def get_all_video_files(self) -> list[str]:
         return self.get_view().get_video_file_list().get_draggable_list_view().get_all_items()
@@ -160,8 +157,8 @@ class ConcatePresenter:
             return
 
         cap = cv2.VideoCapture(first_video_path)
-        # 显示视频中不为黑色的第一帧
-        while True:
+        # 显示视频中不为黑色的第一帧(为了加快速度,只显示前50帧)
+        for _ in range(50):
             ret, frame = cap.read()
             if not ret:
                 break
@@ -172,16 +169,7 @@ class ConcatePresenter:
     # 图片预览
     def _show_first_frame(self):
         def frame_selector(cap):
-            total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            # 显示视频中不为黑色的第一帧
-            for i in range(total_frame):
-                # 设置视频的位置
-                cap.set(cv2.CAP_PROP_POS_FRAMES, i)
-                ret, frame = cap.read()
-                if not ret:
-                    break
-                if not self._black_remover.is_black(frame):
-                    break
+            cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         self._show_frame(frame_selector)
 
