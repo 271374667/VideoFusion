@@ -197,8 +197,10 @@ class RunInThread(QObject):
         self.worker.result.connect(self._done_callback)
 
     def _done_callback(self, *args, **kwargs):
-        if args != (None,) or kwargs:
+        if len(args) == 2 or kwargs:
             self.finished_func(*args, **kwargs)
+        elif len(args) == 1:
+            self.finished_func(args[0], None)
         else:
             self.finished_func()
 

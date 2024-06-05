@@ -4,6 +4,7 @@ from PySide6.QtWidgets import QFileDialog
 from src.config import cfg
 from src.core.version import __version__
 from src.model.settings_model import SettingsModel
+from src.utils import RunInThread
 from src.utils import VersionRequest
 from src.view.settings_view import SettingView
 
@@ -51,21 +52,42 @@ class SettingsPresenter:
 
     def _check_update(self):
         current_version = __version__
-        latest_version, description = self._version_request.get_latest_version()
-        if latest_version is None:
-            self.get_view().show_error_infobar("错误", "无法获取最新版本信息,请检查网络,或者自行前往官网下载最新版本",
-                                               duration=3000, is_closable=True)
-            return
 
-        latest_version = latest_version.replace("v", "")
-        if latest_version > current_version:
-            self.get_view().show_mask_dialog(f"最新版本: {latest_version}", description)
-            return
+        def start():
+            return self._version_request.get_latest_version()
 
-        self.get_view().show_info_infobar("提示", "当前已经是最新版本", duration=3000, is_closable=True)
+        def finished(x, y):
+            print(f'{x=} {y=}')
+            latest_version, description = x
+            if latest_version is None:
+                self.get_view().show_error_infobar("错误",
+                                                   "无法获取最新版本信息,请检查网络,或者自行前往官网下载最新版本",
+                                                   duration=3000, is_closable=True)
+                return
+
+            latest_version = latest_version.replace("v", "")
+            if latest_version > current_version:
+                self.get_view().show_mask_dialog(f"最新版本: {latest_version}", description)
+                return
+
+            self.get_view().show_info_infobar("提示", "当前已经是最新版本", duration=3000, is_closable=True)
+
+        self._run_in_thread = RunInThread()
+        self._run_in_thread.set_start_func(start)
+        self._run_in_thread.set_finished_func(finished)
+        self._run_in_thread.start()
 
     def _connect_signal(self):
         self._view.ffmpeg_file_card.clicked.connect(self._select_ffmpeg_file)
         self._view.temp_dir_card.clicked.connect(self._select_temp_dir)
         self._view.output_file_path_card.clicked.connect(self._select_output_file_path)
         self._view.update_card.clicked.connect(self._check_update)
+
+
+if __name__ == '__main__':
+    from PySide6.QtWidgets import QApplication
+
+    app = QApplication([])
+    settings_presenter = SettingsPresenter()
+    settings_presenter.get_view().show()
+    app.exec()
