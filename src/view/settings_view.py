@@ -1,7 +1,7 @@
 from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QFrame, QVBoxLayout, QWidget
-from qfluentwidgets import (BodyLabel, ComboBoxSettingCard, FluentIcon, Icon, PushSettingCard, RangeSettingCard,
-                            SettingCardGroup, SwitchSettingCard, ToolTipFilter)
+from qfluentwidgets import (BodyLabel, ComboBoxSettingCard, FluentIcon, Icon, PrimaryPushSettingCard, PushSettingCard,
+                            RangeSettingCard, SettingCardGroup, SwitchSettingCard, ToolTipFilter)
 from qfluentwidgets.components import (
     ExpandLayout,
     LargeTitleLabel,
@@ -63,6 +63,9 @@ class SettingView(MessageBaseView):
         self.preview_frame_card = ComboBoxSettingCard(cfg.preview_frame, Icon(FluentIcon.CHEVRON_RIGHT), "预览视频帧",
                                                       "设置预览视频的封面为第几帧的图片",
                                                       ["第一帧", "最后一帧", "随机帧"], self.general_group)
+        self.update_card = PrimaryPushSettingCard("检查更新", Icon(FluentIcon.CHEVRON_RIGHT), "检查更新",
+                                                  "检查当前软件版本",
+                                                  self.general_group)
 
         # 视频质量
         self.output_file_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
@@ -140,18 +143,18 @@ class SettingView(MessageBaseView):
         self.deband_card.setToolTip(
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/debanding.png"/></p></body></html>')
         self.deblock_card.setToolTip(
-            '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
+                '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
-            '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
-            '</p><p>值为0则不启用去除黑边,0~1之间使用静态去黑边,为1则开启动态去黑边模式</p></body></html>')
+                '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
+                '</p><p>值为0则不启用去除黑边,0~1之间使用静态去黑边,为1则开启动态去黑边模式</p></body></html>')
         self.scaling_quality_card.setToolTip(
-            '<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
+                '<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
         self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
         self.output_codec_card.setToolTip(
-            "调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
+                "调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
 
     def _set_up_layout(self):
         """设置布局"""
@@ -169,7 +172,8 @@ class SettingView(MessageBaseView):
                 self.temp_dir_card,
                 self.delete_temp_dir_card,
                 self.preview_video_remove_black_card,
-                self.preview_frame_card
+                self.preview_frame_card,
+                self.update_card
                 ])
         self.video_group.addSettingCards([
                 self.output_file_path_card,

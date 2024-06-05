@@ -1,8 +1,11 @@
+import json
 import shutil
+import threading
 import time
 from functools import wraps
 from pathlib import Path
-from typing import Callable, Optional
+from typing import Callable, Optional, Tuple
+from urllib import error, request
 
 import loguru
 from PySide6.QtCore import QObject, QThread, Signal
@@ -200,6 +203,78 @@ class RunInThread(QObject):
             self.finished_func()
 
 
+class VersionRequest:
+    # 定义线程超时异常
+    class TimeoutException(Exception):
+        pass
+
+    # 定义用于超时控制的函数
+    def _raise_timeout(self, signum, frame):
+        raise self.TimeoutException
+
+    # 定义重试装饰器
+    @staticmethod
+    def retry(retries: int):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                last_exception = None
+                for _ in range(retries):
+                    try:
+                        return func(*args, **kwargs)
+                    except Exception as e:
+                        last_exception = e
+                        time.sleep(1)  # 重试间隔时间
+                loguru.logger.debug(f"正在进行第{retries}次重试获取最新版本, 上一次的报错信息为: {last_exception}")
+                return None, None
+
+            return wrapper
+
+        return decorator
+
+    # 定义多线程装饰器
+    @staticmethod
+    def timeout(seconds: int):
+        def decorator(func):
+            @wraps(func)
+            def wrapper(*args, **kwargs):
+                result = [None]
+
+                def target():
+                    try:
+                        result[0] = func(*args, **kwargs)
+                    except VersionRequest.TimeoutException:
+                        result[0] = (None, None)
+
+                thread = threading.Thread(target=target)
+                thread.start()
+                thread.join(seconds)
+                if thread.is_alive():
+                    loguru.logger.debug(f"正在进行第{seconds}秒超时处理, 请稍后重试")
+                    result[0] = (None, None)
+                return result[0]
+
+            return wrapper
+
+        return decorator
+
+    @retry(retries=3)
+    @timeout(seconds=20)
+    def get_latest_version(self) -> Tuple[Optional[str], Optional[str]]:
+        url = "https://api.github.com/repos/271374667/VideoFusion/releases/latest"
+        try:
+            with request.urlopen(url) as response:
+                if response.status != 200:
+                    return None, None
+                data = json.loads(response.read().decode('utf-8'))
+                latest_version = data.get("tag_name")
+                release_notes = data.get("body")
+                return latest_version, release_notes
+        except error.URLError as e:
+            loguru.logger.error(f'获取最新版本失败: {e}')
+            return None, None
+
+
 if __name__ == '__main__':
     # 抽帧示例用法
     # current_num = 180000
@@ -208,10 +283,14 @@ if __name__ == '__main__':
     # print(f"抽帧:{result}")
     # print(len(result)) [0, 0, 1, 2, 2, 3]
 
-    # 插帧示例用法
-    current_num = 1148
-    target_num = 1500
-    start = time.time()
-    result = evenly_interpolate_numbers(current_num, target_num)
-    print(time.time() - start)
-    print(f"插帧:{result}")
+    # # 插帧示例用法
+    # current_num = 1148
+    # target_num = 1500
+    # start = time.time()
+    # result = evenly_interpolate_numbers(current_num, target_num)
+    # print(time.time() - start)
+    # print(f"插帧:{result}")
+
+    v = VersionRequest()
+    version, notes = v.get_latest_version()
+    print(f"Latest Version: {version}, Release Notes: {notes}")
