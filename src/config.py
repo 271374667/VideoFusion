@@ -1,10 +1,22 @@
+import locale
+import sys
 from enum import Enum
 from pathlib import Path
 
+import loguru
 from qfluentwidgets import (BoolValidator, ConfigItem, ConfigValidator, EnumSerializer, FolderValidator,
                             OptionsConfigItem, OptionsValidator, QConfig, RangeConfigItem, RangeValidator, qconfig)
 
-from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_FILE, TEMP_DIR, ROOT)
+from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_FILE, ROOT, TEMP_DIR)
+
+if sys.getdefaultencoding() != 'utf-8':
+    import importlib
+
+    importlib.reload(sys)
+    loguru.logger.debug(f"系统默认编码: {sys.getdefaultencoding()}, 已经重新加载为UTF-8")
+
+# 确保环境变量LANG设置为UTF-8
+locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 
 # 音频响度标准化标准
@@ -104,7 +116,8 @@ class Config(QConfig):
     audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
                                             OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
     audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
-                                            OptionsValidator(AudioNoiseReduction), EnumSerializer(AudioNoiseReduction))
+                                              OptionsValidator(AudioNoiseReduction),
+                                              EnumSerializer(AudioNoiseReduction))
     video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.DISABLE,
                                               OptionsValidator(VideoNoiseReduction),
                                               EnumSerializer(VideoNoiseReduction))

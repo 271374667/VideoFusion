@@ -10,6 +10,7 @@ from src.config import (AudioNoiseReduction, AudioNormalization, FrameRateAdjust
                         VideoNoiseReduction, cfg)
 from src.core.datacls import CropInfo
 from src.signal_bus import SignalBus
+from src.utils import TempDir
 
 signal_bus = SignalBus()
 
@@ -91,21 +92,36 @@ def generate_ffmpeg_command(input_file: str | Path,
     return command
 
 
-def merge_videos(video_list: list[str | Path], output_path: str | Path):
-    def convert_to_ts(input_file: str | Path, output_file: str | Path):
+def merge_videos(video_list: list[Path], output_path: Path):
+    def convert_to_ts(input_file: Path, output_file: Path):
+        # 创建一个临时的文本文件
+        txt_path: Path = TempDir().get_temp_dir() / 'ts_videos.txt'
+        with open(txt_path, 'w', encoding='utf-8') as f:
+            for video in video_list:
+                # 将文件路径转换为UTF-8编码, 防止中文路径导致的问题
+                video = str(video).encode('utf-8').decode('utf-8')
+                f.write(f"file '{video}'\n")
+
         loguru.logger.debug(f'正在将视频{input_file}转换为TS格式')
         ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
         command = f'"{ffmpeg_exe}" -fflags +genpts -i "{input_file}" -c copy -bsf:v h264_mp4toannexb -f mpegts "{output_file}" -y'
         run_command(input_file, command)
 
-    def merge_ts_files(ts_files: list[str | Path], output_file: str | Path):
+    def merge_ts_files(ts_files: list[Path], output_file: Path):
         loguru.logger.debug(f'正在将{ts_files}TS文件合并至->{output_file}')
+        # 创建一个临时的文本文件
+        txt_path: Path = TempDir().get_temp_dir() / 'ts_merge_videos.txt'
+        with open(txt_path, 'w') as f:
+            for video in ts_files:
+                # 将文件路径转换为UTF-8编码
+                video = str(video).encode('utf-8').decode('utf-8')
+                f.write(f"file '{video}'\n")
+
         ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
-        input_files = '|'.join(str(file) for file in ts_files)
-        command = f'"{ffmpeg_exe}" -i "concat:{input_files}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
+        command = f'"{ffmpeg_exe}" -fflags +genpts -f concat -safe 0 -i "{txt_path}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
         run_command_without_progress(command)
 
-    temp_dir: Path = Path(cfg.get(cfg.temp_dir))
+    temp_dir: Path = TempDir().get_temp_dir()
     ts_files = []
 
     # Convert each video to TS format and store the paths in ts_files
@@ -146,7 +162,7 @@ def run_command(input_file_path: str | Path, command: str):
     #                            universal_newlines=True, encoding='utf-8')
 
     # 运行ffmpeg命令
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, encoding='utf-8')
 
     # 更新进度条
@@ -170,12 +186,18 @@ def run_command(input_file_path: str | Path, command: str):
 
 
 def run_command_without_progress(command: str):
+    print(command)
+
+    # 将命令变成列表
+    command = command.replace('"', '')
+    command_list = command.split()
+    print(command_list)
     # 运行ffmpeg命令
-    # process = subprocess.Popen(command, shell=True,
-    #                            universal_newlines=True, encoding='utf-8')
+    # process = subprocess.Popen(command_list,
+    #                            universal_newlines=True, encoding='gbk')
 
     # 运行ffmpeg命令
-    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,
+    process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                                universal_newlines=True, encoding='utf-8')
 
     # 更新进度条
@@ -193,15 +215,15 @@ def run_command_without_progress(command: str):
 
 
 if __name__ == '__main__':
-    input_file = r"E:\load\python\Project\VideoFusion\测试\video\video_2024-03-04_16-55-16.mp4"
-    output_file = r"E:\load\python\Project\VideoFusion\测试\video\output3.mp4"
-    print(generate_ffmpeg_command(input_file=Path(input_file),
-                                  output_file_path=Path(output_file),
-                                  crop_position=CropInfo(0, 0, 1920, 1080),
-                                  width=1920,
-                                  height=1080,
-                                  rotation_angle=0))
-    # video_list = Path(r"E:\load\python\Project\VideoMosaic\测试\video\2.txt").read_text(
-    #         encoding="utf-8").replace('"', '').splitlines()
-    # merge_videos(video_list,
-    #              r"E:\load\python\Project\VideoMosaic\测试\video\output1.mp4")
+    # input_file = r"E:\load\python\Project\VideoFusion\测试\video\video_2024-03-04_16-55-16.mp4"
+    # output_file = r"E:\load\python\Project\VideoFusion\测试\video\output3.mp4"
+    # print(generate_ffmpeg_command(input_file=Path(input_file),
+    #                               output_file_path=Path(output_file),
+    #                               crop_position=CropInfo(0, 0, 1920, 1080),
+    #                               width=1920,
+    #                               height=1080,
+    #                               rotation_angle=0))
+    video_list = Path(r"E:\load\python\Project\VideoFusion\测试\video\1.txt").read_text(
+            ).replace('"', '').splitlines()
+    merge_videos(video_list,
+                 r"E:\load\python\Project\VideoFusion\TempAndTest\output.mp4")

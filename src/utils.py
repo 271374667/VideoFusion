@@ -122,7 +122,7 @@ class TempDir:
         self._is_exists: bool = False
 
     def get_temp_dir(self) -> Path:
-        if self._is_exists:
+        if self.path.exists():
             return self.path
         self.delete_dir()
 
@@ -132,13 +132,14 @@ class TempDir:
 
     def delete_dir(self) -> None:
         if not self.path.exists():
-            raise OSError(f'文件夹不存在:{self.path},无法删除')
+            loguru.logger.error(f'文件夹不存在:{self.path},无法删除')
+            return
 
         shutil.rmtree(self.path, ignore_errors=True)
         loguru.logger.debug(f"删除临时文件夹:{self.path}")
 
-    def __del__(self):
-        self.delete_dir()
+    # def __del__(self):
+    #     self.delete_dir()
 
 
 class WorkThread(QObject):
