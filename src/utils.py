@@ -132,7 +132,7 @@ class TempDir:
 
     def delete_dir(self) -> None:
         if not self.path.exists():
-            loguru.logger.error(f'文件夹不存在:{self.path},无法删除')
+            loguru.logger.debug(f'文件夹不存在:{self.path},无法删除')
             return
 
         shutil.rmtree(self.path, ignore_errors=True)
@@ -201,7 +201,7 @@ class RunInThread(QObject):
         if len(args) == 2 or kwargs:
             self.finished_func(*args, **kwargs)
         elif len(args) == 1:
-            self.finished_func(args[0], None)
+            self.finished_func(args[0])
         else:
             self.finished_func()
 

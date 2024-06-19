@@ -58,14 +58,14 @@ class ScalingQuality(Enum):
 
 # 视频编码策略
 class VideoCodec(Enum):
-    H264 = "-c:v libx264 -crf 23 -preset slow -qcomp 0.5 -psy-rd 0.3:0 -aq-mode 2 -aq-strength 0.8 -b:a 256k"
-    H264Intel = "-c:v h264_qsv -qscale 15 -b:a 256k"
-    H264AMD = "-c:v h264_amf -qscale 15 -b:a 256k"
-    H264Nvidia = "-c:v h264_nvenc -qscale 15 -b:a 256k"
-    H265 = "-c:v libx265 -crf 28 -b:a 256k"
-    H265Intel = "-c:v hevc_qsv -qscale 15 -b:a 256k"
-    H265AMD = "-c:v hevc_amf -qscale 15 -b:a 256k"
-    H265Nvidia = "-c:v hevc_nvenc -qscale 15 -b:a 256k"
+    H264 = "-c:v libx264 -crf 23 -preset slow -qcomp 0.5 -psy-rd 0.3:0 -aq-mode 2 -aq-strength 0.8"
+    H264Intel = "-c:v h264_qsv -qscale 15"
+    H264AMD = "-c:v h264_amf -qscale 15"
+    H264Nvidia = "-c:v h264_nvenc -qscale 15"
+    H265 = "-c:v libx265 -crf 28"
+    H265Intel = "-c:v hevc_qsv -qscale 15"
+    H265AMD = "-c:v hevc_amf -qscale 15"
+    H265Nvidia = "-c:v hevc_nvenc -qscale 15"
 
 
 # 预览视频帧
