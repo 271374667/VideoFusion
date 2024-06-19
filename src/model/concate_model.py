@@ -57,15 +57,6 @@ class Worker(QObject):
         self._signal_bus.set_total_progress_description.emit("分析视频")
         self._signal_bus.set_total_progress_max.emit(len(video_list))
 
-        # 获取视频去黑边的力度
-        sample_rate: int = cfg.get(cfg.video_sample_rate)
-        sample = sample_rate / 10
-        # sample 要在0到1之间, 0为不采样, 1为全部采样
-        if sample < 0:
-            sample = 0
-        elif sample > 1:
-            sample = 1
-
         video_info_list: list[VideoInfo] = []
         for each in video_list:
             if not self.is_running:
@@ -73,7 +64,7 @@ class Worker(QObject):
                 break
 
             loguru.logger.debug(f'正在分析视频:{each.name}')
-            video_info = get_video_info(each, sample_rate=sample)  # Assuming a sample rate of 0.1
+            video_info = get_video_info(each, sample_rate=0.8)  # Assuming a sample rate of 0.1
             video_info_list.append(video_info)
 
             self._signal_bus.advance_total_progress.emit(1)

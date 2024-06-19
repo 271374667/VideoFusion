@@ -8,6 +8,7 @@ import loguru
 
 from src.common.black_remove.img_black_remover import BlackRemover
 from src.common.black_remove.video_remover import VideoRemover
+from src.config import BlackBorderAlgorithm, cfg
 from src.core.datacls import CropInfo, VideoInfo
 from src.core.enums import Orientation
 from src.signal_bus import SignalBus
@@ -26,6 +27,9 @@ def _img_black_remover_start(video_path: Path, sample_rate: float) -> VideoInfo:
     fps = int(video.get(cv2.CAP_PROP_FPS))
     # 如果有黑边则需要获取主体区域坐标(只获取部分百比分帧)
     sample_frames = int(total_frames * sample_rate)
+    # 限制最大采样帧数,不然长时间的视频会导致等待时间过长
+    max_frames = cfg.get(cfg.video_sample_frame_number)
+    sample_frames = min([max_frames, sample_frames])
     # 计算每次需要跳过的帧数
     skip_frames = total_frames // sample_frames if sample_frames else 0
 
@@ -95,11 +99,13 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     fps = int(video.get(cv2.CAP_PROP_FPS))
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+
     loguru.logger.debug(f'正在获取视频信息[{video_path.name}]')
     signal_bus.set_detail_progress_reset.emit()
     signal_bus.set_detail_progress_max.emit(total_frames)
 
-    if sample_rate == 0:
+    # 是否需要去黑边
+    if cfg.get(cfg.video_black_border_algorithm) == BlackBorderAlgorithm.DISABLE:
         return VideoInfo(video_path, fps, total_frames, width, height, None)
 
     # 先判断是否有黑边(获取视频中随机的10帧)
@@ -117,10 +123,13 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
         return VideoInfo(video_path, fps, total_frames, width, height, None)
     video.release()
 
-    if sample_rate != 1:
+    black_remove_algorithm: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
+    if black_remove_algorithm == BlackBorderAlgorithm.STATIC:
         return _img_black_remover_start(video_path, sample_rate)
-    else:
+    elif black_remove_algorithm == BlackBorderAlgorithm.DYNAMIC:
         return _video_black_remover_start(video_path)
+    else:
+        raise ValueError(f'未知的黑边去除算法:{black_remove_algorithm}')
 
 
 def get_most_compatible_resolution(video_info_list: list[VideoInfo],

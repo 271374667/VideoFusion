@@ -81,10 +81,17 @@ class SettingView(MessageBaseView):
                                             cfg.shake, self.video_group)
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
-        self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
-                                                       "去黑边采样率",
-                                                       "通过算法去除视频的黑边或者logo等,留下视频的主体画面",
+        self.video_black_border_algorithm_card = ComboBoxSettingCard(cfg.video_black_border_algorithm,
+                                                                     Icon(FluentIcon.CHEVRON_RIGHT),
+                                                                     "视频黑边去除算法",
+                                                                     "通过算法去除视频的黑边或者logo等,留下视频的主体画面",
+                                                                     ["关闭", "静态", "动态"],
+                                                                     self.video_group)
+        self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_frame_number, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                       "去黑边采样帧数",
+                                                       "设置静态进去黑边的采样帧数,数值越大效果越好,但是速度越慢",
                                                        self.video_group)
+        self.video_sample_rate_card.slider.setSingleStep(1)
         self.audio_normalization_card = ComboBoxSettingCard(cfg.audio_normalization, Icon(FluentIcon.CHEVRON_RIGHT),
                                                             "视频音量自动调整",
                                                             "将声音过大或者过小的视频音频自动调整到合适的响度",
@@ -148,13 +155,15 @@ class SettingView(MessageBaseView):
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
-                '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
-                '</p><p>值为0则不启用去除黑边,0~1之间使用静态去黑边,为1则开启动态去黑边模式</p></body></html>')
+            '静态去黑边会从视频内读取一定数量的帧,然后通过这些帧计算出黑边的位置,然后进行拟合,数值越大效果越好,但是速度越慢')
         self.scaling_quality_card.setToolTip(
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
         self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
         self.output_codec_card.setToolTip(
                 "调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
+        self.video_black_border_algorithm_card.setToolTip(
+            '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
+            '<center><p>黑边不动优先使用动态算法,黑边上的logo会移动优先选择静态算法</p></center></body></html>')
 
     def _set_up_layout(self):
         """设置布局"""
@@ -182,6 +191,7 @@ class SettingView(MessageBaseView):
                 self.shake_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
+                self.video_black_border_algorithm_card,
                 self.audio_normalization_card,
                 self.audio_noise_reduction_card,
                 self.video_noise_reduction_card,

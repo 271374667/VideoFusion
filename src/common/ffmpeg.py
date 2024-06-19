@@ -124,12 +124,6 @@ def merge_videos(video_list: list[Path], output_path: Path):
         command = f'"{ffmpeg_exe}" -fflags +genpts -f concat -safe 0 -i "{txt_path}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
         run_command_without_progress(command)
 
-    def compress_video(input_file: Path, final_output_file: Path):
-        loguru.logger.debug(f'正在重新编码视频音频{input_file}')
-        ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
-        command = f'"{ffmpeg_exe}" -i "{input_file}" -c:v copy -c:a aac -async 1 "{final_output_file}" -y'
-        run_command(input_file, command)
-
     temp_dir: Path = TempDir().get_temp_dir()
     ts_files = []
 
@@ -145,10 +139,7 @@ def merge_videos(video_list: list[Path], output_path: Path):
         ts_files.append(ts_file)
 
     # Merge the TS files
-    first_output_video = temp_dir / 'first_output.mp4'
-    merge_ts_files(ts_files, Path(output_file))
-    # 因为有可能音频出现问题, 所以重新单独编码一次音频
-    # compress_video(first_output_video, output_path)
+    merge_ts_files(ts_files, output_path)
 
 
 def run_command(input_file_path: str | Path, command: str):

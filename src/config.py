@@ -1,6 +1,6 @@
 import locale
 import sys
-from enum import Enum
+from enum import Enum, auto
 from pathlib import Path
 
 import loguru
@@ -17,6 +17,13 @@ if sys.getdefaultencoding() != 'utf-8':
 
 # 确保环境变量LANG设置为UTF-8
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
+
+
+# 去黑边算法
+class BlackBorderAlgorithm(Enum):
+    DISABLE = 0
+    STATIC = auto()
+    DYNAMIC = auto()
 
 
 # 音频响度标准化标准
@@ -112,7 +119,10 @@ class Config(QConfig):
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
-    video_sample_rate = RangeConfigItem("Video", "黑边采样率", 10, RangeValidator(0, 10))
+    video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 100, RangeValidator(10, 1000))
+    video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DISABLE,
+                                                     OptionsValidator(BlackBorderAlgorithm),
+                                                     EnumSerializer(BlackBorderAlgorithm))
     audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
                                             OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
     audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
