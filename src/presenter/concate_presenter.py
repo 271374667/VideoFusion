@@ -45,13 +45,14 @@ class ConcatePresenter:
                                                is_closable=True)
             return
 
-        self._signal_bus.started.emit()
-        self._set_btns_enable(False, True)
         video_list = self.get_all_video_files()
         if not video_list:
             loguru.logger.warning("请先选择视频文件")
             self.get_view().show_warning_infobar("错误", "您还没有添加任何视频文件")
             return
+
+        self._signal_bus.started.emit()
+        self._set_btns_enable(False, True)
 
         if self.get_view().get_horization_video_radio_btn().isChecked():
             video_orientation = Orientation.HORIZONTAL

@@ -1,4 +1,3 @@
-import os
 import re
 import subprocess
 from pathlib import Path
@@ -216,6 +215,7 @@ def run_command_without_progress(command: str):
 if __name__ == '__main__':
     import os
     from src.core.paths import ROOT
+
     os.chdir(ROOT)
     signal_bus.set_detail_progress_current.connect(lambda x: print(f'detail_progress_current: {x}'))
     signal_bus.set_detail_progress_max.connect(lambda x: print(f'detail_progress_max: {x}'))

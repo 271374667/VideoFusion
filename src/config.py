@@ -119,7 +119,7 @@ class Config(QConfig):
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
-    video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 100, RangeValidator(10, 1000))
+    video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
     video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DISABLE,
                                                      OptionsValidator(BlackBorderAlgorithm),
                                                      EnumSerializer(BlackBorderAlgorithm))
