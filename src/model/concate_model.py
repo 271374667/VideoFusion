@@ -64,7 +64,7 @@ class Worker(QObject):
                 break
 
             loguru.logger.debug(f'正在分析视频:{each.name}')
-            video_info = get_video_info(each, sample_rate=0.8)  # Assuming a sample rate of 0.1
+            video_info = get_video_info(each, sample_rate=0.8)  # Assuming a sample rate of 0.8
             video_info_list.append(video_info)
 
             self._signal_bus.advance_total_progress.emit(1)
@@ -147,7 +147,7 @@ class Worker(QObject):
                 loguru.logger.info('用户取消了视频合并')
                 return
 
-            loguru.logger.debug(f'正在处理视频:{each[0].name}')
+            loguru.logger.debug(f'正在处理视频:{each[0].name}, 命令为:{each[1]}')
             run_command(input_file_path=each[0], command=each[1])
             signal_bus.advance_total_progress.emit(1)
 

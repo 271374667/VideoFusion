@@ -9,7 +9,7 @@ from src.config import (AudioNoiseReduction, AudioNormalization, FrameRateAdjust
                         VideoNoiseReduction, cfg)
 from src.core.datacls import CropInfo
 from src.signal_bus import SignalBus
-from src.utils import TempDir
+from src.utils import TempDir, check_file_readability
 
 signal_bus = SignalBus()
 
@@ -106,7 +106,7 @@ def merge_videos(video_list: list[Path], output_path: Path):
 
         loguru.logger.debug(f'正在将视频{input_file}转换为TS格式')
         ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
-        command = f'"{ffmpeg_exe}" -fflags +genpts -i "{input_file}" -c copy -bsf:v h264_mp4toannexb -f mpegts "{output_file}" -y'
+        command = f'"{ffmpeg_exe}" -fflags +genpts -i "{input_file}" -c copy -bsf:v h264_mp4toannexb -vsync 2 -f mpegts "{output_file}" -y'
         run_command(input_file, command)
 
     def merge_ts_files(ts_files: list[Path], output_file: Path):
@@ -143,14 +143,15 @@ def merge_videos(video_list: list[Path], output_path: Path):
 
 def run_command(input_file_path: str | Path, command: str):
     # Convert input_file_path to a Path object
-    input_file_path = Path(input_file_path)
+    input_file_path = Path(input_file_path).resolve()
+    loguru.logger.debug(f'正在处理视频: {input_file_path}haha')
 
-    # Check if the file exists
+    # Check if the file
     if not input_file_path.exists():
         raise FileNotFoundError(f"The file {input_file_path} does not exist.")
 
     # Check if the file is readable
-    if not os.access(input_file_path, os.R_OK):
+    if not check_file_readability(input_file_path):
         raise PermissionError(f"The file {input_file_path} is not readable.")
 
     # 获取视频的总帧数
@@ -191,8 +192,8 @@ def run_command_without_progress(command: str):
     # 将命令变成列表
     command = command.replace('"', '')
     # 运行ffmpeg命令
-    # process = subprocess.Popen(command_list,
-    #                            universal_newlines=True, encoding='gbk')
+    # process = subprocess.Popen(command,shell=True,
+    #                            universal_newlines=True, encoding='utf-8')
 
     # 运行ffmpeg命令
     process = subprocess.Popen(command, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT,

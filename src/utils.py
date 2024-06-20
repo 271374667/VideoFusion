@@ -1,4 +1,5 @@
 import json
+import os
 import shutil
 import threading
 import time
@@ -115,6 +116,17 @@ def trans_second_to_human_time(second: int) -> str:
         return f"{str(hour)}小时{str(minute)}分{second}秒"
 
 
+def check_file_readability(file_path: Path) -> bool:
+    if not os.path.exists(file_path):
+        return False
+    try:
+        with open(file_path, 'r'):
+            return True
+    except IOError as e:
+        loguru.logger.error(f'文件{file_path}不可读: {e}')
+        return False
+
+
 @singleton
 class TempDir:
     def __init__(self, temp_dir: Path | None = None):
@@ -138,8 +150,8 @@ class TempDir:
         shutil.rmtree(self.path, ignore_errors=True)
         loguru.logger.debug(f"删除临时文件夹:{self.path}")
 
-    # def __del__(self):
-    #     self.delete_dir()
+    def __del__(self):
+        self.delete_dir()
 
 
 class WorkThread(QObject):

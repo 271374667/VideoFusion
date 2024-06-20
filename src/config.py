@@ -15,7 +15,7 @@ if sys.getdefaultencoding() != 'utf-8':
     importlib.reload(sys)
     loguru.logger.debug(f"系统默认编码: {sys.getdefaultencoding()}, 已经重新加载为UTF-8")
 
-# 确保环境变量LANG设置为UTF-8
+# # 确保环境变量LANG设置为UTF-8
 locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 
@@ -120,7 +120,7 @@ class Config(QConfig):
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
-    video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DISABLE,
+    video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DYNAMIC,
                                                      OptionsValidator(BlackBorderAlgorithm),
                                                      EnumSerializer(BlackBorderAlgorithm))
     audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
