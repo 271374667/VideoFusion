@@ -102,4 +102,4 @@ pip install -r requirements.txt
 
 您可以通过邮箱联系我进行捐赠，也可以通过下方的二维码进行捐赠
 
-![image-20240620172145334](./README.assets/image-20240620172145334.png)
+![donate](./README.assets/donate.png)
