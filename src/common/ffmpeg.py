@@ -95,47 +95,52 @@ def generate_ffmpeg_command(input_file: str | Path,
 
 
 def merge_videos(video_list: list[Path], output_path: Path):
+    temp_dir: Path = TempDir().get_temp_dir()
+    ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
+
     def convert_to_ts(input_file: Path, output_file: Path):
         # 创建一个临时的文本文件
-        txt_path: Path = TempDir().get_temp_dir() / 'ts_videos.txt'
+        txt_path: Path = temp_dir / 'ts_videos.txt'
         with open(txt_path, 'w', encoding='utf-8') as f:
             for video in video_list:
-                # 将文件路径转换为UTF-8编码, 防止中文路径导致的问题
-                video = str(video).encode('utf-8').decode('utf-8')
                 f.write(f"file '{video}'\n")
 
         loguru.logger.debug(f'正在将视频{input_file}转换为TS格式')
-        ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
+
         command = f'"{ffmpeg_exe}" -fflags +genpts -i "{input_file}" -c copy -bsf:v h264_mp4toannexb -vsync 2 -f mpegts "{output_file}" -y'
         run_command(input_file, command)
 
     def merge_ts_files(ts_files: list[Path], output_file: Path):
         loguru.logger.debug(f'正在将{ts_files}TS文件合并至->{output_file}')
+        signal_bus.set_total_progress_description.emit("合并TS")
+        signal_bus.set_total_progress_reset.emit()
+
         # 创建一个临时的文本文件
-        txt_path: Path = TempDir().get_temp_dir() / 'ts_merge_videos.txt'
-        with open(txt_path, 'w') as f:
+        txt_path: Path = temp_dir / 'ts_merge_videos.txt'
+        with open(txt_path, 'w', encoding='utf-8') as f:
             for video in ts_files:
-                # 将文件路径转换为UTF-8编码
-                video = str(video).encode('utf-8').decode('utf-8')
                 f.write(f"file '{video}'\n")
 
-        ffmpeg_exe: Path = cfg.get(cfg.ffmpeg_file)
         command = f'"{ffmpeg_exe}" -fflags +genpts -f concat -safe 0 -i "{txt_path}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
         run_command_without_progress(command)
 
-    temp_dir: Path = TempDir().get_temp_dir()
-    ts_files = []
-
     # Convert each video to TS format and store the paths in ts_files
+    ts_files = []
     ts_dir = temp_dir / 'ts_files'
     if not ts_dir.exists():
         ts_dir.mkdir(parents=True, exist_ok=True)
         loguru.logger.debug(f'创建临时目录{ts_dir}成功')
 
+    # 将视频转换为TS格式
+    signal_bus.set_detail_progress_reset.emit()
+    signal_bus.set_total_progress_reset.emit()
+    signal_bus.set_total_progress_max.emit(len(video_list))
+    signal_bus.set_total_progress_description.emit("转为TS")
     for video in video_list:
         ts_file = ts_dir / f'{Path(video).stem}.ts'
         convert_to_ts(video, ts_file)
         ts_files.append(ts_file)
+        signal_bus.advance_total_progress.emit(1)
 
     # Merge the TS files
     merge_ts_files(ts_files, output_path)

@@ -1,8 +1,10 @@
 import json
+import math
 import os
 import shutil
 import threading
 import time
+from functools import reduce
 from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional, Tuple
@@ -127,8 +129,19 @@ def check_file_readability(file_path: Path) -> bool:
         return False
 
 
+def get_gcd(number_list):
+    return reduce(math.gcd, number_list)
+
+
 @singleton
 class TempDir:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if not cls._instance:
+            cls._instance = super().__new__(cls, *args, **kwargs)
+        return cls._instance
+
     def __init__(self, temp_dir: Path | None = None):
         self.path = temp_dir or Path(cfg.get(cfg.temp_dir))
         self._is_exists: bool = False
@@ -306,6 +319,7 @@ if __name__ == '__main__':
     # print(time.time() - start)
     # print(f"插帧:{result}")
 
-    v = VersionRequest()
-    version, notes = v.get_latest_version()
-    print(f"Latest Version: {version}, Release Notes: {notes}")
+    # v = VersionRequest()
+    # version, notes = v.get_latest_version()
+    # print(f"Latest Version: {version}, Release Notes: {notes}")
+    print(get_gcd([2, 4, 6, 8]))

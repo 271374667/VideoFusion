@@ -1,4 +1,6 @@
+import json
 import os
+import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -71,6 +73,16 @@ class Worker(QObject):
             loguru.logger.debug(f'视频分析{each.name}分析完成:{video_info}')
         loguru.logger.info(f'获取视频信息完成,一共获取到了{len(video_info_list)}个视频信息')
         return video_info_list
+
+    def _get_audio_sample_rate(self, video_path: str | Path) -> int:
+        # 使用FFmpeg命令获取媒体文件的信息，并输出为json格式
+        video_path: Path = Path(video_path)
+        command = f'ffprobe -v quiet -print_format json -show_streams {video_path}'
+        result = subprocess.run(command, shell=True, capture_output=True, text=True)
+        data = json.loads(result.stdout)
+        for stream in data['streams']:
+            if stream['codec_type'] == 'audio':
+                return int(stream['sample_rate'])
 
     def _get_best_resolution(self, video_info_list, video_orientation) -> tuple[int, int]:
         loguru.logger.debug('正在获取最佳分辨率')
@@ -230,5 +242,5 @@ if __name__ == '__main__':
     video_list = Path(r"E:\load\python\Project\VideoFusion\测试\video\1.txt").read_text(
             ).replace('"', '').splitlines()
     model = ConcateModel()
-    model.start(video_list, Orientation.HORIZONTAL, Rotation.CLOCKWISE)
+    # model.start(video_list, Orientation.HORIZONTAL, Rotation.CLOCKWISE)
 
