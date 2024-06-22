@@ -1,6 +1,4 @@
-import json
 import os
-import subprocess
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -12,7 +10,7 @@ from src.common.video_info import VideoInfo, get_most_compatible_resolution, get
 from src.config import cfg
 from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
-from src.utils import TempDir
+from src.utils import TempDir, get_gcd, get_lcm
 
 signal_bus = SignalBus()
 temp_dir = TempDir()
@@ -37,10 +35,12 @@ class Worker(QObject):
             return
 
         best_width, best_height = self._get_best_resolution(video_info_list, video_orientation)
+        best_audio_sample_rate: int = self._get_best_audio_sample_rate(video_info_list)
         if not self.is_running:
             return
 
         ffmpeg_list, output_video_list = self._generate_ffmpeg_commands(video_info_list, best_width, best_height,
+                                                                        best_audio_sample_rate,
                                                                         video_orientation, video_rotation)
         if not self.is_running:
             return
@@ -74,16 +74,6 @@ class Worker(QObject):
         loguru.logger.info(f'获取视频信息完成,一共获取到了{len(video_info_list)}个视频信息')
         return video_info_list
 
-    def _get_audio_sample_rate(self, video_path: str | Path) -> int:
-        # 使用FFmpeg命令获取媒体文件的信息，并输出为json格式
-        video_path: Path = Path(video_path)
-        command = f'ffprobe -v quiet -print_format json -show_streams {video_path}'
-        result = subprocess.run(command, shell=True, capture_output=True, text=True)
-        data = json.loads(result.stdout)
-        for stream in data['streams']:
-            if stream['codec_type'] == 'audio':
-                return int(stream['sample_rate'])
-
     def _get_best_resolution(self, video_info_list, video_orientation) -> tuple[int, int]:
         loguru.logger.debug('正在获取最佳分辨率')
         self._signal_bus.set_total_progress_description.emit("调优参数")
@@ -93,10 +83,17 @@ class Worker(QObject):
         loguru.logger.info(f'最佳分辨率获取完成,最佳分辨率为: {best_width}x{best_height}')
         return best_width, best_height
 
+    def _get_best_audio_sample_rate(self, video_info_list: list[VideoInfo]) -> int:
+        audio_sample_rate_list: list[int] = [x.audio_sample_rate for x in video_info_list]
+        best_audio_sample_rate = get_lcm(audio_sample_rate_list)
+        loguru.logger.info(f'最佳音频采样率为:{best_audio_sample_rate}')
+        return best_audio_sample_rate
+
     def _generate_ffmpeg_commands(self,
                                   video_info_list: list[VideoInfo],
                                   best_width: int,
                                   best_height: int,
+                                  best_audio_sample_rate: int,
                                   video_orientation: Orientation,
                                   video_rotation: Rotation) -> tuple[list[tuple[Path, str]], list[Path]]:
         """
@@ -106,6 +103,7 @@ class Worker(QObject):
             video_info_list: 视频信息列表
             best_width: 最佳宽度
             best_height: 最佳高度
+            best_audio_sample_rate: 最佳音频采样率
             video_orientation: 视频方向
             video_rotation: 视频旋转角度
 
@@ -143,6 +141,7 @@ class Worker(QObject):
             output_video_list.append(output_path)
             command = generate_ffmpeg_command(input_file=each.video_path, output_file_path=output_path,
                                               crop_position=each.crop, width=best_width, height=best_height,
+                                              audio_sample_rate=best_audio_sample_rate,
                                               rotation_angle=rotate_angle)
             ffmpeg_list.append((each.video_path, command))
         loguru.logger.info('ffmepg命令生成完成')
@@ -243,4 +242,3 @@ if __name__ == '__main__':
             ).replace('"', '').splitlines()
     model = ConcateModel()
     # model.start(video_list, Orientation.HORIZONTAL, Rotation.CLOCKWISE)
-

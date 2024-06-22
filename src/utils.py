@@ -2,6 +2,7 @@ import json
 import math
 import os
 import shutil
+import subprocess
 import threading
 import time
 from functools import reduce
@@ -131,6 +132,35 @@ def check_file_readability(file_path: Path) -> bool:
 
 def get_gcd(number_list):
     return reduce(math.gcd, number_list)
+
+
+def lcm(a, b):
+    return a * b // math.gcd(a, b)
+
+
+def get_lcm(numbers):
+    return reduce(lcm, numbers)
+
+
+def get_audio_sample_rate(file_path: Path) -> int:
+    # 使用FFmpeg命令获取媒体文件的信息，并输出为json格式
+    cmd = [
+            'ffprobe',
+            '-v', 'error',
+            '-select_streams', 'a:0',
+            '-show_entries', 'stream=sample_rate',
+            '-of', 'json',
+            file_path
+            ]
+
+    # 运行FFmpeg命令并获取输出
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+
+    # 解析输出的json数据
+    output = json.loads(result.stdout)
+    loguru.logger.debug(f'视频信息:{output}')
+
+    return int(output['streams'][0]['sample_rate'])
 
 
 @singleton

@@ -12,6 +12,7 @@ from src.config import BlackBorderAlgorithm, cfg
 from src.core.datacls import CropInfo, VideoInfo
 from src.core.enums import Orientation
 from src.signal_bus import SignalBus
+from src.utils import get_audio_sample_rate
 
 black_remover = BlackRemover()
 video_remover = VideoRemover()
@@ -25,6 +26,7 @@ def _img_black_remover_start(video_path: Path, sample_rate: float) -> VideoInfo:
     width: int = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height: int = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
     fps = int(video.get(cv2.CAP_PROP_FPS))
+    audio_sample_rate: int = get_audio_sample_rate(video_path)
     # 如果有黑边则需要获取主体区域坐标(只获取部分百比分帧)
     sample_frames = int(total_frames * sample_rate)
     # 限制最大采样帧数,不然长时间的视频会导致等待时间过长
@@ -70,12 +72,13 @@ def _img_black_remover_start(video_path: Path, sample_rate: float) -> VideoInfo:
 
     # 如果剪裁区域的宽高和原视频的宽高相同则不剪裁
     if w == width and h == height:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
+        return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)
 
     loguru.logger.debug(f'[{video_path.name}]的主体区域坐标为{x, y, w, h}')
     signal_bus.set_total_progress_finish.emit()
     signal_bus.set_detail_progress_finish.emit()
-    return VideoInfo(video_path, fps, total_frames, width, height, CropInfo(*most_common_coordinates))
+    return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate,
+                     CropInfo(*most_common_coordinates))
 
 
 def _video_black_remover_start(video_path: Path) -> VideoInfo:
@@ -84,13 +87,14 @@ def _video_black_remover_start(video_path: Path) -> VideoInfo:
     fps = int(video.get(cv2.CAP_PROP_FPS))
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    audio_sample_rate: int = get_audio_sample_rate(video_path)
 
     # 获取结果
     x, y, w, h = video_remover.start(video_path)
 
     if w == width and h == height:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
-    return VideoInfo(video_path, fps, total_frames, width, height, CropInfo(x, y, w, h))
+        return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)
+    return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, CropInfo(x, y, w, h))
 
 
 def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
@@ -99,6 +103,7 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     fps = int(video.get(cv2.CAP_PROP_FPS))
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    audio_sample_rate: int = get_audio_sample_rate(video_path)
 
     loguru.logger.debug(f'正在获取视频信息[{video_path.name}]')
     signal_bus.set_detail_progress_reset.emit()
@@ -106,7 +111,7 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
 
     # 是否需要去黑边
     if cfg.get(cfg.video_black_border_algorithm) == BlackBorderAlgorithm.DISABLE:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
+        return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)
 
     # 先判断是否有黑边(获取视频中随机的10帧)
     random_frames = random.sample(range(total_frames), 10)
@@ -120,7 +125,7 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
             is_black = True
             break
     if not is_black:
-        return VideoInfo(video_path, fps, total_frames, width, height, None)
+        return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)
     video.release()
 
     black_remove_algorithm: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)

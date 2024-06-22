@@ -10,6 +10,7 @@ class VideoInfo:
     frame_count: int
     width: int
     height: int
+    audio_sample_rate: int
     crop: Optional["CropInfo"] = None
 
 

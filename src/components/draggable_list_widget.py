@@ -8,6 +8,7 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFileDialog, QLi
                                QVBoxLayout, QWidget)
 from qfluentwidgets import Action, FluentIcon, MenuAnimationType
 from qfluentwidgets.components import RoundMenu
+
 from src.signal_bus import SignalBus
 
 signal_bus = SignalBus()
@@ -32,6 +33,10 @@ class DraggableListWidgetView(QListWidget):
         self.clear()
         for item in items:
             self.addFileItem(item)
+
+    def addFileItem(self, file_path: str) -> None:
+        item = QListWidgetItem(file_path)
+        self.addItem(item)
 
     def dragEnterEvent(self, event: QDragEnterEvent) -> None:
         if event.mimeData().hasUrls():
@@ -65,13 +70,15 @@ class DraggableListWidgetView(QListWidget):
         else:
             super().dropEvent(event)
 
-    def addFileItem(self, file_path: str) -> None:
-        item = QListWidgetItem(file_path)
-        self.addItem(item)
-
     def keyPressEvent(self, event: QKeyEvent) -> None:
         if event.key() == Qt.Key.Key_Control:
             self.setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        if event.key() in [Qt.Key.Key_Backspace, Qt.Key.Key_Delete]:
+            if current_item := self.currentItem():
+                row = self.row(current_item)
+                self.takeItem(row)
+                loguru.logger.debug(f"删除了一个文件: {current_item.text()}")
+
         super().keyPressEvent(event)
 
     def keyReleaseEvent(self, event: QKeyEvent) -> None:
