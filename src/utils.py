@@ -154,7 +154,8 @@ def get_audio_sample_rate(file_path: Path) -> int:
             ]
 
     # 运行FFmpeg命令并获取输出
-    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8')
+    result = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True, encoding='utf-8',
+                            creationflags=subprocess.CREATE_NO_WINDOW)
 
     # 解析输出的json数据
     output = json.loads(result.stdout)
