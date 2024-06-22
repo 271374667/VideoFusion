@@ -13,7 +13,7 @@ about_txt: str = """
         /* Fluent Design-inspired styles */
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f9f9f9;
+            background-color: #fdfdfd;
             margin: 0;
             display: flex;
             justify-content: center;
@@ -22,7 +22,7 @@ about_txt: str = """
         }
 
         .container {
-            background: #f9f9f9;
+            background: #fdfdfd;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
             border-radius: 8px;
             max-width: 800px;

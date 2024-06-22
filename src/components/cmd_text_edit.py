@@ -1,6 +1,7 @@
 import json
 import subprocess
 import sys
+import traceback
 from typing import Union
 
 import loguru
@@ -97,6 +98,11 @@ class CMDTextEdit(QWidget):
             self.append_log(ansi_color_text['text'])
 
         loguru.logger.add(sink, colorize=True, serialize=True)
+        sys.excepthook = self._handle_exception
+
+    def _handle_exception(self, exc_type, exc_value, exc_traceback):
+        exc_info = "".join(traceback.format_exception(exc_type, exc_value, exc_traceback))
+        loguru.logger.critical(f"Uncaught exception: {exc_info}")
 
     def _append_log_slot(self, context: str) -> None:
         self.text_edit.moveCursor(QTextCursor.MoveOperation.End)

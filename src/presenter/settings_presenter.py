@@ -56,21 +56,25 @@ class SettingsPresenter:
         def start():
             return self._version_request.get_latest_version()
 
-        def finished(x, y):
-            print(f'{x=} {y=}')
+        def finished(x):
+            print(f'{x=}')
             latest_version, description = x
             if latest_version is None:
                 self.get_view().show_error_infobar("错误",
                                                    "无法获取最新版本信息,请检查网络,或者自行前往官网下载最新版本",
                                                    duration=3000, is_closable=True)
+                loguru.logger.error("无法获取最新版本信息")
                 return
 
             latest_version = latest_version.replace("v", "")
             if latest_version > current_version:
                 self.get_view().show_mask_dialog(f"最新版本: {latest_version}", description)
+                loguru.logger.info(f"发现新版本: {latest_version}, 当前版本: {current_version}")
+                loguru.logger.info(f"更新内容: {description}")
                 return
 
             self.get_view().show_info_infobar("提示", "当前已经是最新版本", duration=3000, is_closable=True)
+            loguru.logger.info(f"当前已经是最新版本: {current_version}")
 
         self._run_in_thread = RunInThread()
         self._run_in_thread.set_start_func(start)
