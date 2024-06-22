@@ -92,8 +92,7 @@
            </size>
           </property>
           <property name="toolTip">
-           <string>将视频拖放到下方列表中,右键有更多选项
-(Tip: 可以通过拖放一个每一行一个视频路径的txt放置大量视频文件,此方式比直接拖动视频更快)</string>
+           <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;将视频拖放到下方列表中,右键有更多选项,您可以使用退格或者delete键删除列表内的视频(不会删除本地文件)&lt;/p&gt;&lt;p&gt;(Tip: 可以通过拖放一个每一行一个视频路径的txt放置大量视频文件,此方式比直接拖动视频更快)&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
           </property>
           <property name="frameShape">
            <enum>QFrame::Box</enum>

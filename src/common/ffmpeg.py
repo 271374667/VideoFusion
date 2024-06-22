@@ -19,6 +19,7 @@ def generate_ffmpeg_command(input_file: str | Path,
                             crop_position: CropInfo | None,
                             width: int,
                             height: int,
+                            audio_sample_rate: int,
                             rotation_angle: int,
                             ) -> str:
     if rotation_angle not in {0, 90, 180, 270}:
@@ -80,7 +81,7 @@ def generate_ffmpeg_command(input_file: str | Path,
         audio_filters.append(audio_noise_reduction.value.replace("\\", "/"))
 
     # 音频重新采样
-    audio_filters.append("aresample=44100:resampler=soxr:precision=33:osf=s16:dither_method=triangular")
+    audio_filters.append(f"aresample={audio_sample_rate}:resampler=soxr:precision=28:osf=s16:dither_method=triangular")
 
     video_filter_chain = ','.join(filters)
     command = f'"{ffmpeg_path}" -i "{input_file}" -filter_complex "{video_filter_chain}"'
@@ -88,6 +89,9 @@ def generate_ffmpeg_command(input_file: str | Path,
         audio_filter_chain = ','.join(audio_filters)
 
         command += f" -af \"{audio_filter_chain}\""
+
+    # 音频同步以及重新编码
+    command += f' -c:a aac -b:a {audio_sample_rate} -strict experimental -vsync 1'
     command += f' {output_codec} "{output_file_path}"'
     command += ' -y'
     loguru.logger.debug(f"FFmpeg命令: {command}")
