@@ -82,6 +82,17 @@ class PreviewFrame(Enum):
     RandomFrame = 3
 
 
+# 音频采样率
+class AudioSampleRate(Enum):
+    Hz8000 = 8000
+    Hz16000 = 16000
+    Hz22050 = 22050
+    Hz32000 = 32000
+    Hz44100 = 44100
+    Hz96000 = 96000
+    Max = 0
+
+
 class OutputFileValidator(ConfigValidator):
     """ Config validator """
 
@@ -137,6 +148,8 @@ class Config(QConfig):
                                              OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))
     output_codec = OptionsConfigItem("Video", "输出编码策略", VideoCodec.H264, OptionsValidator(VideoCodec),
                                      EnumSerializer(VideoCodec))
+    audio_sample_rate = OptionsConfigItem("Video", "音频采样率", AudioSampleRate.Hz44100,
+                                          OptionsValidator(AudioSampleRate), EnumSerializer(AudioSampleRate))
 
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())

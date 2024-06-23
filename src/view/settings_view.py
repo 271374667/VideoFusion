@@ -128,6 +128,17 @@ class SettingView(MessageBaseView):
                                                      ["H264", "H264Intel", "H264AMD", "H264Nvidia",
                                                              "H265", "H265Intel", "H265AMD", "H265Nvidia"],
                                                      self.video_group)
+        self.audio_sample_rate_card = ComboBoxSettingCard(cfg.audio_sample_rate, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                          "音频采样率",
+                                                          "调整音频的采样率,采样率越高音质越好,但是文件越大",
+                                                          ["8kHz-电话音质",
+                                                                  "16kHz-低质量音乐录音",
+                                                                  "22.05kHz-AM广播质量",
+                                                                  "32kHz-FM广播质量",
+                                                                  "44.1kHz-CD音质",
+                                                                  "96kHz-高解析度音频",
+                                                                  "最大采样率"],
+                                                          self.video_group)
 
     def _set_up_tooltip(self):
         ffmpeg_file_path = cfg.get(cfg.ffmpeg_file)
@@ -155,15 +166,17 @@ class SettingView(MessageBaseView):
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
-            '静态去黑边会从视频内读取一定数量的帧,然后通过这些帧计算出黑边的位置,然后进行拟合,数值越大效果越好,但是速度越慢')
+                '静态去黑边会从视频内读取一定数量的帧,然后通过这些帧计算出黑边的位置,然后进行拟合,数值越大效果越好,但是速度越慢')
         self.scaling_quality_card.setToolTip(
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/upscale.png"/></p></body></html>')
         self.rate_adjustment_type_card.setToolTip("调整视频帧率的算法,光流法会大幅增加运算时间")
         self.output_codec_card.setToolTip(
                 "调整视频编码的算法,默认推荐经过优化的H264算法,压缩比例非常高,且画质清晰,适合大部分场景")
         self.video_black_border_algorithm_card.setToolTip(
-            '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
-            '<center><p>黑边不动优先使用动态算法,黑边上的logo会移动优先选择静态算法</p></center></body></html>')
+                '<html><head/><body><p><img src=":/tooltip/images/tooltip/black_remover.png"/>'
+                '<center><p>黑边不动优先使用动态算法,黑边上的logo会移动优先选择静态算法</p></center></body></html>')
+        self.audio_sample_rate_card.setToolTip(
+                "最大采样率为所有视频采样率中最高的采样率,如果您的视频音频采样率为32kHz,则输出音频采样率为32kHz")
 
     def _set_up_layout(self):
         """设置布局"""
@@ -198,6 +211,7 @@ class SettingView(MessageBaseView):
                 self.scaling_quality_card,
                 self.rate_adjustment_type_card,
                 self.output_codec_card,
+                self.audio_sample_rate_card
                 ])
 
     def _initialize(self) -> None:

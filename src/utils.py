@@ -1,11 +1,9 @@
 import json
-import math
 import os
 import shutil
 import subprocess
 import threading
 import time
-from functools import reduce
 from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional, Tuple
@@ -128,18 +126,6 @@ def check_file_readability(file_path: Path) -> bool:
     except IOError as e:
         loguru.logger.error(f'文件{file_path}不可读: {e}')
         return False
-
-
-def get_gcd(number_list):
-    return reduce(math.gcd, number_list)
-
-
-def lcm(a, b):
-    return a * b // math.gcd(a, b)
-
-
-def get_lcm(numbers):
-    return reduce(lcm, numbers)
 
 
 def get_audio_sample_rate(file_path: Path) -> int:

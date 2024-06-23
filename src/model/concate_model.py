@@ -7,10 +7,10 @@ from PySide6.QtCore import QObject
 
 from src.common.ffmpeg import generate_ffmpeg_command, merge_videos, run_command
 from src.common.video_info import VideoInfo, get_most_compatible_resolution, get_video_info
-from src.config import cfg
+from src.config import AudioSampleRate, cfg
 from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
-from src.utils import TempDir, get_gcd, get_lcm
+from src.utils import TempDir
 
 signal_bus = SignalBus()
 temp_dir = TempDir()
@@ -35,12 +35,15 @@ class Worker(QObject):
             return
 
         best_width, best_height = self._get_best_resolution(video_info_list, video_orientation)
-        best_audio_sample_rate: int = self._get_best_audio_sample_rate(video_info_list)
+        target_audio_sample_rate: int = self._get_audio_sample_rate(video_info_list)
+
+        loguru.logger.info(f'当前音频采样率为:{target_audio_sample_rate}')
+
         if not self.is_running:
             return
 
         ffmpeg_list, output_video_list = self._generate_ffmpeg_commands(video_info_list, best_width, best_height,
-                                                                        best_audio_sample_rate,
+                                                                        target_audio_sample_rate,
                                                                         video_orientation, video_rotation)
         if not self.is_running:
             return
@@ -83,11 +86,30 @@ class Worker(QObject):
         loguru.logger.info(f'最佳分辨率获取完成,最佳分辨率为: {best_width}x{best_height}')
         return best_width, best_height
 
-    def _get_best_audio_sample_rate(self, video_info_list: list[VideoInfo]) -> int:
-        audio_sample_rate_list: list[int] = [x.audio_sample_rate for x in video_info_list]
-        best_audio_sample_rate = get_lcm(audio_sample_rate_list)
-        loguru.logger.info(f'最佳音频采样率为:{best_audio_sample_rate}')
-        return best_audio_sample_rate
+    def _get_audio_sample_rate(self, video_info_list: list[VideoInfo]) -> int:
+        # 根据配置文件选择音频采样率
+        audio_sample_rate: AudioSampleRate = cfg.get(cfg.audio_sample_rate)
+        match audio_sample_rate:
+            case AudioSampleRate.Hz8000:
+                target_audio_sample_rate = 8000
+            case AudioSampleRate.Hz16000:
+                target_audio_sample_rate = 16000
+            case AudioSampleRate.Hz22050:
+                target_audio_sample_rate = 22050
+            case AudioSampleRate.Hz32000:
+                target_audio_sample_rate = 32000
+            case AudioSampleRate.Hz44100:
+                target_audio_sample_rate = 44100
+            case AudioSampleRate.Hz96000:
+                target_audio_sample_rate = 96000
+            case AudioSampleRate.Max:
+                audio_sample_rate_list: list[int] = [x.audio_sample_rate for x in video_info_list]
+                # 获取最大的采样率
+                target_audio_sample_rate = max(audio_sample_rate_list)
+            case _:
+                raise ValueError(f'未知的音频采样率:{audio_sample_rate}')
+
+        return target_audio_sample_rate
 
     def _generate_ffmpeg_commands(self,
                                   video_info_list: list[VideoInfo],
