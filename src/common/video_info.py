@@ -143,6 +143,7 @@ def get_most_compatible_resolution(video_info_list: list[VideoInfo],
     resolutions: list[Tuple[int, int]] = []
     for each in video_info_list:
         width, height = (each.crop.w, each.crop.h) if each.crop else (each.width, each.height)
+
         # 判断视频的方向,如果视频的方向和用户选择的方向不一致则需要调换宽高
         if (orientation == Orientation.HORIZONTAL and width > height) or (
                 orientation == Orientation.VERTICAL and width < height):

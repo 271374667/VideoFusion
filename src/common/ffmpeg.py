@@ -58,14 +58,14 @@ def generate_ffmpeg_command(input_file: str | Path,
     if deblock:
         filters.append("deblock=alpha=1:beta=1")
 
-    if crop_position:
-        filters.append(f"crop={crop_position.w}:{crop_position.h}:{crop_position.x}:{crop_position.y}")
-
     if rotation_angle == 180:
         filters.append("transpose=2,transpose=2")
 
     elif rotation_angle in {90, 270}:
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
+
+    if crop_position:
+        filters.append(f"crop={crop_position.w}:{crop_position.h}:{crop_position.x}:{crop_position.y}")
 
     # 缩放
     filters.append(
