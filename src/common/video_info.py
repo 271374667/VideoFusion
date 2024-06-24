@@ -87,10 +87,16 @@ def _video_black_remover_start(video_path: Path) -> VideoInfo:
     fps = int(video.get(cv2.CAP_PROP_FPS))
     width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
+    video.release()
+
     audio_sample_rate: int = get_audio_sample_rate(video_path)
 
     # 获取结果
     x, y, w, h = video_remover.start(video_path)
+    x = max(0, x)
+    y = max(0, y)
+    w = min(width, w)
+    h = min(height, h)
 
     if w == width and h == height:
         return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)

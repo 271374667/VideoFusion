@@ -83,6 +83,7 @@ class VideoRemover:
 
         # 返回变化区域图像和最大矩形区域
         loguru.logger.debug(f'最大变化区域: x={max_rect[0]}, y={max_rect[1]}, w={max_rect[2]}, h={max_rect[3]}')
+
         return max_rect
 
 

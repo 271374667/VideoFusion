@@ -35,7 +35,6 @@ def generate_ffmpeg_command(input_file: str | Path,
     deband: bool = cfg.get(cfg.deband)
     deblock: bool = cfg.get(cfg.deblock)
     output_codec: VideoCodec = cfg.get(cfg.output_codec).value
-    target_resolution = f"{width}:{height}"
     ffmpeg_path = cfg.get(cfg.ffmpeg_file)
     scaling_quality: ScalingQuality = cfg.get(cfg.scaling_quality)
 
@@ -58,18 +57,20 @@ def generate_ffmpeg_command(input_file: str | Path,
     if deblock:
         filters.append("deblock=alpha=1:beta=1")
 
+    if crop_position:
+        filters.append(f"crop={crop_position.w}:{crop_position.h}:{crop_position.x}:{crop_position.y}")
+
     if rotation_angle == 180:
         filters.append("transpose=2,transpose=2")
 
     elif rotation_angle in {90, 270}:
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
 
-    if crop_position:
-        filters.append(f"crop={crop_position.w}:{crop_position.h}:{crop_position.x}:{crop_position.y}")
-
-    # 缩放
-    filters.append(
-            f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
+    # 缩放(如果剪裁之后的视频分辨率和目标分辨率不一致则需要进行缩放)
+    if crop_position and (crop_position.w != width or crop_position.h != height):
+        target_resolution = f"{width}:{height}"
+        filters.append(
+                f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
 
     audio_filters = []
     # 音频标准化
