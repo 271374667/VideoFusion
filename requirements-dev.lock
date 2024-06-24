@@ -17,19 +17,19 @@ darkdetect==0.8.0
     # via pyside6-fluent-widgets
 loguru==0.7.2
     # via videomosaic
-nuitka==2.3
-numpy==1.26.4
+nuitka==2.3.9
+numpy==2.0.0
     # via opencv-python
     # via videomosaic
-opencv-python==4.9.0.80
+opencv-python==4.10.0.84
     # via videomosaic
 ordered-set==4.1.0
     # via nuitka
-pyside6==6.7.1
+pyside6==6.7.2
     # via pyside6-fluent-widgets
-pyside6-addons==6.7.1
+pyside6-addons==6.7.2
     # via pyside6
-pyside6-essentials==6.7.1
+pyside6-essentials==6.7.2
     # via pyside6
     # via pyside6-addons
 pyside6-fluent-widgets==1.5.7
@@ -38,7 +38,7 @@ pysidesix-frameless-window==0.3.12
     # via pyside6-fluent-widgets
 pywin32==306
     # via pysidesix-frameless-window
-shiboken6==6.7.1
+shiboken6==6.7.2
     # via pyside6
     # via pyside6-addons
     # via pyside6-essentials

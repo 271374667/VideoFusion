@@ -8,6 +8,7 @@ from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional, Tuple
 from urllib import error, request
+from src.core.paths import FFPROBE_FILE
 
 import loguru
 from PySide6.QtCore import QObject, QThread, Signal
@@ -131,7 +132,7 @@ def check_file_readability(file_path: Path) -> bool:
 def get_audio_sample_rate(file_path: Path) -> int:
     # 使用FFmpeg命令获取媒体文件的信息，并输出为json格式
     cmd = [
-            'ffprobe',
+            FFPROBE_FILE,
             '-v', 'error',
             '-select_streams', 'a:0',
             '-show_entries', 'stream=sample_rate',

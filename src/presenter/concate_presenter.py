@@ -12,7 +12,7 @@ from PySide6.QtWidgets import QFileDialog
 from src.common.black_remove.img_black_remover import BlackRemover
 from src.config import PreviewFrame, cfg
 from src.core.enums import Orientation, Rotation
-from src.core.paths import FFMPEG_FILE, TEMP_DIR
+from src.core.paths import FFMPEG_FILE, FFPROBE_FILE, TEMP_DIR
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
 from src.utils import RunInThread, TempDir, trans_second_to_human_time
@@ -42,6 +42,12 @@ class ConcatePresenter:
         if not FFMPEG_FILE.exists():
             self.get_view().show_error_infobar("错误",
                                                "ffmpeg文件不存在无法进行视频合成,请检查bin目录下是否有ffmpeg.exe文件",
+                                               is_closable=True)
+            return
+
+        if not FFPROBE_FILE.exists():
+            self.get_view().show_error_infobar("错误",
+                                               "ffprobe文件不存在无法进行视频合成,请检查bin目录下是否有ffprobe.exe文件",
                                                is_closable=True)
             return
 
