@@ -89,7 +89,7 @@ class SettingView(MessageBaseView):
                                                                      self.video_group)
         self.video_sample_rate_card = RangeSettingCard(cfg.video_sample_frame_number, Icon(FluentIcon.CHEVRON_RIGHT),
                                                        "去黑边采样帧数",
-                                                       "设置静态进去黑边的采样帧数,数值越大效果越好,但是速度越慢",
+                                                       "设置静态去黑边的采样帧数,数值越大效果越好,但是速度越慢",
                                                        self.video_group)
         self.video_sample_rate_card.slider.setSingleStep(1)
         self.audio_normalization_card = ComboBoxSettingCard(cfg.audio_normalization, Icon(FluentIcon.CHEVRON_RIGHT),
