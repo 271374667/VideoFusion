@@ -139,7 +139,7 @@ class Config(QConfig):
     audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
                                               OptionsValidator(AudioNoiseReduction),
                                               EnumSerializer(AudioNoiseReduction))
-    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.DISABLE,
+    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.HQDN3D,
                                               OptionsValidator(VideoNoiseReduction),
                                               EnumSerializer(VideoNoiseReduction))
     scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.SINC, OptionsValidator(ScalingQuality),
