@@ -67,7 +67,7 @@ def generate_ffmpeg_command(input_file: str | Path,
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
 
     # 缩放(如果剪裁之后的视频分辨率和目标分辨率不一致则需要进行缩放)
-    if crop_position and (crop_position.w != width or crop_position.h != height):
+    if crop_position and (crop_position.w != width and crop_position.h != height):
         target_resolution = f"{width}:{height}"
         filters.append(
                 f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
@@ -191,6 +191,7 @@ def run_command(input_file_path: str | Path, command: str):
     stdout, stderr = process.communicate()
     if process.returncode != 0:
         loguru.logger.critical(f"FFmpeg命令运行失败: {command}, 错误信息: {stderr}")
+        signal_bus.failed.emit()
         raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
 
     # 终止子进程
@@ -217,6 +218,7 @@ def run_command_without_progress(command: str):
     stdout, stderr = process.communicate()
     if process.returncode != 0:
         loguru.logger.critical(f"FFmpeg命令运行失败: {command}, 错误信息: {stderr}")
+        signal_bus.failed.emit()
         raise subprocess.CalledProcessError(process.returncode, command, output=stdout, stderr=stderr)
 
     # 终止子进程

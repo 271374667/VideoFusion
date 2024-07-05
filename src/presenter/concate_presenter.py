@@ -278,6 +278,11 @@ class ConcatePresenter:
                          Qt.TransformationMode.SmoothTransformation)
         img_lb.setPixmap(QPixmap.fromImage(img))
 
+    def _show_failed_infobar(self):
+        self.get_view().show_error_infobar("错误",
+                                           "当前视频合成出错,请前往控制台查看错误原因,您可以前往github提出issue或者检查视频是否出现损坏",
+                                           is_closable=True)
+
     def resizeEvent(self, event):
         if img_lb := self.get_view().get_preview_pic_lb():
             img_lb.setMaximumSize(QSize(self.get_view().width() // 2, self.get_view().height() // 2))
@@ -297,6 +302,7 @@ class ConcatePresenter:
         self.get_view().get_cancle_btn().clicked.connect(self.cancle_worker)
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
+        self._signal_bus.failed.connect(self._show_failed_infobar)
 
     def __del__(self):
         temp_dir.delete_dir()
