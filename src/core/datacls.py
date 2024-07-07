@@ -10,7 +10,7 @@ class VideoInfo:
     frame_count: int
     width: int
     height: int
-    audio_sample_rate: int
+    audio_sample_rate: int  # 音频采样率,例如44100
     crop: Optional["CropInfo"] = None
 
 
