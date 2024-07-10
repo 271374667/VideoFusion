@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Generic, TypeVar
+from src.core.datacls import FFmpegDTO
 
 import numpy as np
 
@@ -30,12 +31,12 @@ class OpenCVProcessor(BaseProcessor):
 
 class FFmpegProcessor(BaseProcessor):
     @abstractmethod
-    def process(self, input_file_path: Path) -> Path:
+    def process(self, ffmpeg_dto: list[FFmpegDTO]) -> list[FFmpegDTO]:
         """
         将输入的文件进行处理并返回处理后的文件路径
 
         Args:
-            input_file_path: 输入文件路径
+            ffmpeg_dto: 输入文件路径
 
         Returns:
             处理后的文件路径
@@ -74,24 +75,7 @@ class BaseProcessorManager(ABC, Generic[T]):
         return x
 
 
-class OpenCVProcessorManager(BaseProcessorManager[np.ndarray]):
-    def __init__(self):
-        super().__init__()
-        self._processors: list[OpenCVProcessor] = []
-
-    def get_processors(self) -> list[OpenCVProcessor]:
-        return self._processors
-
-    def add_processor(self, processor: OpenCVProcessor):
-        self._processors.append(processor)
-
-    def process(self, x: T) -> T:
-        for processor in self._processors:
-            x = processor.process(x)
-        return x
-
-
-class FFmpegProcessorManager(BaseProcessorManager[Path]):
+class FFmpegProcessorManager(BaseProcessorManager[FFmpegDTO]):
     def __init__(self):
         super().__init__()
         self._processors: list[FFmpegProcessor] = []

@@ -26,3 +26,9 @@ class CropInfo:
 class VideoScaling:
     video_path: Path
     scale_rate: float  # 音频长度缩放比例
+
+
+@dataclass(frozen=True, slots=True)
+class FFmpegDTO:
+    video_info: VideoInfo
+    ffmpeg_command: str | None = None

@@ -35,9 +35,9 @@ moviepy==1.0.3
 numpy==2.0.0
     # via imageio
     # via moviepy
-    # via opencv-python
+    # via opencv-contrib-python
     # via videomosaic
-opencv-python==4.10.0.84
+opencv-contrib-python==4.10.0.84
     # via videomosaic
 pillow==10.4.0
     # via imageio

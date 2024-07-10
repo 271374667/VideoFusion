@@ -36,9 +36,9 @@ nuitka==2.3.11
 numpy==2.0.0
     # via imageio
     # via moviepy
-    # via opencv-python
+    # via opencv-contrib-python
     # via videomosaic
-opencv-python==4.10.0.84
+opencv-contrib-python==4.10.0.84
     # via videomosaic
 ordered-set==4.1.0
     # via nuitka

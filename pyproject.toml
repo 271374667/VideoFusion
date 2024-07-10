@@ -10,8 +10,8 @@ dependencies = [
     "ansi2html>=1.9.1",
     "loguru>=0.7.2",
     "numpy>=1.26.4",
-    "opencv-python>=4.9.0.80",
     "moviepy>=1.0.3",
+    "opencv-contrib-python>=4.10.0.84",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
