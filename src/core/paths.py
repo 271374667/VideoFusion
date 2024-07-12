@@ -21,3 +21,7 @@ QRC_FILE = ASSETS_DIR / "resource.qrc"
 QRC_PY_FILE = ROOT / "resource_rc.py"
 LOG_FILE = ROOT / "log.log"
 ABOUT_HTML_FILE = ASSETS_DIR / "about.html"
+
+# MODEL
+ESPCN_x2_FILE = BIN_DIR / "ESPCN_x2.pb"
+LapSRN_x2_FILE = BIN_DIR / "LapSRN_x2.pb"
