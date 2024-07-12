@@ -67,6 +67,8 @@ shiboken6==6.7.2
 tqdm==4.66.4
     # via moviepy
     # via proglog
+typing-extensions==4.12.2
+    # via videomosaic
 urllib3==2.2.2
     # via requests
 win32-setctime==1.1.0
