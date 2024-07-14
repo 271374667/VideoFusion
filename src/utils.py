@@ -1,3 +1,5 @@
+import contextlib
+import ctypes
 import json
 import os
 import shutil
@@ -8,12 +10,12 @@ from functools import wraps
 from pathlib import Path
 from typing import Callable, Optional, Tuple
 from urllib import error, request
-from src.core.paths import FFPROBE_FILE
 
 import loguru
 from PySide6.QtCore import QObject, QThread, Signal
 
 from src.config import cfg
+from src.core.paths import FFPROBE_FILE
 
 
 def singleton(cls):
@@ -38,6 +40,51 @@ def timit(func):
         return result
 
     return wrapper
+
+
+def thread_with_timeout(timeout: int):
+    """线程超时自动杀死
+
+    通过调用底层CPython的代码将线程超时自动杀死
+
+    Example:
+        @thread_with_timeout(5)
+            def target_function():
+                for i in range(10):
+                    print(f"Doing task {i}")
+                    time.sleep(1)  # Simulate time-consuming task
+        target_function()
+
+    Args:
+        timeout: 超时时间，单位秒
+    """
+
+    def decorator(func):
+        def wrapper(*args, **kwargs):
+            def run_func():
+                with contextlib.suppress(SystemExit):
+                    func(*args, **kwargs)
+
+            def timer():
+                time.sleep(timeout)
+                if thread.is_alive():
+                    res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(thread.ident),
+                                                                     ctypes.py_object(SystemExit))
+                    if res > 1:
+                        ctypes.pythonapi.PyThreadState_SetAsyncExc(thread.ident, 0)
+                        loguru.logger.error('Error: could not terminate thread')
+                    else:
+                        loguru.logger.debug(f'Thread {thread.ident} forcefully terminated')
+
+            thread = threading.Thread(target=run_func)
+            thread.start()
+
+            timer_thread = threading.Thread(target=timer)
+            timer_thread.start()
+
+        return wrapper
+
+    return decorator
 
 
 def calculate_dimensions(width: int, height: int, target_width: int, target_height: int):

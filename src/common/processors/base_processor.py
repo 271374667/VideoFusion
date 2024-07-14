@@ -1,9 +1,10 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Generic, TypeVar
-from src.core.datacls import FFmpegDTO
 
 import numpy as np
+
+from src.core.datacls import FFmpegDTO
 
 T = TypeVar("T")
 
@@ -15,6 +16,8 @@ class BaseProcessor(ABC, Generic[T]):
 
 
 class OpenCVProcessor(BaseProcessor):
+    is_enable: bool = True
+
     @abstractmethod
     def process(self, frame: np.ndarray) -> np.ndarray:
         """
