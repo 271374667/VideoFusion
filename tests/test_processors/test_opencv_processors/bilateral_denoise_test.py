@@ -13,7 +13,7 @@ class TestBilateralDenoiseProcessor(unittest.TestCase):
         # Create a frame with uniform noise
         noisy_frame = np.random.uniform(0, 255, (100, 100, 3)).astype(np.uint8)
         # Process the frame
-        denoised_frame = self.processor.process(noisy_frame)
+        denoised_frame = self.processor._video_process(noisy_frame)
         # Check if the denoised frame has less noise than the original
         self.assertTrue(np.var(denoised_frame) < np.var(noisy_frame))
 
@@ -22,7 +22,7 @@ class TestBilateralDenoiseProcessor(unittest.TestCase):
         noisy_frame = np.zeros((100, 100, 3), dtype=np.uint8)
         noisy_frame[np.random.choice([True, False], size=noisy_frame.shape)] = 255
         # Process the frame
-        denoised_frame = self.processor.process(noisy_frame)
+        denoised_frame = self.processor._video_process(noisy_frame)
         # Check if the denoised frame has less noise than the original
         self.assertTrue(np.mean(denoised_frame) > np.mean(noisy_frame[np.where(noisy_frame == 0)]))
         self.assertTrue(np.mean(denoised_frame) < np.mean(noisy_frame[np.where(noisy_frame == 255)]))
@@ -31,7 +31,7 @@ class TestBilateralDenoiseProcessor(unittest.TestCase):
         # Create an empty frame
         empty_frame = np.zeros((100, 100, 3), dtype=np.uint8)
         # Process the frame
-        processed_frame = self.processor.process(empty_frame)
+        processed_frame = self.processor._video_process(empty_frame)
         # Check if the processed frame is the same as the input
         self.assertTrue(np.array_equal(processed_frame, empty_frame))
 

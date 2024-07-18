@@ -1,5 +1,5 @@
 pyside6-fluent-widgets>=1.5.6
 ansi2html>=1.9.1
-numpy<=1.23.1
+numpy<=2
 loguru>=0.7.2
 opencv-python>=4.9.0.80

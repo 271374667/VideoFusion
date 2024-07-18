@@ -240,7 +240,8 @@ if __name__ == '__main__':
                                   crop_position=None,
                                   width=1920,
                                   height=1080,
-                                  rotation_angle=0)
+                                  rotation_angle=0,
+                                  audio_sample_rate=44100)
     print(cmd)
     run_command(input_file, cmd)
 

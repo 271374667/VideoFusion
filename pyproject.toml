@@ -10,7 +10,6 @@ dependencies = [
     "ansi2html>=1.9.1",
     "loguru>=0.7.2",
     "numpy>=1.26.4",
-    "moviepy>=1.0.3",
     "opencv-contrib-python>=4.10.0.84",
     "typing-extensions>=4.12.2",
 ]

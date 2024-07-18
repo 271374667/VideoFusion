@@ -1,3 +1,4 @@
+import atexit
 import contextlib
 import ctypes
 import json
@@ -198,15 +199,12 @@ def get_audio_sample_rate(file_path: Path) -> int:
     return int(output['streams'][0]['sample_rate'])
 
 
+def get_output_file_path(input_file_path: Path, process_info: str = "out") -> Path:
+    return TempDir().get_temp_dir() / f"{input_file_path.stem}_{process_info}{input_file_path.suffix}"
+
+
 @singleton
 class TempDir:
-    _instance = None
-
-    def __new__(cls, *args, **kwargs):
-        if not cls._instance:
-            cls._instance = super().__new__(cls, *args, **kwargs)
-        return cls._instance
-
     def __init__(self, temp_dir: Path | None = None):
         self.path = temp_dir or Path(cfg.get(cfg.temp_dir))
         self._is_exists: bool = False
@@ -214,7 +212,6 @@ class TempDir:
     def get_temp_dir(self) -> Path:
         if self.path.exists():
             return self.path
-        self.delete_dir()
 
         self.path.mkdir(parents=True, exist_ok=True)
         loguru.logger.debug(f"创建临时文件夹:{self.path}")
@@ -229,7 +226,9 @@ class TempDir:
         loguru.logger.debug(f"删除临时文件夹:{self.path}")
 
     def __del__(self):
-        self.delete_dir()
+        @atexit.register
+        def delete_temp_dir():
+            TempDir().delete_dir()
 
 
 class WorkThread(QObject):
@@ -387,4 +386,4 @@ if __name__ == '__main__':
     # v = VersionRequest()
     # version, notes = v.get_latest_version()
     # print(f"Latest Version: {version}, Release Notes: {notes}")
-    print(get_gcd([2, 4, 6, 8]))
+    ...

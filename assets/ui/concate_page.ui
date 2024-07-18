@@ -577,7 +577,7 @@
          <string>点击此处直接开始合并，您可以通过在设置页面定义输出文件位置</string>
         </property>
         <property name="text">
-         <string>开始合并</string>
+         <string>开始运行</string>
         </property>
         <property name="icon">
          <iconset resource="../resource.qrc">

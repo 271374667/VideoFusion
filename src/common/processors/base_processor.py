@@ -62,6 +62,21 @@ class EXEProcessor(BaseProcessor):
         raise NotImplementedError("Not implemented yet")
 
 
+class AudioProcessor(BaseProcessor):
+    @abstractmethod
+    def process(self, input_wav_path: Path) -> Path:
+        """
+        将输入的音频文件进行处理并返回处理后的音频文件路径
+
+        Args:
+            input_wav_path: 输入音频文件路径
+
+        Returns:
+            处理后的音频文件路径
+        """
+        raise NotImplementedError("Not implemented yet")
+
+
 class BaseProcessorManager(ABC, Generic[T]):
     def __init__(self):
         self._processors: list[BaseProcessor] = []
@@ -76,6 +91,23 @@ class BaseProcessorManager(ABC, Generic[T]):
         for processor in self._processors:
             x = processor.process(x)
         return x
+
+
+class OpenCVProcessorManager(BaseProcessorManager[np.ndarray]):
+    def __init__(self):
+        super().__init__()
+        self._processors: list[OpenCVProcessor] = []
+
+    def get_processors(self) -> list[OpenCVProcessor]:
+        return self._processors
+
+    def add_processor(self, processor: OpenCVProcessor):
+        self._processors.append(processor)
+
+    def process(self, frame: np.ndarray) -> np.ndarray:
+        for processor in self._processors:
+            frame = processor.process(frame)
+        return frame
 
 
 class FFmpegProcessorManager(BaseProcessorManager[FFmpegDTO]):
@@ -104,6 +136,23 @@ class EXEProcessorManager(BaseProcessorManager[Path]):
         return self._processors
 
     def add_processor(self, processor: EXEProcessor):
+        self._processors.append(processor)
+
+    def process(self, x: T) -> T:
+        for processor in self._processors:
+            x = processor.process(x)
+        return x
+
+
+class AudioProcessorManager(BaseProcessorManager[Path]):
+    def __init__(self):
+        super().__init__()
+        self._processors: list[AudioProcessor] = []
+
+    def get_processors(self) -> list[AudioProcessor]:
+        return self._processors
+
+    def add_processor(self, processor: AudioProcessor):
         self._processors.append(processor)
 
     def process(self, x: T) -> T:

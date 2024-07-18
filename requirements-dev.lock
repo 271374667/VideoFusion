@@ -9,43 +9,22 @@
 #   generate-hashes: false
 
 -e file:.
-ansi2html==1.9.1
+ansi2html==1.9.2
     # via videomosaic
-certifi==2024.7.4
-    # via requests
-charset-normalizer==3.3.2
-    # via requests
 colorama==0.4.6
     # via loguru
-    # via tqdm
 darkdetect==0.8.0
     # via pyside6-fluent-widgets
-decorator==4.4.2
-    # via moviepy
-idna==3.7
-    # via requests
-imageio==2.34.2
-    # via moviepy
-imageio-ffmpeg==0.5.1
-    # via moviepy
 loguru==0.7.2
-    # via videomosaic
-moviepy==1.0.3
     # via videomosaic
 nuitka==2.3.11
 numpy==2.0.0
-    # via imageio
-    # via moviepy
     # via opencv-contrib-python
     # via videomosaic
 opencv-contrib-python==4.10.0.84
     # via videomosaic
 ordered-set==4.1.0
     # via nuitka
-pillow==10.4.0
-    # via imageio
-proglog==0.1.10
-    # via moviepy
 pyside6==6.7.2
     # via pyside6-fluent-widgets
 pyside6-addons==6.7.2
@@ -59,21 +38,12 @@ pysidesix-frameless-window==0.3.12
     # via pyside6-fluent-widgets
 pywin32==306
     # via pysidesix-frameless-window
-requests==2.32.3
-    # via moviepy
-setuptools==70.2.0
-    # via imageio-ffmpeg
 shiboken6==6.7.2
     # via pyside6
     # via pyside6-addons
     # via pyside6-essentials
-tqdm==4.66.4
-    # via moviepy
-    # via proglog
 typing-extensions==4.12.2
     # via videomosaic
-urllib3==2.2.2
-    # via requests
 win32-setctime==1.1.0
     # via loguru
 zstandard==0.22.0
