@@ -6,14 +6,14 @@ from src.core.paths import ESPCN_x2_FILE, LapSRN_x2_FILE
 
 
 class SuperResolutionESPCNProcessor(OpenCVProcessor):
-    def __init__(self):
+    def __init__(self, scale_factor=2):
         """
         图像超分辨率处理器，使用ESPCN模型
         """
         self.model = cv2.dnn_superres.DnnSuperResImpl_create()
         self.model.readModel(str(ESPCN_x2_FILE))
-        self.model.setModel("espcn", scale_factor)
-        self.scale_factor = 2
+        self.scale_factor = scale_factor
+        self.model.setModel("espcn", self.scale_factor)
 
     def process(self, frame: np.ndarray) -> np.ndarray:
         """
@@ -41,11 +41,11 @@ class SuperResolutionESPCNProcessor(OpenCVProcessor):
 
 
 class SuperResolutionLapSRNProcessor(SuperResolutionESPCNProcessor):
-    def __init__(self):
+    def __init__(self, scale_factor=2):
         super().__init__()
         self.model.readModel(str(LapSRN_x2_FILE))
-        self.model.setModel("lapsrn", scale_factor)
-        self.scale_factor = 2
+        self.scale_factor = scale_factor
+        self.model.setModel("lapsrn", self.scale_factor)
 
 
 # Example usage

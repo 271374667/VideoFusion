@@ -43,8 +43,8 @@ class AudioNoiseReduction(Enum):
 
 # 视频降噪策略
 class VideoNoiseReduction(Enum):
-    DISABLE = ""
-    HQDN3D = "hqdn3d=4.0:3.0:6.0:4.5"  # 快速降噪滤镜
+    DISABLE = 0
+    BILATERAL = auto()
     NLMEANS = "nlmeans=6.0:7.0"  # 非局部均值降噪滤镜, 更慢, 但效果更好
 
 
@@ -61,6 +61,13 @@ class ScalingQuality(Enum):
     BICUBIC = 'bicubic'
     LANCZOS = 'lanczos'
     SINC = "sinc"
+
+
+# 视频超分辨率算法
+class SuperResolutionAlgorithm(Enum):
+    DISABLE = 0
+    ESPCN = auto()
+    LAPSRN = auto()
 
 
 # 视频编码策略
@@ -90,7 +97,6 @@ class AudioSampleRate(Enum):
     Hz32000 = 32000
     Hz44100 = 44100
     Hz96000 = 96000
-    Max = 0
 
 
 class OutputFileValidator(ConfigValidator):
@@ -129,6 +135,8 @@ class Config(QConfig):
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
+    white_balance = ConfigItem("Video", "视频白平衡", False, BoolValidator())
+    brightness_contrast = ConfigItem("Video", "自动调整视频亮度对比度", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
     video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DYNAMIC,
@@ -139,11 +147,14 @@ class Config(QConfig):
     audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
                                               OptionsValidator(AudioNoiseReduction),
                                               EnumSerializer(AudioNoiseReduction))
-    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.HQDN3D,
+    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.BILATERAL,
                                               OptionsValidator(VideoNoiseReduction),
                                               EnumSerializer(VideoNoiseReduction))
     scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.SINC, OptionsValidator(ScalingQuality),
                                         EnumSerializer(ScalingQuality))
+    super_resolution_algorithm = OptionsConfigItem("Video", "超分辨率算法", SuperResolutionAlgorithm.DISABLE,
+                                                   OptionsValidator(SuperResolutionAlgorithm),
+                                                   EnumSerializer(SuperResolutionAlgorithm))
     rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.NORMAL,
                                              OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))
     output_codec = OptionsConfigItem("Video", "输出编码策略", VideoCodec.H264, OptionsValidator(VideoCodec),

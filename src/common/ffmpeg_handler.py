@@ -11,6 +11,9 @@ from src.core.paths import FFMPEG_FILE, ROOT
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
 
+# ffmpeg的AI降噪模型需要在项目目录下运行
+os.chdir(ROOT)
+
 
 class FFmpegHandler:
     def __init__(self):
@@ -148,7 +151,6 @@ class FFmpegHandler:
         output_audio_path = get_output_file_path(input_audio_path, "denoise")
         model_value = mode.value
         if mode == AudioNoiseReduction.AI:
-            os.chdir(ROOT)
             audio_filter = [f"{model_value}".replace('\\', '/')]
             command = self._get_ffmpeg_command(input_audio_path,
                                                output_audio_path,
@@ -160,6 +162,26 @@ class FFmpegHandler:
                                                output_audio_path,
                                                audio_filter=audio_filter)
             self._run_command(command)
+        return output_audio_path
+
+    def audio_process(self, input_audio_path: Path, audio_filter: list[str]) -> Path:
+        """对音频文件进行处理。
+
+        该方法接受一个音频文件路径和一个音频滤镜列表作为输入，对音频文件进行处理，
+        并返回处理后的音频文件的路径。
+
+        Args:
+            input_audio_path (Path): 输入音频文件的路径。
+            audio_filter (list[str]): 音频滤镜列表。
+
+        Returns:
+            处理后的音频文件的路径。
+        """
+        output_audio_path = get_output_file_path(input_audio_path, "audio_processed")
+        command = self._get_ffmpeg_command(input_audio_path,
+                                           output_audio_path,
+                                           audio_filter=audio_filter)
+        self._run_command(command)
         return output_audio_path
 
     def merge_videos(self, video_list: list[Path]) -> Path:

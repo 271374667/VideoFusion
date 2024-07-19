@@ -1,5 +1,4 @@
 import cv2
-import loguru
 import numpy as np
 
 from src.common.processors.base_processor import OpenCVProcessor
@@ -15,7 +14,6 @@ class RotateProcessor(OpenCVProcessor):
     def process(self, frame: np.ndarray) -> np.ndarray:
         angle: int = self._processor_global_var.get("rotation_angle")
         orientation: Orientation = self._processor_global_var.get("orientation")
-        loguru.logger.debug(f'{angle=}, {orientation=}')
 
         if not orientation:
             raise ValueError("orientation is required")

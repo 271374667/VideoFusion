@@ -4,6 +4,7 @@ import numpy as np
 
 from src.common.processors.base_processor import OpenCVProcessor
 from src.common.processors.processor_global_var import ProcessorGlobalVar
+from src.config import ScalingQuality, cfg
 
 
 class ResizeCache:
@@ -33,8 +34,6 @@ class ResizeCache:
 class ResizeProcessor(OpenCVProcessor):
     def __init__(self):
         self._processor_global_var = ProcessorGlobalVar()
-        self._target_width: int = self._processor_global_var.get("target_width")
-        self._target_height: int = self._processor_global_var.get("target_height")
         self._cache = ResizeCache()
 
     def process(self, frame: np.ndarray) -> np.ndarray:
@@ -47,14 +46,16 @@ class ResizeProcessor(OpenCVProcessor):
         Returns:
             处理后的帧，一个numpy数组
         """
+        target_width: int = self._processor_global_var.get("target_width")
+        target_height: int = self._processor_global_var.get("target_height")
         # 获取输入帧的宽度和高度
         height, width = frame.shape[:2]
 
         # 检查是否有缓存
         if not self._cache.is_set():
             new_width, new_height, pad_top, pad_bottom, pad_left, pad_right = self._calculate_dimensions(width, height,
-                                                                                                         self._target_width,
-                                                                                                         self._target_height)
+                                                                                                         target_width,
+                                                                                                         target_height)
             self._cache.set_values(new_width, new_height, pad_top, pad_bottom, pad_left, pad_right)
         else:
             new_width = self._cache.new_width
@@ -65,7 +66,21 @@ class ResizeProcessor(OpenCVProcessor):
             pad_right = self._cache.pad_right
 
         # 缩放视频帧到新的尺寸
-        resized_frame = cv2.resize(frame, (new_width, new_height))
+        resize_algorithm: ScalingQuality = cfg.get(cfg.scaling_quality)
+        match resize_algorithm:
+            case ScalingQuality.NEAREST:
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
+            case ScalingQuality.BILINEAR:
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
+            case ScalingQuality.BICUBIC:
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+            case ScalingQuality.LANCZOS:
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
+            case ScalingQuality.SINC:
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
+            case _:
+                loguru.logger.error(f"Invalid scaling quality: {resize_algorithm}")
+                resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
 
         return cv2.copyMakeBorder(
                 resized_frame,

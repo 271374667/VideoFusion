@@ -8,3 +8,7 @@ class VideoInfoDict(TypedDict):
     orientation: NotRequired[Orientation]
     target_width: NotRequired[int]
     target_height: NotRequired[int]
+    crop_x: NotRequired[int]
+    crop_y: NotRequired[int]
+    crop_width: NotRequired[int]
+    crop_height: NotRequired[int]
