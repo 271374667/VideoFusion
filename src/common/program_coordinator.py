@@ -18,10 +18,12 @@ from src.utils import move_file_to_output_dir
 
 class ProgramCoordinator:
     def __init__(self):
+        self.is_running: bool = True
+        self.is_merging: bool = False
+
         self._signal_bus = SignalBus()
         self._processor_global_var = ProcessorGlobalVar()
         self._video_handler = VideoHandler()
-        self._is_running: bool = True
 
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path:
         finished_video_path_list: list[Path] = []
@@ -48,7 +50,7 @@ class ProgramCoordinator:
 
         video_info_list: list[VideoInfo] = []
         for each_path in input_video_path_list:
-            if not self._is_running:
+            if not self.is_running:
                 break
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
             video_info_list.append(video_info)

@@ -224,6 +224,13 @@ class TempDir:
         self.path = temp_dir or Path(cfg.get(cfg.temp_dir))
         self._is_exists: bool = False
 
+        delete_temp_dir: bool = cfg.get(cfg.delete_temp_dir)
+
+        if delete_temp_dir:
+            @atexit.register
+            def delete_temp_dir():
+                self.delete_dir()
+
     def get_temp_dir(self) -> Path:
         if self.path.exists():
             return self.path
@@ -239,11 +246,6 @@ class TempDir:
 
         shutil.rmtree(self.path, ignore_errors=True)
         loguru.logger.debug(f"删除临时文件夹:{self.path}")
-
-    def __del__(self):
-        @atexit.register
-        def delete_temp_dir():
-            TempDir().delete_dir()
 
 
 class WorkThread(QObject):
