@@ -304,10 +304,6 @@ class ConcatePresenter:
         self._signal_bus.finished.connect(self.finished)
         self._signal_bus.failed.connect(self._show_failed_infobar)
 
-    def __del__(self):
-        temp_dir.delete_dir()
-        loguru.logger.warning(f'删除临时目录{temp_dir.get_temp_dir()}')
-
 
 if __name__ == '__main__':
     from PySide6.QtWidgets import QApplication

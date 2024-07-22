@@ -238,10 +238,6 @@ class Worker(QObject):
     def set_running(self, flag: bool):
         self.is_running = flag
 
-    def __del__(self):
-        temp_dir.delete_dir()
-        loguru.logger.warning(f'运行完成,删除临时文件夹{temp_dir.get_temp_dir()}')
-
 
 class ConcateModel:
     def __init__(self):
