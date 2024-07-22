@@ -7,7 +7,7 @@ import loguru
 from qfluentwidgets import (BoolValidator, ConfigItem, ConfigValidator, EnumSerializer, FolderValidator,
                             OptionsConfigItem, OptionsValidator, QConfig, RangeConfigItem, RangeValidator, qconfig)
 
-from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_FILE, ROOT, TEMP_DIR)
+from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_FILE, ROOT, TEMP_DIR, OUTPUT_DIR)
 
 if sys.getdefaultencoding() != 'utf-8':
     import importlib
@@ -113,6 +113,20 @@ class OutputFileValidator(ConfigValidator):
         return value if file_path.is_file() else str(OUTPUT_FILE)
 
 
+class OutputDirValidator(ConfigValidator):
+    """ Config validator """
+
+    def validate(self, value):
+        """ Verify whether the value is legal """
+        file_path: Path = Path(value)
+        return bool(file_path.is_dir())
+
+    def correct(self, value):
+        """ correct illegal value """
+        file_path: Path = Path(value)
+        return value if file_path.is_dir() else str(OUTPUT_DIR)
+
+
 class FFmpegValidator(ConfigValidator):
     """ Config validator """
 
@@ -131,7 +145,7 @@ class FFmpegValidator(ConfigValidator):
 
 class Config(QConfig):
     # 视频质量
-    output_file_path = ConfigItem("Video", "输出文件路径", str(OUTPUT_FILE), OutputFileValidator())
+    output_dir = ConfigItem("Video", "输出文件路径", str(OUTPUT_DIR), OutputDirValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
@@ -170,6 +184,7 @@ class Config(QConfig):
     preview_frame = OptionsConfigItem("General", "预览视频帧", PreviewFrame.FirstFrame, OptionsValidator(PreviewFrame),
                                       EnumSerializer(PreviewFrame))
     preview_auto_play = ConfigItem("General", "预览视频自动播放", False, BoolValidator())
+    merge_video = ConfigItem("General", "是否合并视频", True, BoolValidator())
 
 
 cfg = Config()

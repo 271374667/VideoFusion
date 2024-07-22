@@ -11,13 +11,20 @@ class VideoInfoReader:
     def __init__(self, video_path: str):
         self.video_path = Path(video_path)
 
-    def get_video_info(self, black_remove_algorithm: BlackRemoveAlgorithm) -> VideoInfo:
+    def get_video_info(self, black_remove_algorithm: BlackRemoveAlgorithm | None) -> VideoInfo:
         video = cv2.VideoCapture(str(self.video_path))
         frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = int(video.get(cv2.CAP_PROP_FPS))
         width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         video.release()
+
+        if black_remove_algorithm is None:
+            return VideoInfo(video_path=self.video_path,
+                             fps=fps,
+                             frame_count=frame_count,
+                             width=width,
+                             height=height)
 
         # 获取剪裁信息
         x, y, w, h = black_remove_algorithm.remove_black(self.video_path)

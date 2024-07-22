@@ -46,6 +46,11 @@ class ResizeProcessor(OpenCVProcessor):
         Returns:
             处理后的帧，一个numpy数组
         """
+        # 不需要合并就不需要调整分辨率
+        is_merge: bool = cfg.get(cfg.merge_video)
+        if not is_merge:
+            return frame
+
         target_width: int = self._processor_global_var.get("target_width")
         target_height: int = self._processor_global_var.get("target_height")
         # 获取输入帧的宽度和高度

@@ -1,4 +1,5 @@
 import os
+from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 
@@ -6,7 +7,7 @@ import loguru
 from PySide6.QtCore import QObject
 
 from src.common.ffmpeg import generate_ffmpeg_command, merge_videos, run_command
-from src.common.video_info import VideoInfo, get_most_compatible_resolution, get_video_info
+from src.common.video_info import VideoInfo, get_video_info
 from src.config import AudioSampleRate, cfg
 from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
@@ -77,7 +78,28 @@ class Worker(QObject):
         loguru.logger.info(f'获取视频信息完成,一共获取到了{len(video_info_list)}个视频信息')
         return video_info_list
 
-    def _get_best_resolution(self, video_info_list, video_orientation) -> tuple[int, int]:
+    def _get_best_resolution(self, video_info_list: list[VideoInfo], video_orientation: Orientation) -> tuple[int, int]:
+        def get_most_compatible_resolution(video_info_list: list[VideoInfo],
+                                           orientation: Orientation = Orientation.VERTICAL) -> tuple[int, int]:
+            """获取最合适的视频分辨率"""
+            resolutions: list[tuple[int, int]] = []
+            for each in video_info_list:
+                width, height = (each.crop.w, each.crop.h) if each.crop else (each.width, each.height)
+
+                # 判断视频的方向,如果视频的方向和用户选择的方向不一致则需要调换宽高
+                if (orientation == Orientation.HORIZONTAL and width > height) or (
+                        orientation == Orientation.VERTICAL and width < height):
+                    resolutions.append((width, height))
+                else:
+                    resolutions.append((height, width))
+
+            aspect_ratios: list[float] = [i[0] / i[1] for i in resolutions]
+            most_common_ratio = Counter(aspect_ratios).most_common(1)[0][0]
+            compatible_resolutions = [res for res in resolutions if (res[0] / res[1]) == most_common_ratio]
+            compatible_resolutions.sort(key=lambda x: (x[0] * x[1]), reverse=True)
+            width, height = compatible_resolutions[0][:2]
+            return width, height
+
         loguru.logger.debug('正在获取最佳分辨率')
         self._signal_bus.set_total_progress_description.emit("调优参数")
         self._signal_bus.set_total_progress_reset.emit()
@@ -201,13 +223,13 @@ class Worker(QObject):
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_description.emit("合并视频")
 
-        output_path = Path(cfg.get(cfg.output_file_path))
+        output_path = Path(cfg.get(cfg.output_dir))
         output_dir = Path(output_path).parent
         merge_videos(video_list=output_video_list, output_path=output_path)
 
         os.startfile(output_dir)
 
-        loguru.logger.success(f'合并完成,文件已经输出到{cfg.get(cfg.output_file_path)}')
+        loguru.logger.success(f'合并完成,文件已经输出到{cfg.get(cfg.output_dir)}')
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
         self._signal_bus.set_total_progress_description.emit("处理完成")

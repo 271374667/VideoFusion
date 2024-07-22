@@ -203,6 +203,21 @@ def get_output_file_path(input_file_path: Path, process_info: str = "out") -> Pa
     return TempDir().get_temp_dir() / f"{input_file_path.stem}_{process_info}{input_file_path.suffix}"
 
 
+def move_file_to_output_dir(video_list: list[Path]) -> Path:
+    output_dir: Path = Path(cfg.get(cfg.output_dir))
+    if output_dir.exists():
+        shutil.rmtree(output_dir, ignore_errors=True)
+        loguru.logger.debug(f"清空输出目录:{output_dir}")
+
+    output_dir.mkdir(parents=True, exist_ok=True)
+    # 将视频移动到输出目录
+    for video in video_list:
+        output_video = output_dir / video.name
+        video.replace(output_video)
+        loguru.logger.debug(f"移动文件:{video} -> {output_video}")
+    return output_dir
+
+
 @singleton
 class TempDir:
     def __init__(self, temp_dir: Path | None = None):

@@ -9,6 +9,7 @@ ASSETS_DIR = ROOT / "assets"
 IMAGES_DIR = ASSETS_DIR / "images"
 BIN_DIR = ROOT / "bin"
 TEMP_DIR = ROOT / "Temp"
+OUTPUT_DIR = ROOT / "output"
 
 # FILE
 OUTPUT_FILE = ROOT / "output.mp4"

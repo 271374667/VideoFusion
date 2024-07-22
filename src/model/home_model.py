@@ -24,7 +24,7 @@ class Worker(QObject):
         else:
             self._vm.read_from_txt_file(dir_or_file)
 
-        self._vm.output_file_path = output_file
+        self._vm.output_dir = output_file
         self._vm.fps = fps
         self._vm.sample_rate = sample_rate
         self._vm.video_orientation = video_orientation

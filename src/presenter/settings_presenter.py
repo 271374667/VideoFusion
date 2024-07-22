@@ -45,7 +45,7 @@ class SettingsPresenter:
         output_file_path = QFileDialog.getSaveFileName(self._view, "选择输出文件路径", "输出文件.mp4",
                                                        "视频文件 (*.mp4)")
         if output_file_path[0]:
-            cfg.set(cfg.output_file_path, output_file_path[0])
+            cfg.set(cfg.output_dir, output_file_path[0])
             loguru.logger.info(f"选择了输出文件路径: {output_file_path[0]}")
             return
         self.get_view().show_error_infobar("错误", "请选择一个有效的输出文件路径", duration=3000, is_closable=True)
@@ -84,7 +84,7 @@ class SettingsPresenter:
     def _connect_signal(self):
         self._view.ffmpeg_file_card.clicked.connect(self._select_ffmpeg_file)
         self._view.temp_dir_card.clicked.connect(self._select_temp_dir)
-        self._view.output_file_path_card.clicked.connect(self._select_output_file_path)
+        self._view.output_dir_path_card.clicked.connect(self._select_output_file_path)
         self._view.update_card.clicked.connect(self._check_update)
 
 

@@ -63,12 +63,14 @@ class SettingView(MessageBaseView):
         self.preview_frame_card = ComboBoxSettingCard(cfg.preview_frame, Icon(FluentIcon.CHEVRON_RIGHT), "预览视频帧",
                                                       "设置预览视频的封面为第几帧的图片",
                                                       ["第一帧", "最后一帧", "随机帧"], self.general_group)
+        self.merge_video_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "合并视频",
+                                                        "对视频处理完毕之后是否将视频合并成一个", cfg.merge_video, self.general_group)
         self.update_card = PrimaryPushSettingCard("检查更新", Icon(FluentIcon.CHEVRON_RIGHT), "检查更新",
                                                   "检查当前软件版本",
                                                   self.general_group)
 
         # 视频质量
-        self.output_file_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
+        self.output_dir_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
                                                      "设置输出文件路径", self.video_group)
         self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
@@ -160,9 +162,10 @@ class SettingView(MessageBaseView):
         self.preview_video_remove_black_card.setToolTip(
                 "如果您发现您的画面黑边,请尝试勾选此选项,但是单帧画面效果不是很好,请通过预览视频查看效果")
         self.preview_frame_card.setToolTip("设置预览视频的封面为第几帧的图片")
+        self.merge_video_card.setToolTip("所有视频的分辨率会被重新计算调整到最佳的分辨率,然后合并成一个视频文件")
 
-        output_file_path = cfg.get(cfg.output_file_path)
-        self.output_file_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
+        output_file_path = cfg.get(cfg.output_dir)
+        self.output_dir_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
         self.audio_noise_reduction_card.setToolTip(
                 "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
         self.video_noise_reduction_card.setToolTip(
@@ -209,10 +212,11 @@ class SettingView(MessageBaseView):
                 self.delete_temp_dir_card,
                 self.preview_video_remove_black_card,
                 self.preview_frame_card,
+                self.merge_video_card,
                 self.update_card
                 ])
         self.video_group.addSettingCards([
-                self.output_file_path_card,
+                self.output_dir_path_card,
                 self.deband_card,
                 self.deblock_card,
                 self.shake_card,

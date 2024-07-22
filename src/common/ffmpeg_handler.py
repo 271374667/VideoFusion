@@ -6,7 +6,7 @@ from pathlib import Path
 import cv2
 import loguru
 
-from src.config import AudioNoiseReduction, AudioSampleRate, VideoCodec, cfg
+from src.config import AudioNoiseReduction, AudioSampleRate, FrameRateAdjustment, VideoCodec, cfg
 from src.core.paths import FFMPEG_FILE, ROOT
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
@@ -26,6 +26,61 @@ class FFmpegHandler:
             loguru.logger.error(f"FFmpeg文件不存在: {self._ffmpeg_path}")
             raise FileNotFoundError(f"FFmpeg文件不存在: {self._ffmpeg_path}")
 
+    def reencode_video(self, input_file_path: Path) -> Path:
+        """
+        重新编译指定的视频文件。
+
+        此方法接收一个视频文件路径作为输入，根据配置中指定的视频编解码器和音频采样率对视频进行压缩处理，
+        并将压缩后的视频保存在临时目录下，文件名为原视频文件名加上 "_reencode" 后缀。
+
+        Args:
+            input_file_path (Path): 输入视频文件的路径。该视频文件将被压缩。
+
+        Returns:
+            Path: 重新编译后的视频文件的路径。
+
+        Example:
+            >>> ffmpeg_handler = FFmpegHandler()
+            >>> input_video_path = Path("/path/to/video.mp4")
+            >>> reencode_video_path = ffmpeg_handler.reencode_video(input_video_path)
+            >>> print(reencode_video_path)
+            Path("/path/to/temp_dir/video_compressed.mp4")
+
+        注意:
+            - 压缩过程中使用的视频编解码器和音频采样率由配置文件中的 `output_codec` 和 `audio_sample_rate` 决定。
+            - 输出视频文件将保存在临时目录中。
+        """
+        output_file_path: Path = get_output_file_path(input_file_path, "reencode")
+
+        # 生成压缩命令
+        video_codec: VideoCodec = cfg.get(cfg.output_codec)
+
+        audio_sample_rate: AudioSampleRate = cfg.get(cfg.audio_sample_rate)
+        audio_sample_rate = audio_sample_rate.value
+        audio_filter = [f"aresample={audio_sample_rate}:resampler=soxr:precision=28:osf=s16:dither_method=triangular"]
+        audio_codec = f' -c:a aac -b:a {audio_sample_rate} -strict experimental -vsync 1'
+
+        video_filter = []
+        frame_rate_adjustment_type: FrameRateAdjustment = cfg.get(cfg.rate_adjustment_type)
+        framerate: int = cfg.get(cfg.video_fps)
+        if frame_rate_adjustment_type == FrameRateAdjustment.NORMAL:
+            video_filter.append(f"fps=fps={framerate}")
+        elif frame_rate_adjustment_type == FrameRateAdjustment.MOTION_INTERPOLATION:
+            video_filter.append(
+                    f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
+
+        command = self._get_ffmpeg_command(input_file_path,
+                                           output_file_path,
+                                           audio_filter=audio_filter,
+                                           video_codec=video_codec.value,
+                                           video_filter=video_filter,
+                                           audio_codec=audio_codec)
+        # 获取视频总帧数
+        total_frame = self._get_video_total_frame(input_file_path)
+
+        self._run_command(command, total_frame)
+        return output_file_path
+
     def compress_video(self, input_file_path: Path) -> Path:
         """
         压缩指定的视频文件。
@@ -37,32 +92,16 @@ class FFmpegHandler:
             input_file_path (Path): 输入视频文件的路径。该视频文件将被压缩。
 
         Returns:
-            Path: 压缩后的视频文件的路径。
-
-        Example:
-            >>> ffmpeg_handler = FFmpegHandler()
-            >>> input_video_path = Path("/path/to/video.mp4")
-            >>> compressed_video_path = ffmpeg_handler.compress_video(input_video_path)
-            >>> print(compressed_video_path)
-            Path("/path/to/temp_dir/video_compressed.mp4")
-
-        注意:
-            - 压缩过程中使用的视频编解码器和音频采样率由配置文件中的 `output_codec` 和 `audio_sample_rate` 决定。
-            - 输出视频文件将保存在临时目录中。
+            压缩后的视频文件的路径。
         """
         output_file_path: Path = get_output_file_path(input_file_path, "compressed")
 
         # 生成压缩命令
         video_codec: VideoCodec = cfg.get(cfg.output_codec)
-
-        audio_sample_rate: AudioSampleRate = cfg.get(cfg.audio_sample_rate)
-        audio_sample_rate = audio_sample_rate.value
-        audio_filter = [f"aresample={audio_sample_rate}:resampler=soxr:precision=28:osf=s16:dither_method=triangular"]
-        audio_codec = f' -c:a aac -b:a {audio_sample_rate} -strict experimental -vsync 1'
+        audio_codec = ' -c:a copy '
 
         command = self._get_ffmpeg_command(input_file_path,
                                            output_file_path,
-                                           audio_filter=audio_filter,
                                            video_codec=video_codec.value,
                                            audio_codec=audio_codec)
         # 获取视频总帧数
@@ -224,6 +263,19 @@ class FFmpegHandler:
         self._run_command(command, total_frame)
         return output_file
 
+    def get_support_video_format(self) -> list[str]:
+        """获取FFmpeg支持的视频格式
+
+        Returns:
+            list[str]: 支持的视频格式列表
+            Example:
+                ['.mp4', '.avi', '.mov', '.flv', '.wmv']
+        """
+        # 调用ffmpeg -formats命令获取所有支持的格式
+        result = subprocess.run([self._ffmpeg_path, '-formats'], capture_output=True, text=True)
+        formats = re.findall(r'D\s+([a-zA-Z0-9]+)', result.stdout)
+        return [f'.{fmt}' for fmt in formats]
+
     def _get_video_total_frame(self, video_path: Path) -> int:
         cap = cv2.VideoCapture(str(video_path))
         if not cap.isOpened():
@@ -248,7 +300,7 @@ class FFmpegHandler:
             command += ' '.join(video_filter)
 
         if audio_filter:
-            command += '-af '
+            command += ' -af '
             command_without_quote = ','.join(audio_filter)
             command += f'"{command_without_quote}"'
 

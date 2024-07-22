@@ -85,7 +85,7 @@ class ConcatePresenter:
         used_time: int = int(time.time() - self.start_time)
         self.get_view().show_info_infobar("完成", f"视频合并完成,总共耗时{trans_second_to_human_time(used_time)}",
                                           duration=-1, is_closable=True)
-        output_path = cfg.get(cfg.output_file_path)
+        output_path = cfg.get(cfg.output_dir)
         self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件至: {output_path}")
 
     def cancle_worker(self):

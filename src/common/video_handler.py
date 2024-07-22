@@ -1,6 +1,7 @@
 from pathlib import Path
 
 import cv2
+import loguru
 
 from src.common.ffmpeg_handler import FFmpegHandler
 from src.common.processors.audio_processors.audio_processor_manager import AudioProcessorManager
@@ -19,27 +20,41 @@ class VideoHandler:
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
 
-    def process_video(self, input_video_path: Path,) -> Path:
+    def process_video(self, input_video_path: Path) -> Path:
         video_after_processed = self._video_process(input_video_path)
 
-        audio_extractor = self._ffmpeg_handler.extract_audio_from_video(input_video_path)
-        audio_after_processed = self._audio_process(audio_extractor, self._audio_processor_manager)
+        try:
+            audio_extractor = self._ffmpeg_handler.extract_audio_from_video(input_video_path)
+        except Exception as e:
+            loguru.logger.error(f'提取音频失败，原因：{e}')
+            audio_extractor = None
+
+        if not audio_extractor:
+            loguru.logger.debug(f'视频{input_video_path}没有音频')
+            return video_after_processed
+        audio_after_processed = self._audio_process(audio_extractor)
         # 合并视频和音频
-        return self._ffmpeg_handler.replace_video_audio(video_after_processed, audio_after_processed)
+        video_with_audio: Path = self._ffmpeg_handler.replace_video_audio(video_after_processed, audio_after_processed)
+        return self._ffmpeg_handler.reencode_video(video_with_audio)
 
-    def merge_videos(self, video_list: list[Path]):
+    def merge_videos(self, video_list: list[Path]) -> Path:
+        return self._ffmpeg_handler.merge_videos(video_list)
+
+    def compress_video(self, input_video_path: Path) -> Path:
+        return self._ffmpeg_handler.reencode_video(input_video_path)
+
+    def move_videos(self, video_list: list[Path], output_dir: Path) -> list[Path]:
         ...
 
-    def compress_video(self, input_video_path: Path, output_video_path: Path):
-        ...
-
-    def _video_process(self, input_video_path: Path,) -> Path:
+    def _video_process(self, input_video_path: Path, ) -> Path:
         """
         读取输入视频，逐帧处理，然后写入输出视频,以及音频处理
 
         Args:
             input_video_path: 输入视频的路径
         """
+        self._signal_bus.set_detail_progress_reset.emit()
+
         cap = cv2.VideoCapture(str(input_video_path))
         if not cap.isOpened():
             raise ValueError("无法打开输入视频")
@@ -54,6 +69,7 @@ class VideoHandler:
         output_file_path = get_output_file_path(input_video_path, "video_processed")
         out = cv2.VideoWriter(str(output_file_path), fourcc, fps, (width, height))
 
+        self._signal_bus.set_detail_progress_max.emit(total_frames)
         for _ in range(total_frames):
             ret, frame = cap.read()
             if not ret:
@@ -64,26 +80,27 @@ class VideoHandler:
 
             # 写入处理后的帧
             out.write(processed_frame)
+            self._signal_bus.advance_detail_progress.emit(1)
 
         # 释放资源
         cap.release()
         out.release()
+
+        self._signal_bus.set_detail_progress_finish.emit()
         return output_file_path
 
-    def _audio_process(self, input_video_path: Path,
-                       processor_manager: AudioProcessorManager) -> Path:
+    def _audio_process(self, input_video_path: Path) -> Path:
         """
         读取输入视频，逐帧处理，然后写入输出视频,以及音频处理
 
         Args:
             input_video_path: 输入视频的路径
-            processor_manager: 用于处理音频的处理器
         """
         output_file_path = get_output_file_path(input_video_path, "audio_processed")
-        processor_manager.process(input_video_path)
+        self._audio_processor_manager.process(input_video_path)
         return output_file_path
 
-    def _get_after_process_width_and_height(self,input_video_path: Path,) -> tuple[int, int]:
+    def _get_after_process_width_and_height(self, input_video_path: Path, ) -> tuple[int, int]:
         cap = cv2.VideoCapture(str(input_video_path))
         if not cap.isOpened():
             raise ValueError("无法打开输入视频")
