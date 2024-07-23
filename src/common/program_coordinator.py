@@ -18,14 +18,17 @@ from src.utils import move_file_to_output_dir
 
 class ProgramCoordinator:
     def __init__(self):
-        self.is_running: bool = True
+        self.is_running: bool = False
         self.is_merging: bool = False
 
         self._signal_bus = SignalBus()
         self._processor_global_var = ProcessorGlobalVar()
         self._video_handler = VideoHandler()
 
-    def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path:
+    def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
+        self.is_running = True
+        self.is_merging = False
+
         finished_video_path_list: list[Path] = []
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_reset.emit()
@@ -46,20 +49,31 @@ class ProgramCoordinator:
         self._processor_global_var.get_data()['rotation_angle'] = rotation.value
 
         self._signal_bus.set_total_progress_max.emit(len(input_video_path_list))
-        self._signal_bus.set_total_progress_description.emit("处理视频")
+        self._signal_bus.set_total_progress_description.emit("分析视频")
 
+        # 读取视频信息
         video_info_list: list[VideoInfo] = []
         for each_path in input_video_path_list:
             if not self.is_running:
-                break
+                return None
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
             video_info_list.append(video_info)
 
         best_width, best_height = self._get_best_resolution(video_info_list, orientation)
         self._processor_global_var.get_data()['target_width'] = best_width
         self._processor_global_var.get_data()['target_height'] = best_height
+        self._signal_bus.set_total_progress_finish.emit()
+        self._signal_bus.set_detail_progress_finish.emit()
 
+        # 逐个处理视频
+        self._signal_bus.set_total_progress_reset.emit()
+        self._signal_bus.set_detail_progress_reset.emit()
+        self._signal_bus.set_total_progress_description.emit("处理视频")
+        self._signal_bus.set_total_progress_max.emit(len(video_info_list))
         for video_info in video_info_list:
+            if not self.is_running:
+                return None
+
             self._update_processor_global_var_with_crop_info(video_info)
 
             finished_video_path: Path = self._video_handler.process_video(video_info.video_path)
@@ -68,9 +82,11 @@ class ProgramCoordinator:
 
         is_merge: bool = cfg.get(cfg.merge_video)
         if is_merge:
+            self.is_merging = True
             finished_video_path = self._video_handler.merge_videos(finished_video_path_list)
             finished_video_path_list.clear()
             finished_video_path_list.append(finished_video_path)
+            self.is_merging = False
 
         output_dir = move_file_to_output_dir(finished_video_path_list)
         os.startfile(output_dir)
@@ -116,11 +132,14 @@ class ProgramCoordinator:
         loguru.logger.info(f'最佳分辨率获取完成,最佳分辨率为: {best_width}x{best_height}')
         return best_width, best_height
 
+    def _set_merge_status(self, status: bool):
+        self.is_merging = status
+
 
 if __name__ == '__main__':
     p = ProgramCoordinator()
     print(p.process([
-            Path(r"E:\load\python\Project\VideoFusion\测试\dy\8fd68ff8825a0de6aff59c482abe7147.mp4"),
+            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\other\video_2024-03-04_16-55-20.mp4"),
             Path(r"E:\load\python\Project\VideoFusion\测试\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")
             ],
 

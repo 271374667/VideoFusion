@@ -43,10 +43,7 @@ class VideoHandler:
     def compress_video(self, input_video_path: Path) -> Path:
         return self._ffmpeg_handler.reencode_video(input_video_path)
 
-    def move_videos(self, video_list: list[Path], output_dir: Path) -> list[Path]:
-        ...
-
-    def _video_process(self, input_video_path: Path, ) -> Path:
+    def _video_process(self, input_video_path: Path) -> Path:
         """
         读取输入视频，逐帧处理，然后写入输出视频,以及音频处理
 
