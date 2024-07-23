@@ -12,13 +12,11 @@ from PySide6.QtWidgets import QFileDialog
 from src.common.black_remove.img_black_remover import BlackRemover
 from src.config import PreviewFrame, cfg
 from src.core.enums import Orientation, Rotation
-from src.core.paths import FFMPEG_FILE, FFPROBE_FILE, TEMP_DIR
+from src.core.paths import FFMPEG_FILE, FFPROBE_FILE
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
 from src.utils import RunInThread, TempDir, trans_second_to_human_time
 from src.view.concate_view import ConcateView
-
-temp_dir = TempDir()
 
 
 class ConcatePresenter:
@@ -27,6 +25,7 @@ class ConcatePresenter:
         self._black_remover = BlackRemover()
         self.current_rotation: int = 0
         self.start_time: float = time.time()
+        self._temp_dir = TempDir()
 
         self._view: ConcateView = ConcateView()
         self._model: ConcateModel = ConcateModel()
@@ -120,7 +119,7 @@ class ConcatePresenter:
         file_dialog.setNameFilters([f"Video Files (*{suffix})" for suffix in available_suffix])
         file_dialog.setViewMode(QFileDialog.ViewMode.List)
 
-        target_dir = TEMP_DIR
+        target_dir = self._temp_dir.get_temp_dir()
         if current_item := self.get_view().get_video_file_list().get_current_item_text():
             target_dir = Path(current_item).parent
         file_dialog.setDirectory(str(target_dir))

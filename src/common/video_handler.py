@@ -19,6 +19,9 @@ class VideoHandler:
         self._ffmpeg_handler: FFmpegHandler = FFmpegHandler()
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
+        self.is_running: bool = True
+
+        self._signal_bus.set_running.connect(self._set_running)
 
     def process_video(self, input_video_path: Path) -> Path:
         video_after_processed = self._video_process(input_video_path)
@@ -33,6 +36,10 @@ class VideoHandler:
             loguru.logger.debug(f'视频{input_video_path}没有音频')
             return video_after_processed
         audio_after_processed = self._audio_process(audio_extractor)
+
+        if not self.is_running:
+            raise ValueError("您暂停了程序")
+
         # 合并视频和音频
         video_with_audio: Path = self._ffmpeg_handler.replace_video_audio(video_after_processed, audio_after_processed)
         return self._ffmpeg_handler.reencode_video(video_with_audio)
@@ -69,7 +76,7 @@ class VideoHandler:
         self._signal_bus.set_detail_progress_max.emit(total_frames)
         for _ in range(total_frames):
             ret, frame = cap.read()
-            if not ret:
+            if not ret or not self.is_running:
                 break
 
             # 对帧进行处理
@@ -110,6 +117,9 @@ class VideoHandler:
         height, width = processed_frame.shape[:2]
         cap.release()
         return width, height
+
+    def _set_running(self, is_running: bool):
+        self.is_running = is_running
 
 
 if __name__ == '__main__':

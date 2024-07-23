@@ -386,5 +386,5 @@ if __name__ == '__main__':
     #                        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (3) - 副本.mp4")]
     #                )
 
-    # print(f.encode_video_to_ts(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (1).mp4")))
+    print(f.encode_video_to_ts(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (1).mp4")))
     app.exec()

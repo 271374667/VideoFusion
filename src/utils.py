@@ -88,6 +88,34 @@ def thread_with_timeout(timeout: int):
     return decorator
 
 
+class ForceStopThread:
+    def __init__(self):
+        self.thread = None
+        self.thread_id = None
+
+    def start_task(self, func, *args, **kwargs):
+        if self.thread:
+            self.stop_task()
+
+        def run():
+            self.thread_id = threading.get_ident()
+            with contextlib.suppress(SystemExit):
+                func(*args, **kwargs)
+
+        self.thread = threading.Thread(target=run)
+        self.thread.start()
+
+    def stop_task(self):
+        if self.thread is not None and self.thread.is_alive():
+            res = ctypes.pythonapi.PyThreadState_SetAsyncExc(ctypes.c_long(self.thread_id),
+                                                             ctypes.py_object(SystemExit))
+            if res > 1:
+                ctypes.pythonapi.PyThreadState_SetAsyncExc(self.thread_id, 0)
+                loguru.logger.error('Error: could not terminate thread')
+            else:
+                loguru.logger.debug(f'Thread {self.thread_id} forcefully terminated')
+
+
 def calculate_dimensions(width: int, height: int, target_width: int, target_height: int):
     if width == 0 or height == 0:
         loguru.logger.critical("视频的宽度或高度为0, 请检查视频")
@@ -216,6 +244,17 @@ def move_file_to_output_dir(video_list: list[Path]) -> Path:
         video.replace(output_video)
         loguru.logger.debug(f"移动文件:{video} -> {output_video}")
     return output_dir
+
+
+def is_available_video_file(video_path: str | Path) -> bool:
+    video_path = Path(video_path)
+    if not video_path.exists():
+        return False
+    if not video_path.is_file():
+        return False
+    if video_path.suffix.lower() not in ['.mp4', '.mov', '.avi', '.mkv', '.flv', '.wmv', '.webm', '.ts']:
+        return False
+    return True
 
 
 @singleton

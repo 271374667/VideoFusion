@@ -4,6 +4,13 @@ from src.utils import singleton
 
 @singleton
 class ProcessorGlobalVar:
+    _instance = None
+
+    def __new__(cls, *args, **kwargs):
+        if cls._instance is None:
+            cls._instance = super().__new__(cls)
+        return cls._instance
+
     def __init__(self):
         self._data: VideoInfoDict = {}
 
@@ -23,3 +30,6 @@ class ProcessorGlobalVar:
 
     def clear(self):
         self._data.clear()
+
+    def __repr__(self):
+        return f"ProcessorGlobalVar({self._data})"

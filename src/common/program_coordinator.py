@@ -26,13 +26,18 @@ class ProgramCoordinator:
         self._video_handler = VideoHandler()
 
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
+        self._processor_global_var.clear()
+
         self.is_running = True
         self.is_merging = False
+
+        self._processor_global_var.update('orientation', orientation)
+        self._processor_global_var.update('rotation_angle', rotation.value)
+        loguru.logger.debug(self._processor_global_var)
 
         finished_video_path_list: list[Path] = []
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_reset.emit()
-        self._processor_global_var.clear()
 
         black_remove_algorithm_enum: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
         match black_remove_algorithm_enum:
@@ -58,6 +63,7 @@ class ProgramCoordinator:
                 return None
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
             video_info_list.append(video_info)
+            self._signal_bus.advance_total_progress.emit(1)
 
         best_width, best_height = self._get_best_resolution(video_info_list, orientation)
         self._processor_global_var.get_data()['target_width'] = best_width
@@ -93,6 +99,7 @@ class ProgramCoordinator:
 
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
+        self._signal_bus.finished.emit()
         return output_dir
 
     def _update_processor_global_var_with_crop_info(self, video_info: VideoInfo):
