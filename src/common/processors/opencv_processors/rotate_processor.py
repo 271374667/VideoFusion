@@ -12,7 +12,7 @@ class RotateProcessor(OpenCVProcessor):
         # 获取旋转的角度{0, 90, 180, 270}
 
     def process(self, frame: np.ndarray) -> np.ndarray:
-        angle: int = self._processor_global_var.get_data()['rotation_angle']
+        angle: int = self._processor_global_var.get('rotation_angle')
         orientation: Orientation = self._processor_global_var.get("orientation")
 
         if orientation is None:

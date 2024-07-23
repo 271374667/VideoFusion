@@ -1,4 +1,5 @@
 import os
+import time
 from collections import Counter
 from pathlib import Path
 
@@ -20,6 +21,7 @@ class ProgramCoordinator:
     def __init__(self):
         self.is_running: bool = False
         self.is_merging: bool = False
+        self._start_time = time.time()
 
         self._signal_bus = SignalBus()
         self._processor_global_var = ProcessorGlobalVar()
@@ -100,6 +102,8 @@ class ProgramCoordinator:
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
         self._signal_bus.finished.emit()
+        loguru.logger.info(
+            f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
         return output_dir
 
     def _update_processor_global_var_with_crop_info(self, video_info: VideoInfo):

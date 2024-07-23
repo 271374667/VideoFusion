@@ -9,7 +9,7 @@ from src.common.processors.opencv_processors.crop_processor import CropProcessor
 class CropProcessorTest(unittest.TestCase):
     def setUp(self):
         self.processor = CropProcessor()
-        self.processor.processor_global_var.get = MagicMock(side_effect=lambda key: {
+        self.processor._processor_global_var.get = MagicMock(side_effect=lambda key: {
                 "crop_x": 10,
                 "crop_y": 20,
                 "crop_width": 100,
