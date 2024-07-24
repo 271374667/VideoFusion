@@ -50,7 +50,7 @@ class FFmpegHandler:
             - 压缩过程中使用的视频编解码器和音频采样率由配置文件中的 `output_codec` 和 `audio_sample_rate` 决定。
             - 输出视频文件将保存在临时目录中。
         """
-        output_file_path: Path = get_output_file_path(input_file_path, "reencode")
+        output_file_path: Path = get_output_file_path(input_file_path, "reencode").with_suffix('.mp4')
 
         # 生成压缩命令
         video_codec: VideoCodec = cfg.get(cfg.output_codec)
@@ -94,7 +94,7 @@ class FFmpegHandler:
         Returns:
             压缩后的视频文件的路径。
         """
-        output_file_path: Path = get_output_file_path(input_file_path, "compressed")
+        output_file_path: Path = get_output_file_path(input_file_path, "compressed").with_suffix('.mp4')
 
         # 生成压缩命令
         video_codec: VideoCodec = cfg.get(cfg.output_codec)
@@ -276,6 +276,28 @@ class FFmpegHandler:
         formats = re.findall(r'D\s+([a-zA-Z0-9]+)', result.stdout)
         return [f'.{fmt}' for fmt in formats]
 
+    def _check_audio_stream_with_ffmpeg(self, video_path: Path) -> bool:
+        """使用ffmpeg命令检查视频文件是否包含音频流。
+        """
+        temp_audio_file = self._temp_dir.get_temp_dir() / video_path.name
+        command = f'{self._ffmpeg_path} -i "{video_path}" -vn -acodec copy "{temp_audio_file}" -y'
+        try:
+            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True,
+                           encoding='utf-8',
+                           universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            loguru.logger.error(f"检查音频流失败: {e}")
+            return False
+        has_audio = temp_audio_file.exists()
+
+        # 清理临时音频文件
+        if has_audio:
+            os.remove(temp_audio_file)
+        else:
+            loguru.logger.debug(f"视频文件{video_path}不包含音频流")
+
+        return has_audio
+
     def _get_video_total_frame(self, video_path: Path) -> int:
         cap = cv2.VideoCapture(str(video_path))
         if not cap.isOpened():
@@ -295,20 +317,27 @@ class FFmpegHandler:
                             other_command: list[str] | None = None
                             ) -> str:
         command: str = f'"{self._ffmpeg_path}" -i "{input_video_path}" '
+        has_audio: bool = self._check_audio_stream_with_ffmpeg(input_video_path)
+        # 如果没有音频流，添加静音音频流
+        silence_audio_command = ' -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a aac -shortest '
         if video_filter:
             command += ' -filter_complex '
             command += ' '.join(video_filter)
 
-        if audio_filter:
+        if audio_filter and has_audio:
             command += ' -af '
             command_without_quote = ','.join(audio_filter)
             command += f'"{command_without_quote}"'
+        elif audio_filter and not has_audio:
+            command += silence_audio_command
 
         if other_command:
             command += ' '.join(other_command)
 
-        if audio_codec:
+        if audio_codec and has_audio:
             command += f' {audio_codec} '
+        elif audio_codec and not has_audio:
+            command += silence_audio_command
 
         if video_codec:
             command += f' {video_codec} '
@@ -371,11 +400,8 @@ if __name__ == '__main__':
     signal_bus.failed.connect(lambda: print("failed"))
     signal_bus.set_detail_progress_reset.connect(lambda: print("set_detail_progress_reset"))
 
-    video_input_path: Path = Path(
-            r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\1\视频  (3).mp4")
-    video_output_path: Path = video_input_path.with_stem(f"{video_input_path.stem}_out")
     f = FFmpegHandler()
-    # f.compress_video(video_input_path)
+    print(f.compress_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,
     #                       Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\1\视频  (1)_out.wav"))
@@ -386,5 +412,5 @@ if __name__ == '__main__':
     #                        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (3) - 副本.mp4")]
     #                )
 
-    print(f.encode_video_to_ts(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (1).mp4")))
+    # print(f.encode_video_to_ts(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\视频  (1).mp4")))
     app.exec()
