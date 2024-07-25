@@ -48,6 +48,9 @@ class OpenCVProcessorManager(BaseProcessorManager[np.ndarray]):
     def get_processors(self) -> list[OpenCVProcessor]:
         return self._processors
 
+    def get_crop_processor(self) -> CropProcessor:
+        return self._crop_processor
+
     def add_processor(self, processor: OpenCVProcessor):
         self._processors.append(processor)
 

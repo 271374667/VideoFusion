@@ -7,6 +7,7 @@ from src.common.ffmpeg_handler import FFmpegHandler
 from src.common.processors.audio_processors.audio_processor_manager import AudioProcessorManager
 from src.common.processors.opencv_processors.opencv_processor_manager import OpenCVProcessorManager
 from src.common.processors.processor_global_var import ProcessorGlobalVar
+from src.core.datacls import VideoInfo
 from src.core.enums import Orientation
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
@@ -19,21 +20,30 @@ class VideoHandler:
         self._ffmpeg_handler: FFmpegHandler = FFmpegHandler()
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
+        self._processor_global_var: ProcessorGlobalVar = ProcessorGlobalVar()
         self.is_running: bool = True
 
         self._signal_bus.set_running.connect(self._set_running)
 
-    def process_video(self, input_video_path: Path) -> Path:
-        video_after_processed = self._video_process(input_video_path)
+    def process_video(self, video_info: VideoInfo) -> Path:
+        if video_info.crop:
+            self._processor_global_var.get_data()['crop_x'] = video_info.crop.x
+            self._processor_global_var.get_data()['crop_y'] = video_info.crop.y
+            self._processor_global_var.get_data()['crop_width'] = video_info.crop.w
+            self._processor_global_var.get_data()['crop_height'] = video_info.crop.h
+        else:
+            self._video_processor_manager.get_crop_processor().is_enable = False
+
+        video_after_processed = self._video_process(video_info.video_path)
 
         try:
-            audio_extractor = self._ffmpeg_handler.extract_audio_from_video(input_video_path)
+            audio_extractor = self._ffmpeg_handler.extract_audio_from_video(video_info.video_path)
         except Exception as e:
             loguru.logger.error(f'提取音频失败，原因：{e}')
             audio_extractor = None
 
         if not audio_extractor:
-            loguru.logger.debug(f'视频{input_video_path}没有音频')
+            loguru.logger.debug(f'视频{video_info.video_path}没有音频')
             return video_after_processed
         audio_after_processed = self._audio_process(audio_extractor)
 
@@ -134,4 +144,5 @@ if __name__ == '__main__':
     global_var.update("target_width", 500)
     global_var.update("target_height", 300)
 
-    print(v.process_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\1\视频  (3).mp4")))
+    print(v.process_video(
+        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))

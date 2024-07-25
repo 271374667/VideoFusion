@@ -134,11 +134,17 @@ class FFmpegHandler:
             - 如果输入视频文件中不包含音频轨道，将不会生成音频文件，并可能抛出异常。
         """
         output_file_path = get_output_file_path(input_file_path).with_suffix('.wav')
-        other_command = [f'-vn -acodec pcm_s16le "{output_file_path}"']
+        has_audio: bool = self._check_audio_stream_with_ffmpeg(input_file_path)
+        if not has_audio:
+            self._run_command(
+                f'"{self._ffmpeg_path}" -f lavfi -i anullsrc=r=44100:cl=stereo -t 10 "{output_file_path}"')
+            return output_file_path
+        other_command = [' -vn -acodec pcm_s16le ']
         command = self._get_ffmpeg_command(input_file_path,
                                            output_file_path,
                                            other_command=other_command)
-        self._run_command(command)
+        total_frame = self._get_video_total_frame(input_file_path)
+        self._run_command(command, total_frame)
         return output_file_path
 
     def replace_video_audio(self, input_video_path: Path, audio_wav_path: Path) -> Path:
@@ -290,10 +296,7 @@ class FFmpegHandler:
             return False
         has_audio = temp_audio_file.exists()
 
-        # 清理临时音频文件
-        if has_audio:
-            os.remove(temp_audio_file)
-        else:
+        if not has_audio:
             loguru.logger.debug(f"视频文件{video_path}不包含音频流")
 
         return has_audio
@@ -319,7 +322,7 @@ class FFmpegHandler:
         command: str = f'"{self._ffmpeg_path}" -i "{input_video_path}" '
         has_audio: bool = self._check_audio_stream_with_ffmpeg(input_video_path)
         # 如果没有音频流，添加静音音频流
-        silence_audio_command = ' -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a aac -shortest '
+        silence_audio_command = ' -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a aac -t 10 '
         if video_filter:
             command += ' -filter_complex '
             command += ' '.join(video_filter)
@@ -401,7 +404,8 @@ if __name__ == '__main__':
     signal_bus.set_detail_progress_reset.connect(lambda: print("set_detail_progress_reset"))
 
     f = FFmpegHandler()
-    print(f.compress_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
+    print(f.extract_audio_from_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
+    # print(f.reencode_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,
     #                       Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\1\视频  (1)_out.wav"))

@@ -84,7 +84,7 @@ class ProgramCoordinator:
 
             self._update_processor_global_var_with_crop_info(video_info)
 
-            finished_video_path: Path = self._video_handler.process_video(video_info.video_path)
+            finished_video_path: Path = self._video_handler.process_video(video_info)
             finished_video_path_list.append(finished_video_path)
             self._signal_bus.advance_total_progress.emit(1)
 
