@@ -53,6 +53,9 @@ class SettingView(MessageBaseView):
         self.temp_dir_card = PushSettingCard("选择目录", Icon(FluentIcon.CHEVRON_RIGHT), "设置临时目录",
                                              "软件在运行的过程中会产生过程文件，请确保目标目录有足够的空间",
                                              self.general_group)
+        self.engine_card = ComboBoxSettingCard(cfg.engine, Icon(FluentIcon.CHEVRON_RIGHT), "底层处理引擎",
+                                               "选择底层处理引擎,FFmpeg处理速度快,OpenCV处理效果好",
+                                               ["FFmpeg", "OpenCV"], self.general_group)
         self.delete_temp_dir_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "删除临时目录",
                                                       "软件在完成后是否删除临时目录", cfg.delete_temp_dir,
                                                       self.general_group)
@@ -64,14 +67,15 @@ class SettingView(MessageBaseView):
                                                       "设置预览视频的封面为第几帧的图片",
                                                       ["第一帧", "最后一帧", "随机帧"], self.general_group)
         self.merge_video_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "合并视频",
-                                                        "对视频处理完毕之后是否将视频合并成一个", cfg.merge_video, self.general_group)
+                                                  "对视频处理完毕之后是否将视频合并成一个", cfg.merge_video,
+                                                  self.general_group)
         self.update_card = PrimaryPushSettingCard("检查更新", Icon(FluentIcon.CHEVRON_RIGHT), "检查更新",
                                                   "检查当前软件版本",
                                                   self.general_group)
 
         # 视频质量
         self.output_dir_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
-                                                     "设置输出文件路径", self.video_group)
+                                                    "设置输出文件路径", self.video_group)
         self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
                                              cfg.deband, self.video_group)
@@ -82,11 +86,11 @@ class SettingView(MessageBaseView):
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
         self.white_balance_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频白平衡",
-                                            "如果视频本身画面偏色,请尝试勾选此选项",
-                                            cfg.white_balance, self.video_group)
+                                                    "如果视频本身画面偏色,请尝试勾选此选项",
+                                                    cfg.white_balance, self.video_group)
         self.brightness_contrast_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "自动调整视频亮度对比度",
-                                            "调整过暗或者过亮的视频画面,可能会损失一些细节",
-                                            cfg.brightness_contrast, self.video_group)
+                                                          "调整过暗或者过亮的视频画面,可能会损失一些细节",
+                                                          cfg.brightness_contrast, self.video_group)
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_black_border_algorithm_card = ComboBoxSettingCard(cfg.video_black_border_algorithm,
@@ -127,10 +131,11 @@ class SettingView(MessageBaseView):
                                                                 ],
                                                         self.video_group)
         self.super_resolution_algorithm_card = ComboBoxSettingCard(cfg.super_resolution_algorithm,
-                                                                     Icon(FluentIcon.CHEVRON_RIGHT), "超分辨率算法平滑画面",
-                                                                        "使用超分算法先放大再缩小来大量减少画面中的噪点",
-                                                                        ["关闭", "ESPCN(速度快)", "LAPSRN(效果好)"],
-                                                                        self.video_group)
+                                                                   Icon(FluentIcon.CHEVRON_RIGHT),
+                                                                   "超分辨率算法平滑画面",
+                                                                   "使用超分算法先放大再缩小来大量减少画面中的噪点",
+                                                                   ["关闭", "ESPCN(速度快)", "LAPSRN(效果好)"],
+                                                                   self.video_group)
         self.rate_adjustment_type_card = ComboBoxSettingCard(cfg.rate_adjustment_type, Icon(FluentIcon.CHEVRON_RIGHT),
                                                              "视频补帧算法",
                                                              "调整视频帧率的算法",
@@ -176,7 +181,8 @@ class SettingView(MessageBaseView):
         self.deblock_card.setToolTip(
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
-        self.white_balance_card.setToolTip("白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确")
+        self.white_balance_card.setToolTip(
+            "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确")
         self.brightness_contrast_card.setToolTip("根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
@@ -209,6 +215,7 @@ class SettingView(MessageBaseView):
         self.general_group.addSettingCards([
                 self.ffmpeg_file_card,
                 self.temp_dir_card,
+                self.engine_card,
                 self.delete_temp_dir_card,
                 self.preview_video_remove_black_card,
                 self.preview_frame_card,

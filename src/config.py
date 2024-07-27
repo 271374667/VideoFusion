@@ -7,7 +7,7 @@ import loguru
 from qfluentwidgets import (BoolValidator, ConfigItem, ConfigValidator, EnumSerializer, FolderValidator,
                             OptionsConfigItem, OptionsValidator, QConfig, RangeConfigItem, RangeValidator, qconfig)
 
-from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_FILE, ROOT, TEMP_DIR, OUTPUT_DIR)
+from src.core.paths import (CONFIG_FILE, FFMPEG_FILE, NOISE_REDUCE_MODEL_FILE, OUTPUT_DIR, OUTPUT_FILE, ROOT, TEMP_DIR)
 
 if sys.getdefaultencoding() != 'utf-8':
     import importlib
@@ -99,6 +99,12 @@ class AudioSampleRate(Enum):
     Hz96000 = 96000
 
 
+# 使用什么底层进行处理
+class VideoProcessEngine(Enum):
+    FFmpeg = 0
+    OpenCV = 1
+
+
 class OutputFileValidator(ConfigValidator):
     """ Config validator """
 
@@ -179,6 +185,9 @@ class Config(QConfig):
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())
     temp_dir = ConfigItem("General", "临时目录", str(TEMP_DIR), FolderValidator())
+    engine = OptionsConfigItem("General", "视频处理引擎", VideoProcessEngine.FFmpeg,
+                               OptionsValidator(VideoProcessEngine),
+                               EnumSerializer(VideoProcessEngine))
     delete_temp_dir = ConfigItem("General", "完成后删除临时目录", True, BoolValidator())
     preview_video_remove_black = ConfigItem("General", "预览视频是否去黑边", False, BoolValidator())
     preview_frame = OptionsConfigItem("General", "预览视频帧", PreviewFrame.FirstFrame, OptionsValidator(PreviewFrame),

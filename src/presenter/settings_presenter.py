@@ -28,6 +28,8 @@ class SettingsPresenter:
         if file_path:
             cfg.set(cfg.ffmpeg_file, file_path)
             loguru.logger.info(f"选择了FFmpeg路径: {file_path}")
+            self._view.ffmpeg_file_card.setToolTip(file_path)
+            self.get_view().show_success_infobar("提示", "FFmpeg路径已经设置成功", duration=3000, is_closable=True)
             return
         self.get_view().show_error_infobar("错误", "请选择一个有效的FFmpeg路径", duration=3000, is_closable=True)
 
@@ -37,6 +39,8 @@ class SettingsPresenter:
                 ):
             cfg.set(cfg.temp_dir, dir_path)
             loguru.logger.info(f"选择了临时目录: {dir_path}")
+            self._view.temp_dir_card.setToolTip(dir_path)
+            self.get_view().show_success_infobar("提示", "临时目录已经设置成功", duration=3000, is_closable=True)
             return
         self.get_view().show_error_infobar("错误", "请选择一个有效的临时目录", duration=3000, is_closable=True)
 
@@ -47,6 +51,8 @@ class SettingsPresenter:
         if output_file_path[0]:
             cfg.set(cfg.output_dir, output_file_path[0])
             loguru.logger.info(f"选择了输出文件路径: {output_file_path[0]}")
+            self._view.output_dir_path_card.setToolTip(output_file_path[0])
+            self.get_view().show_success_infobar("提示", "输出文件路径已经设置成功", duration=3000, is_closable=True)
             return
         self.get_view().show_error_infobar("错误", "请选择一个有效的输出文件路径", duration=3000, is_closable=True)
 

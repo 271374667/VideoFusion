@@ -64,6 +64,7 @@ class ProgramCoordinator:
             if not self.is_running:
                 return None
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
+            loguru.logger.debug(video_info)
             video_info_list.append(video_info)
             self._signal_bus.advance_total_progress.emit(1)
 
@@ -103,7 +104,7 @@ class ProgramCoordinator:
         self._signal_bus.set_detail_progress_finish.emit()
         self._signal_bus.finished.emit()
         loguru.logger.info(
-            f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
+                f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
         return output_dir
 
     def _update_processor_global_var_with_crop_info(self, video_info: VideoInfo):

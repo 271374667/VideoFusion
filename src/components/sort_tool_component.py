@@ -346,7 +346,7 @@ class SortToolComponent(QWidget):
     def _set_img(self, frame):
         # 是否启用去除黑边
 
-        img = QImage(frame.data, frame.shape[1], frame.shape[0], QImage.Format.Format_RGB888)
+        img = QImage(frame._file_path, frame.shape[1], frame.shape[0], QImage.Format.Format_RGB888)
         # 剪裁图片
         if self._black_remove_cb.isChecked():
             left_top_x, left_top_y, right_bottom_x, right_bottom_y = self._black_remover.start(img_array=frame)
