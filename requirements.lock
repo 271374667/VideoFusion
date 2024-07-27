@@ -7,6 +7,7 @@
 #   all-features: false
 #   with-sources: false
 #   generate-hashes: false
+#   universal: false
 
 -e file:.
 ansi2html==1.9.2
@@ -17,7 +18,7 @@ darkdetect==0.8.0
     # via pyside6-fluent-widgets
 loguru==0.7.2
     # via videomosaic
-numpy==2.0.0
+numpy==2.0.1
     # via opencv-contrib-python
     # via videomosaic
 opencv-contrib-python==4.10.0.84
@@ -29,7 +30,7 @@ pyside6-addons==6.7.2
 pyside6-essentials==6.7.2
     # via pyside6
     # via pyside6-addons
-pyside6-fluent-widgets==1.5.8
+pyside6-fluent-widgets==1.6.0
     # via videomosaic
 pysidesix-frameless-window==0.3.12
     # via pyside6-fluent-widgets

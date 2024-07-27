@@ -7,6 +7,7 @@ from src.model.settings_model import SettingsModel
 from src.utils import RunInThread
 from src.utils import VersionRequest
 from src.view.settings_view import SettingView
+from src.components.message_dialog import MessageDialog
 
 
 class SettingsPresenter:
@@ -14,6 +15,7 @@ class SettingsPresenter:
         self._view: SettingView = SettingView()
         self._model: SettingsModel = SettingsModel()
         self._version_request = VersionRequest()
+        self._message_dialog = MessageDialog()
         self._connect_signal()
 
     def get_view(self) -> SettingView:
@@ -74,7 +76,10 @@ class SettingsPresenter:
 
             latest_version = latest_version.replace("v", "")
             if latest_version > current_version:
-                self.get_view().show_mask_dialog(f"最新版本: {latest_version}", description)
+                self._message_dialog.set_title("发现新版本")
+                self._message_dialog.set_explain(f"发现新版本: {latest_version}, 当前版本: {current_version}")
+                self._message_dialog.set_body(description)
+                self._message_dialog.show()
                 loguru.logger.info(f"发现新版本: {latest_version}, 当前版本: {current_version}")
                 loguru.logger.info(f"更新内容: {description}")
                 return
@@ -92,6 +97,8 @@ class SettingsPresenter:
         self._view.temp_dir_card.clicked.connect(self._select_temp_dir)
         self._view.output_dir_path_card.clicked.connect(self._select_output_file_path)
         self._view.update_card.clicked.connect(self._check_update)
+        self._message_dialog.ok_btn.clicked.connect(self._message_dialog.close)
+        self._message_dialog.cancel_btn.clicked.connect(self._message_dialog.close)
 
 
 if __name__ == '__main__':

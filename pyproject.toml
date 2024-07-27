@@ -26,6 +26,10 @@ dev-dependencies = [
     "nuitka>=2.2.3",
 ]
 
+[[tool.rye.sources]]
+name = "default"
+url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
 [tool.hatch.metadata]
 allow-direct-references = true
 
