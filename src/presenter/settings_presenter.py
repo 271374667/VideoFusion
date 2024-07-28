@@ -1,13 +1,13 @@
 import loguru
 from PySide6.QtWidgets import QFileDialog
 
-from src.config import cfg
+from src.components.message_dialog import MessageDialog
+from src.config import VideoProcessEngine, cfg
 from src.core.version import __version__
 from src.model.settings_model import SettingsModel
 from src.utils import RunInThread
 from src.utils import VersionRequest
 from src.view.settings_view import SettingView
-from src.components.message_dialog import MessageDialog
 
 
 class SettingsPresenter:
@@ -16,6 +16,7 @@ class SettingsPresenter:
         self._model: SettingsModel = SettingsModel()
         self._version_request = VersionRequest()
         self._message_dialog = MessageDialog()
+        self._engine_changed()
         self._connect_signal()
 
     def get_view(self) -> SettingView:
@@ -92,6 +93,25 @@ class SettingsPresenter:
         self._run_in_thread.set_finished_func(finished)
         self._run_in_thread.start()
 
+    def _engine_changed(self):  # sourcery skip: extract-duplicate-method
+        current_engine: VideoProcessEngine = cfg.get(cfg.video_process_engine)
+
+        if current_engine == VideoProcessEngine.OpenCV:
+            self._view.engine_card.setToolTip("当前使用OpenCV进行视频处理")
+            self.get_view().show_success_infobar("提示", "当前使用OpenCV进行视频处理", duration=3000, is_closable=True)
+            self.get_view().white_balance_card.setEnabled(True)
+            self.get_view().brightness_contrast_card.setEnabled(True)
+            return
+
+        elif current_engine == VideoProcessEngine.FFmpeg:
+            self._view.engine_card.setToolTip("当前使用FFmpeg进行视频处理")
+            self.get_view().show_success_infobar("提示", "当前使用FFmpeg进行视频处理", duration=3000, is_closable=True)
+            self.get_view().white_balance_card.setEnabled(False)
+            self.get_view().brightness_contrast_card.setEnabled(False)
+            self.get_view().white_balance_card.setValue(False)
+            self.get_view().brightness_contrast_card.setValue(False)
+            return
+
     def _connect_signal(self):
         self._view.ffmpeg_file_card.clicked.connect(self._select_ffmpeg_file)
         self._view.temp_dir_card.clicked.connect(self._select_temp_dir)
@@ -99,6 +119,7 @@ class SettingsPresenter:
         self._view.update_card.clicked.connect(self._check_update)
         self._message_dialog.ok_btn.clicked.connect(self._message_dialog.close)
         self._message_dialog.cancel_btn.clicked.connect(self._message_dialog.close)
+        self.get_view().engine_card.comboBox.currentIndexChanged.connect(self._engine_changed)
 
 
 if __name__ == '__main__':

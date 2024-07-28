@@ -53,7 +53,7 @@ class SettingView(MessageBaseView):
         self.temp_dir_card = PushSettingCard("选择目录", Icon(FluentIcon.CHEVRON_RIGHT), "设置临时目录",
                                              "软件在运行的过程中会产生过程文件，请确保目标目录有足够的空间",
                                              self.general_group)
-        self.engine_card = ComboBoxSettingCard(cfg.engine, Icon(FluentIcon.CHEVRON_RIGHT), "底层处理引擎",
+        self.engine_card = ComboBoxSettingCard(cfg.video_process_engine, Icon(FluentIcon.CHEVRON_RIGHT), "底层处理引擎",
                                                "选择底层处理引擎,FFmpeg处理速度快,OpenCV处理效果好",
                                                ["FFmpeg", "OpenCV"], self.general_group)
         self.delete_temp_dir_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "删除临时目录",
@@ -182,8 +182,8 @@ class SettingView(MessageBaseView):
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
         self.white_balance_card.setToolTip(
-            "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确")
-        self.brightness_contrast_card.setToolTip("根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗")
+            "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确(此功能仅在OpenCV模式下可用)")
+        self.brightness_contrast_card.setToolTip("根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗(此功能仅在OpenCV模式下可用)")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(

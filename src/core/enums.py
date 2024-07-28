@@ -1,4 +1,4 @@
-from enum import Enum, auto
+from enum import Enum
 
 
 class Orientation(Enum):
@@ -15,6 +15,6 @@ class Rotation(Enum):
 
 class FileProcessType(Enum):
     UNPROCESSED = 0
-    PROCESSING = auto()
-    FAILED = auto()
-    FINISHED = auto()
+    PROCESSING = 1
+    FAILED = 2
+    COMPLETED = 3

@@ -185,9 +185,9 @@ class Config(QConfig):
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())
     temp_dir = ConfigItem("General", "临时目录", str(TEMP_DIR), FolderValidator())
-    engine = OptionsConfigItem("General", "视频处理引擎", VideoProcessEngine.FFmpeg,
-                               OptionsValidator(VideoProcessEngine),
-                               EnumSerializer(VideoProcessEngine))
+    video_process_engine = OptionsConfigItem("General", "视频处理引擎", VideoProcessEngine.FFmpeg,
+                                             OptionsValidator(VideoProcessEngine),
+                                             EnumSerializer(VideoProcessEngine))
     delete_temp_dir = ConfigItem("General", "完成后删除临时目录", True, BoolValidator())
     preview_video_remove_black = ConfigItem("General", "预览视频是否去黑边", False, BoolValidator())
     preview_frame = OptionsConfigItem("General", "预览视频帧", PreviewFrame.FirstFrame, OptionsValidator(PreviewFrame),

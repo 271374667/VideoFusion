@@ -8,9 +8,11 @@ import loguru
 from src.common.black_remove_algorithm.img_black_remover import IMGBlackRemover
 from src.common.black_remove_algorithm.video_remover import VideoRemover
 from src.common.processors.processor_global_var import ProcessorGlobalVar
+from src.common.task_resumer.task_resumer import TaskDict, TaskResumer
+from src.common.task_resumer.task_resumer_manager import TaskResumerManager
 from src.common.video_handler import VideoHandler
 from src.common.video_info_reader import VideoInfoReader
-from src.config import BlackBorderAlgorithm, cfg
+from src.config import BlackBorderAlgorithm, VideoProcessEngine, cfg
 from src.core.datacls import VideoInfo
 from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
@@ -28,7 +30,10 @@ class ProgramCoordinator:
         self._video_handler = VideoHandler()
 
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
+        # sourcery skip: low-code-quality
         self._processor_global_var.clear()
+        engine_type: VideoProcessEngine = cfg.get(cfg.video_process_engine)
+        self._task_resumer_manager = TaskResumerManager(engine_type)
 
         self.is_running = True
         self.is_merging = False
@@ -66,6 +71,7 @@ class ProgramCoordinator:
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
             loguru.logger.debug(video_info)
             video_info_list.append(video_info)
+
             self._signal_bus.advance_total_progress.emit(1)
 
         best_width, best_height = self._get_best_resolution(video_info_list, orientation)
@@ -74,20 +80,42 @@ class ProgramCoordinator:
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
 
+        # 将每个任务添加到任务恢复器
+        for video_info in video_info_list:
+            task_resumer = TaskResumer(video_info.video_path)
+            task_info: TaskDict = {
+                    "input_video_path": str(video_info.video_path),
+                    "task_status": 0,
+                    "rotation_angle": rotation.value,
+                    "orientation": orientation.value,
+                    "target_width": best_width,
+                    "target_height": best_height,
+                    "crop_x": video_info.crop.x if video_info.crop else None,
+                    "crop_y": video_info.crop.y if video_info.crop else None,
+                    "crop_width": video_info.crop.w if video_info.crop else None,
+                    "crop_height": video_info.crop.h if video_info.crop else None,
+                    }
+            task_resumer.set_data_dict(task_info)
+            self._task_resumer_manager.append_task(task_resumer)
+
         # 逐个处理视频
         self._signal_bus.set_total_progress_reset.emit()
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_description.emit("处理视频")
         self._signal_bus.set_total_progress_max.emit(len(video_info_list))
-        for video_info in video_info_list:
+        for each_resumer in self._task_resumer_manager.get_task_list():
             if not self.is_running:
                 return None
 
-            self._update_processor_global_var_with_crop_info(video_info)
+            self._update_processor_global_var_with_crop_info(each_resumer.get_crop_x(),
+                                                             each_resumer.get_crop_y(),
+                                                             each_resumer.get_crop_width(),
+                                                             each_resumer.get_crop_height())
 
-            finished_video_path: Path = self._video_handler.process_video(video_info)
+            finished_video_path: Path = self._video_handler.process_video(each_resumer)
             finished_video_path_list.append(finished_video_path)
             self._signal_bus.advance_total_progress.emit(1)
+            each_resumer.set_status_completed()
 
         is_merge: bool = cfg.get(cfg.merge_video)
         if is_merge:
@@ -107,12 +135,14 @@ class ProgramCoordinator:
                 f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
         return output_dir
 
-    def _update_processor_global_var_with_crop_info(self, video_info: VideoInfo):
-        if video_info.crop:
-            self._processor_global_var.get_data()['crop_x'] = video_info.crop.x
-            self._processor_global_var.get_data()['crop_y'] = video_info.crop.y
-            self._processor_global_var.get_data()['crop_width'] = video_info.crop.w
-            self._processor_global_var.get_data()['crop_height'] = video_info.crop.h
+    def _update_processor_global_var_with_crop_info(self, x: int | None = None,
+                                                    y: int | None = None,
+                                                    width: int | None = None,
+                                                    height: int | None = None):
+        self._processor_global_var.get_data()['crop_x'] = x
+        self._processor_global_var.get_data()['crop_y'] = y
+        self._processor_global_var.get_data()['crop_width'] = width
+        self._processor_global_var.get_data()['crop_height'] = height
 
     def _get_best_resolution(self, video_info_list: list[VideoInfo], video_orientation: Orientation) -> tuple[int, int]:
         def get_most_compatible_resolution(video_info_list: list[VideoInfo],
