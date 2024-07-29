@@ -104,18 +104,24 @@ class ProgramCoordinator:
         self._signal_bus.set_total_progress_description.emit("处理视频")
         self._signal_bus.set_total_progress_max.emit(len(video_info_list))
         for each_resumer in self._task_resumer_manager.get_task_list():
-            if not self.is_running:
-                return None
+            try:
+                if not self.is_running:
+                    return None
 
-            self._update_processor_global_var_with_crop_info(each_resumer.get_crop_x(),
-                                                             each_resumer.get_crop_y(),
-                                                             each_resumer.get_crop_width(),
-                                                             each_resumer.get_crop_height())
+                self._update_processor_global_var_with_crop_info(each_resumer.get_crop_x(),
+                                                                 each_resumer.get_crop_y(),
+                                                                 each_resumer.get_crop_width(),
+                                                                 each_resumer.get_crop_height())
 
-            finished_video_path: Path = self._video_handler.process_video(each_resumer)
-            finished_video_path_list.append(finished_video_path)
-            self._signal_bus.advance_total_progress.emit(1)
-            each_resumer.set_status_completed()
+                finished_video_path: Path = self._video_handler.process_video(each_resumer.get_input_video_path())
+                finished_video_path_list.append(finished_video_path)
+                each_resumer.set_output_video_path(finished_video_path)  # 每一个已经处理完成的视频的路径,用来任务判断是否完成
+                each_resumer.set_status_completed()
+            except Exception as e:
+                loguru.logger.error(f'处理视频{each_resumer.get_input_video_path()}失败,原因:{e}')
+                each_resumer.set_status_failed()
+            finally:
+                self._signal_bus.advance_total_progress.emit(1)
 
         is_merge: bool = cfg.get(cfg.merge_video)
         if is_merge:
@@ -133,6 +139,7 @@ class ProgramCoordinator:
         self._signal_bus.finished.emit()
         loguru.logger.info(
                 f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
+        self._task_resumer_manager.clear()
         return output_dir
 
     def _update_processor_global_var_with_crop_info(self, x: int | None = None,

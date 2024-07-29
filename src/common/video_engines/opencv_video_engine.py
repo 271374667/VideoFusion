@@ -7,13 +7,12 @@ from src.common.ffmpeg_handler import FFmpegHandler
 from src.common.processors.audio_processors.audio_processor_manager import AudioProcessorManager
 from src.common.processors.opencv_processors.opencv_processor_manager import OpenCVProcessorManager
 from src.common.processors.processor_global_var import ProcessorGlobalVar
-from src.config import VideoProcessEngine
-from src.core.enums import Orientation
+from src.common.video_engines.base_video_engine import BaseVideoEngine
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
 
 
-class VideoHandler:
+class OpenCVVideoEngine(BaseVideoEngine):
     def __init__(self):
         self._signal_bus: SignalBus = SignalBus()
         self._temp_dir: TempDir = TempDir()
@@ -21,12 +20,11 @@ class VideoHandler:
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
         self._processor_global_var: ProcessorGlobalVar = ProcessorGlobalVar()
-        self.is_running: bool = True
 
+        self.is_running: bool = True
         self._signal_bus.set_running.connect(self._set_running)
 
-    def process_video(self, input_video_path: Path,
-                      engine_type: VideoProcessEngine = VideoProcessEngine.OpenCV) -> Path:
+    def process_video(self, input_video_path: Path) -> Path:
         if (self._processor_global_var.get_data()['crop_x'] is None
                 and self._processor_global_var.get_data()['crop_y'] is None):
             self._video_processor_manager.get_crop_processor().is_enable = False
@@ -50,12 +48,6 @@ class VideoHandler:
         # 合并视频和音频
         video_with_audio: Path = self._ffmpeg_handler.replace_video_audio(video_after_processed, audio_after_processed)
         return self._ffmpeg_handler.reencode_video(video_with_audio)
-
-    def merge_videos(self, video_list: list[Path]) -> Path:
-        return self._ffmpeg_handler.merge_videos(video_list)
-
-    def compress_video(self, input_video_path: Path) -> Path:
-        return self._ffmpeg_handler.reencode_video(input_video_path)
 
     def _video_process(self, input_video_path: Path) -> Path:
         """
@@ -127,19 +119,3 @@ class VideoHandler:
 
     def _set_running(self, is_running: bool):
         self.is_running = is_running
-
-
-if __name__ == '__main__':
-    v = VideoHandler()
-    global_var = ProcessorGlobalVar()
-    global_var.update("crop_x", 0)
-    global_var.update("crop_y", 515)
-    global_var.update("crop_width", 716)
-    global_var.update("crop_height", 482)
-    global_var.update("rotation_angle", 90)
-    global_var.update("orientation", Orientation.HORIZONTAL)
-    global_var.update("target_width", 500)
-    global_var.update("target_height", 300)
-
-    print(v.process_video(
-            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))

@@ -22,6 +22,10 @@ class TaskResumer:
     def get_input_video_path(self) -> Path:
         return Path(self._data_dict.get("input_video_path"))
 
+    def get_output_video_path(self) -> Path | None:
+        output_video_path = self._data_dict.get("output_video_path")
+        return None if output_video_path is None else Path(output_video_path)
+
     def get_rotation_angle(self) -> Rotation:
         rotation = self._data_dict.get("rotation_angle")
         if rotation is None:
@@ -61,6 +65,11 @@ class TaskResumer:
     def set_data_dict(self, data_dict: TaskDict):
         self._data_dict = data_dict
         self._current_status = FileProcessType(data_dict["task_status"])
+
+    def set_output_video_path(self, output_video_path: Path):
+        if not output_video_path.exists():
+            raise FileNotFoundError(f"Output video path {output_video_path} does not exist")
+        self._data_dict["output_video_path"] = str(output_video_path)
 
     def set_status_unprocessed(self):
         self._current_status = FileProcessType.UNPROCESSED

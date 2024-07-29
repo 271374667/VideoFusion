@@ -76,9 +76,9 @@ class FFmpegHandler:
                                            video_filter=video_filter,
                                            audio_codec=audio_codec)
         # 获取视频总帧数
-        total_frame = self._get_video_total_frame(input_file_path)
+        total_frame = self.get_video_total_frame(input_file_path)
 
-        self._run_command(command, total_frame)
+        self.run_command(command, total_frame)
         return output_file_path
 
     def compress_video(self, input_file_path: Path) -> Path:
@@ -105,9 +105,9 @@ class FFmpegHandler:
                                            video_codec=video_codec.value,
                                            audio_codec=audio_codec)
         # 获取视频总帧数
-        total_frame = self._get_video_total_frame(input_file_path)
+        total_frame = self.get_video_total_frame(input_file_path)
 
-        self._run_command(command, total_frame)
+        self.run_command(command, total_frame)
         return output_file_path
 
     def extract_audio_from_video(self, input_file_path: Path) -> Path:
@@ -136,15 +136,15 @@ class FFmpegHandler:
         output_file_path = get_output_file_path(input_file_path).with_suffix('.wav')
         has_audio: bool = self._check_audio_stream_with_ffmpeg(input_file_path)
         if not has_audio:
-            self._run_command(
-                f'"{self._ffmpeg_path}" -f lavfi -i anullsrc=r=44100:cl=stereo -t 10 "{output_file_path}"')
+            self.run_command(
+                    f'"{self._ffmpeg_path}" -f lavfi -i anullsrc=r=44100:cl=stereo -t 10 "{output_file_path}"')
             return output_file_path
         other_command = [' -vn -acodec pcm_s16le ']
         command = self._get_ffmpeg_command(input_file_path,
                                            output_file_path,
                                            other_command=other_command)
-        total_frame = self._get_video_total_frame(input_file_path)
-        self._run_command(command, total_frame)
+        total_frame = self.get_video_total_frame(input_file_path)
+        self.run_command(command, total_frame)
         return output_file_path
 
     def replace_video_audio(self, input_video_path: Path, audio_wav_path: Path) -> Path:
@@ -177,7 +177,7 @@ class FFmpegHandler:
         command = self._get_ffmpeg_command(input_video_path,
                                            output_video_path,
                                            other_command=other_command)
-        self._run_command(command)
+        self.run_command(command)
         return output_video_path
 
     def noisereduce(self, input_audio_path: Path, mode: AudioNoiseReduction = AudioNoiseReduction.AI) -> Path:
@@ -200,13 +200,13 @@ class FFmpegHandler:
             command = self._get_ffmpeg_command(input_audio_path,
                                                output_audio_path,
                                                audio_filter=audio_filter)
-            self._run_command(command)
+            self.run_command(command)
         elif mode == AudioNoiseReduction.STATIC:
             audio_filter = [model_value]
             command = self._get_ffmpeg_command(input_audio_path,
                                                output_audio_path,
                                                audio_filter=audio_filter)
-            self._run_command(command)
+            self.run_command(command)
         return output_audio_path
 
     def audio_process(self, input_audio_path: Path, audio_filter: list[str]) -> Path:
@@ -226,7 +226,7 @@ class FFmpegHandler:
         command = self._get_ffmpeg_command(input_audio_path,
                                            output_audio_path,
                                            audio_filter=audio_filter)
-        self._run_command(command)
+        self.run_command(command)
         return output_audio_path
 
     def merge_videos(self, video_list: list[Path]) -> Path:
@@ -248,7 +248,7 @@ class FFmpegHandler:
             f.writelines(txt_content)
 
         command = f'"{self._ffmpeg_path}" -fflags +genpts -f concat -safe 0 -i "{temp_output_video_txt_path}" -c copy -bsf:a aac_adtstoasc -vsync 2 "{output_file}" -y'
-        self._run_command(command)
+        self.run_command(command)
         return output_file
 
     def encode_video_to_ts(self, input_video_path: Path) -> Path:
@@ -265,8 +265,8 @@ class FFmpegHandler:
         """
         output_file: Path = get_output_file_path(input_video_path, "encode2ts").with_suffix('.ts')
         command = f'"{self._ffmpeg_path}" -fflags +genpts -i "{input_video_path}" -c copy -bsf:v h264_mp4toannexb -vsync 2 -f mpegts "{output_file}" -y'
-        total_frame = self._get_video_total_frame(input_video_path)
-        self._run_command(command, total_frame)
+        total_frame = self.get_video_total_frame(input_video_path)
+        self.run_command(command, total_frame)
         return output_file
 
     def get_support_video_format(self) -> list[str]:
@@ -282,26 +282,7 @@ class FFmpegHandler:
         formats = re.findall(r'D\s+([a-zA-Z0-9]+)', result.stdout)
         return [f'.{fmt}' for fmt in formats]
 
-    def _check_audio_stream_with_ffmpeg(self, video_path: Path) -> bool:
-        """使用ffmpeg命令检查视频文件是否包含音频流。
-        """
-        temp_audio_file = self._temp_dir.get_temp_dir() / video_path.name
-        command = f'{self._ffmpeg_path} -i "{video_path}" -vn -acodec copy "{temp_audio_file}" -y'
-        try:
-            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True,
-                           encoding='utf-8',
-                           universal_newlines=True)
-        except subprocess.CalledProcessError as e:
-            loguru.logger.error(f"检查音频流失败: {e}")
-            return False
-        has_audio = temp_audio_file.exists()
-
-        if not has_audio:
-            loguru.logger.debug(f"视频文件{video_path}不包含音频流")
-
-        return has_audio
-
-    def _get_video_total_frame(self, video_path: Path) -> int:
+    def get_video_total_frame(self, video_path: Path) -> int:
         cap = cv2.VideoCapture(str(video_path))
         if not cap.isOpened():
             raise ValueError("无法打开视频")
@@ -310,45 +291,7 @@ class FFmpegHandler:
         cap.release()
         return total_frame
 
-    def _get_ffmpeg_command(self,
-                            input_video_path: Path,
-                            output_video_path: Path,
-                            video_filter: list[str] | None = None,
-                            audio_filter: list[str] | None = None,
-                            video_codec: str | None = None,
-                            audio_codec: str | None = None,
-                            other_command: list[str] | None = None
-                            ) -> str:
-        command: str = f'"{self._ffmpeg_path}" -i "{input_video_path}" '
-        has_audio: bool = self._check_audio_stream_with_ffmpeg(input_video_path)
-        # 如果没有音频流，添加静音音频流
-        silence_audio_command = ' -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a aac -t 10 '
-        if video_filter:
-            command += ' -filter_complex '
-            command += ' '.join(video_filter)
-
-        if audio_filter and has_audio:
-            command += ' -af '
-            command_without_quote = ','.join(audio_filter)
-            command += f'"{command_without_quote}"'
-        elif audio_filter and not has_audio:
-            command += silence_audio_command
-
-        if other_command:
-            command += ' '.join(other_command)
-
-        if audio_codec and has_audio:
-            command += f' {audio_codec} '
-        elif audio_codec and not has_audio:
-            command += silence_audio_command
-
-        if video_codec:
-            command += f' {video_codec} '
-
-        command += f' "{output_video_path}"'
-        return command
-
-    def _run_command(self, command: str, progress_total: int = 0):
+    def run_command(self, command: str, progress_total: int = 0):
         if not command:
             raise ValueError("命令不能为空")
 
@@ -390,6 +333,63 @@ class FFmpegHandler:
 
         self._signal_bus.set_detail_progress_finish.emit()
 
+    def _check_audio_stream_with_ffmpeg(self, video_path: Path) -> bool:
+        """使用ffmpeg命令检查视频文件是否包含音频流。
+        """
+        temp_audio_file = self._temp_dir.get_temp_dir() / video_path.name
+        command = f'{self._ffmpeg_path} -i "{video_path}" -vn -acodec copy "{temp_audio_file}" -y'
+        try:
+            subprocess.run(command, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, shell=True,
+                           encoding='utf-8',
+                           universal_newlines=True)
+        except subprocess.CalledProcessError as e:
+            loguru.logger.error(f"检查音频流失败: {e}")
+            return False
+        has_audio = temp_audio_file.exists()
+
+        if not has_audio:
+            loguru.logger.debug(f"视频文件{video_path}不包含音频流")
+
+        return has_audio
+
+    def _get_ffmpeg_command(self,
+                            input_video_path: Path,
+                            output_video_path: Path,
+                            video_filter: list[str] | None = None,
+                            audio_filter: list[str] | None = None,
+                            video_codec: str | None = None,
+                            audio_codec: str | None = None,
+                            other_command: list[str] | None = None
+                            ) -> str:
+        command: str = f'"{self._ffmpeg_path}" -i "{input_video_path}" '
+        has_audio: bool = self._check_audio_stream_with_ffmpeg(input_video_path)
+        # 如果没有音频流，添加静音音频流
+        silence_audio_command = ' -f lavfi -i anullsrc=channel_layout=stereo:sample_rate=44100 -c:a aac -t 10 '
+        if video_filter:
+            command += ' -filter_complex '
+            command += ' '.join(video_filter)
+
+        if audio_filter and has_audio:
+            command += ' -af '
+            command_without_quote = ','.join(audio_filter)
+            command += f'"{command_without_quote}"'
+        elif audio_filter and not has_audio:
+            command += silence_audio_command
+
+        if other_command:
+            command += ' '.join(other_command)
+
+        if audio_codec and has_audio:
+            command += f' {audio_codec} '
+        elif audio_codec and not has_audio:
+            command += silence_audio_command
+
+        if video_codec:
+            command += f' {video_codec} '
+
+        command += f' "{output_video_path}"'
+        return command
+
 
 if __name__ == '__main__':
     from PySide6.QtWidgets import QApplication
@@ -404,7 +404,8 @@ if __name__ == '__main__':
     signal_bus.set_detail_progress_reset.connect(lambda: print("set_detail_progress_reset"))
 
     f = FFmpegHandler()
-    print(f.extract_audio_from_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
+    print(f.extract_audio_from_video(
+        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
     # print(f.reencode_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,

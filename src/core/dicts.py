@@ -1,4 +1,3 @@
-
 from typing_extensions import NotRequired, TypedDict
 
 from src.core.enums import Orientation
@@ -19,6 +18,7 @@ class TaskDict(TypedDict):
     input_video_path: str
     task_status: int
 
+    output_video_path: NotRequired[str]
     # 下面其实是VideoInfoDict的内容,不过替换了枚举类
     rotation_angle: NotRequired[int]
     orientation: NotRequired[int]
