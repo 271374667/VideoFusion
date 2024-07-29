@@ -1,12 +1,13 @@
 from pathlib import Path
 
 import cv2
-import loguru
 
 from src.common.ffmpeg_handler import FFmpegHandler
 from src.common.processors.audio_processors.audio_processor_manager import AudioProcessorManager
 from src.common.processors.opencv_processors.opencv_processor_manager import OpenCVProcessorManager
 from src.common.processors.processor_global_var import ProcessorGlobalVar
+from src.common.video_engines.ffmpeg_video_engine import FFmpegVideoEngine
+from src.common.video_engines.opencv_video_engine import OpenCVVideoEngine
 from src.config import VideoProcessEngine
 from src.core.enums import Orientation
 from src.signal_bus import SignalBus
@@ -18,6 +19,8 @@ class VideoHandler:
         self._signal_bus: SignalBus = SignalBus()
         self._temp_dir: TempDir = TempDir()
         self._ffmpeg_handler: FFmpegHandler = FFmpegHandler()
+        self._open_cv_video_engine: OpenCVVideoEngine = OpenCVVideoEngine()
+        self._ffmpeg_video_engine: FFmpegVideoEngine = FFmpegVideoEngine()
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
         self._processor_global_var: ProcessorGlobalVar = ProcessorGlobalVar()
@@ -26,30 +29,15 @@ class VideoHandler:
         self._signal_bus.set_running.connect(self._set_running)
 
     def process_video(self, input_video_path: Path,
-                      engine_type: VideoProcessEngine = VideoProcessEngine.OpenCV) -> Path:
-        if (self._processor_global_var.get_data()['crop_x'] is None
-                and self._processor_global_var.get_data()['crop_y'] is None):
-            self._video_processor_manager.get_crop_processor().is_enable = False
+                      engine_type: VideoProcessEngine = VideoProcessEngine.FFmpeg) -> Path:
+        if engine_type == VideoProcessEngine.OpenCV:
+            video_after_processed = self._open_cv_video_engine.process_video(input_video_path)
+        elif engine_type == VideoProcessEngine.FFmpeg:
+            video_after_processed = self._ffmpeg_video_engine.process_video(input_video_path)
+        else:
+            raise ValueError(f"不支持的视频处理引擎{engine_type}")
 
-        video_after_processed = self._video_process(input_video_path)
-
-        try:
-            audio_extractor = self._ffmpeg_handler.extract_audio_from_video(input_video_path)
-        except Exception as e:
-            loguru.logger.error(f'提取音频失败，原因：{e}')
-            audio_extractor = None
-
-        if not audio_extractor:
-            loguru.logger.debug(f'视频{input_video_path}没有音频')
-            return video_after_processed
-        audio_after_processed = self._audio_process(audio_extractor)
-
-        if not self.is_running:
-            raise ValueError("您暂停了程序")
-
-        # 合并视频和音频
-        video_with_audio: Path = self._ffmpeg_handler.replace_video_audio(video_after_processed, audio_after_processed)
-        return self._ffmpeg_handler.reencode_video(video_with_audio)
+        return video_after_processed
 
     def merge_videos(self, video_list: list[Path]) -> Path:
         return self._ffmpeg_handler.merge_videos(video_list)

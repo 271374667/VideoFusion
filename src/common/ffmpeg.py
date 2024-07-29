@@ -17,11 +17,24 @@ signal_bus = SignalBus()
 def generate_ffmpeg_command(input_file: str | Path,
                             output_file_path: str | Path,
                             crop_position: CropInfo | None,
-                            width: int,
-                            height: int,
+                            target_width: int,
+                            target_height: int,
                             audio_sample_rate: int,
                             rotation_angle: int,
                             ) -> str:
+    def calculate_dimensions(width: int, height: int, target_width: int, target_height: int):
+        if width == 0 or height == 0:
+            loguru.logger.critical("视频的宽度或高度为0, 请检查视频")
+            raise ValueError("Width or height is 0")
+        scale = min(target_width / width, target_height / height)
+        new_width = int(width * scale)
+        new_height = int(height * scale)
+        pad_top = (target_height - new_height) // 2
+        pad_bottom = target_height - new_height - pad_top
+        pad_left = (target_width - new_width) // 2
+        pad_right = target_width - new_width - pad_left
+        return new_width, new_height, pad_top, pad_bottom, pad_left, pad_right
+
     if rotation_angle not in {0, 90, 180, 270}:
         raise ValueError(f"rotation_angle must be one of 0, 90, 180, 270, current value is {rotation_angle}")
 
@@ -67,10 +80,18 @@ def generate_ffmpeg_command(input_file: str | Path,
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
 
     # 缩放(如果剪裁之后的视频分辨率和目标分辨率不一致则需要进行缩放)
-    if crop_position and (crop_position.w != width and crop_position.h != height):
-        target_resolution = f"{width}:{height}"
+    if crop_position and (crop_position.w != target_width and crop_position.h != target_height):
+        new_width, new_height, pad_top, pad_bottom, pad_left, pad_right = calculate_dimensions(crop_position.w,
+                                                                                               crop_position.h,
+                                                                                               target_width,
+                                                                                               target_height)
+        # ffmpeg不允许scale大于pad,所以需要减1确保不会报错
+        if new_width >= target_width:
+            new_width -= 1
+        if new_height >= target_height:
+            new_height -= 1
         filters.append(
-                f"scale={target_resolution}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_resolution}:(ow-iw)/2:(oh-ih)/2:black")
+                f"scale={new_width}:{new_height}:flags={scaling_quality.value}:force_original_aspect_ratio=decrease,pad={target_width}:{target_height}:{pad_left}:{pad_top}:black")
 
     audio_filters = []
     # 音频标准化
@@ -238,8 +259,8 @@ if __name__ == '__main__':
     cmd = generate_ffmpeg_command(input_file=Path(input_file),
                                   output_file_path=Path(output_file),
                                   crop_position=None,
-                                  width=1920,
-                                  height=1080,
+                                  target_width=1920,
+                                  target_height=1080,
                                   rotation_angle=0,
                                   audio_sample_rate=44100)
     print(cmd)

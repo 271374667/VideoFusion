@@ -17,6 +17,9 @@ os.chdir(ROOT)
 
 class FFmpegHandler:
     def __init__(self):
+        # ffmpeg错误关键字,这些字会在终端中被标红,全部小写
+        self.FFMPEG_ERROR_WORD: list[str] = ['error', 'fail', 'cannot', 'could not', 'invalid', 'nothing']
+
         self._temp_dir = TempDir()
         self._signal_bus = SignalBus()
         self._ffmpeg_path: Path = FFMPEG_FILE
@@ -311,10 +314,10 @@ class FFmpegHandler:
             # 更新进度条
             for line in iter(process.stdout.readline, ''):
                 each_line = line.strip()
-                if "Error" not in each_line:
-                    loguru.logger.debug(each_line)
-                else:
+                if any(x in each_line.lower() for x in self.FFMPEG_ERROR_WORD):
                     loguru.logger.error(each_line)
+                else:
+                    loguru.logger.debug(each_line)
                 if progress_total > 0:
                     if match := re.search(r'frame=\s*(\d+)', line):
                         current_frame = int(match[1])
@@ -405,7 +408,7 @@ if __name__ == '__main__':
 
     f = FFmpegHandler()
     print(f.extract_audio_from_video(
-        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
+            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
     # print(f.reencode_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,

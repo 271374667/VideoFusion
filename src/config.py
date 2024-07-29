@@ -44,7 +44,7 @@ class AudioNoiseReduction(Enum):
 # 视频降噪策略
 class VideoNoiseReduction(Enum):
     DISABLE = 0
-    BILATERAL = auto()
+    BILATERAL = "bilateral"  # 双边滤波器, 速度快, 效果一般
     NLMEANS = "nlmeans=6.0:7.0"  # 非局部均值降噪滤镜, 更慢, 但效果更好
 
 

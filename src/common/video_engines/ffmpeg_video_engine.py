@@ -94,8 +94,14 @@ class FFmpegVideoEngine(BaseVideoEngine):
         crop_y = self._processor_global_var.get_data()['crop_y']
         crop_width = self._processor_global_var.get_data()['crop_width']
         crop_height = self._processor_global_var.get_data()['crop_height']
+        original_width = self._processor_global_var.get_data()['width']
+        original_height = self._processor_global_var.get_data()['height']
         crop: CropInfo | None = None
-        if all([crop_x, crop_y, crop_width, crop_height]):
+        # 如果[crop_x, crop_y, crop_width, crop_height]都不为None,则说明需要裁剪
+        if (crop_x is not None
+                and crop_y is not None
+                and crop_width is not None
+                and crop_height is not None):
             crop = CropInfo(
                     x=crop_x,
                     y=crop_y,
@@ -108,12 +114,12 @@ class FFmpegVideoEngine(BaseVideoEngine):
         if video_orientation == Orientation.HORIZONTAL:
             if crop and crop.w < crop.h:
                 rotate_angle = video_rotation.value
-            elif not crop and crop_width < crop_height:
+            elif not crop and original_width < original_height:
                 rotate_angle = video_rotation.value
         elif video_orientation == Orientation.VERTICAL:
             if crop and crop.w > crop.h:
                 rotate_angle = video_rotation.value
-            elif not crop and crop_width > crop_height:
+            elif not crop and original_width > original_height:
                 rotate_angle = video_rotation.value
 
         if output_video_path.exists():
@@ -125,8 +131,8 @@ class FFmpegVideoEngine(BaseVideoEngine):
                 input_file=input_video_path,
                 output_file_path=output_video_path,
                 crop_position=crop,
-                width=best_width,
-                height=best_height,
+                target_width=best_width,
+                target_height=best_height,
                 audio_sample_rate=best_audio_sample_rate,
                 rotation_angle=rotate_angle,
                 )

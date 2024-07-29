@@ -103,7 +103,13 @@ class ProgramCoordinator:
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_description.emit("处理视频")
         self._signal_bus.set_total_progress_max.emit(len(video_info_list))
-        for each_resumer in self._task_resumer_manager.get_task_list():
+        for index, each_resumer in enumerate(self._task_resumer_manager.get_task_list()):
+            video_info: VideoInfo = video_info_list[index]
+            self._processor_global_var.get_data()['fps'] = video_info.fps
+            self._processor_global_var.get_data()['total_frames'] = video_info.frame_count
+            self._processor_global_var.get_data()['width'] = video_info.width
+            self._processor_global_var.get_data()['height'] = video_info.height
+
             try:
                 if not self.is_running:
                     return None
@@ -120,6 +126,7 @@ class ProgramCoordinator:
             except Exception as e:
                 loguru.logger.error(f'处理视频{each_resumer.get_input_video_path()}失败,原因:{e}')
                 each_resumer.set_status_failed()
+                self._task_resumer_manager.set_total_task_status_failed()
             finally:
                 self._signal_bus.advance_total_progress.emit(1)
 
@@ -139,7 +146,7 @@ class ProgramCoordinator:
         self._signal_bus.finished.emit()
         loguru.logger.info(
                 f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
-        self._task_resumer_manager.clear()
+        self._task_resumer_manager.save()
         return output_dir
 
     def _update_processor_global_var_with_crop_info(self, x: int | None = None,
