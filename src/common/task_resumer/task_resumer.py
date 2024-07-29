@@ -1,12 +1,13 @@
 from pathlib import Path
 
 from src.core.dicts import TaskDict
-from src.core.enums import FileProcessType, Orientation, Rotation
+from src.core.enums import FileProcessType, Orientation
 
 
 class TaskResumer:
     def __init__(self, input_video_path: Path,
-                 task_status: FileProcessType = FileProcessType.UNPROCESSED):
+                 task_status: FileProcessType = FileProcessType.UNPROCESSED,
+                 ):
         self._current_status: FileProcessType = task_status
         self._data_dict: TaskDict = {
                 "input_video_path": str(input_video_path),
@@ -25,18 +26,6 @@ class TaskResumer:
     def get_output_video_path(self) -> Path | None:
         output_video_path = self._data_dict.get("output_video_path")
         return None if output_video_path is None else Path(output_video_path)
-
-    def get_rotation_angle(self) -> Rotation:
-        rotation = self._data_dict.get("rotation_angle")
-        if rotation is None:
-            raise ValueError("Rotation angle is not set")
-        return Rotation(rotation)
-
-    def get_orientation(self) -> Orientation:
-        orientation = self._data_dict.get("orientation")
-        if orientation is None:
-            raise ValueError("Orientation is not set")
-        return Orientation(orientation)
 
     def get_target_width(self) -> int:
         target_width = self._data_dict.get("target_width")

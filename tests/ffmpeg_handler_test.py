@@ -16,7 +16,7 @@ class TestFFmpegHandler(unittest.TestCase):
         handler = FFmpegHandler()
         handler._signal_bus.set_detail_progress_finish.emit = MagicMock()
 
-        handler._run_command('ffmpeg -i input.mp4 output.mp3')
+        handler.run_command('ffmpeg -i input.mp4 output.mp3')
 
         handler._signal_bus.set_detail_progress_finish.emit.assert_called_once()
 
@@ -29,14 +29,14 @@ class TestFFmpegHandler(unittest.TestCase):
         handler = FFmpegHandler()
 
         with self.assertRaises(subprocess.CalledProcessError):
-            handler._run_command('ffmpeg -i input.mp4 output.mp3')
+            handler.run_command('ffmpeg -i input.mp4 output.mp3')
 
     @patch('subprocess.Popen')
     def test_empty_command_raises_value_error(self, mock_popen):
         handler = FFmpegHandler()
 
         with self.assertRaises(ValueError):
-            handler._run_command('')
+            handler.run_command('')
 
     @patch('subprocess.Popen')
     def test_progress_tracking_updates_progress_correctly(self, mock_popen):
@@ -48,7 +48,7 @@ class TestFFmpegHandler(unittest.TestCase):
         handler = FFmpegHandler()
         handler._signal_bus.set_detail_progress_current.emit = MagicMock()
 
-        handler._run_command('ffmpeg -i input.mp4 output.mp3', progress_total=20)
+        handler.run_command('ffmpeg -i input.mp4 output.mp3', progress_total=20)
 
         handler._signal_bus.set_detail_progress_current.emit.assert_any_call(10)
         handler._signal_bus.set_detail_progress_current.emit.assert_any_call(20)
@@ -63,7 +63,7 @@ class TestFFmpegHandler(unittest.TestCase):
         handler._signal_bus.failed.emit = MagicMock()
 
         try:
-            handler._run_command('ffmpeg -i input.mp4 output.mp3')
+            handler.run_command('ffmpeg -i input.mp4 output.mp3')
         except subprocess.CalledProcessError:
             pass
 

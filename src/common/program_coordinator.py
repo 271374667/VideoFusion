@@ -14,7 +14,7 @@ from src.common.video_handler import VideoHandler
 from src.common.video_info_reader import VideoInfoReader
 from src.config import BlackBorderAlgorithm, VideoProcessEngine, cfg
 from src.core.datacls import VideoInfo
-from src.core.enums import Orientation, Rotation
+from src.core.enums import FileProcessType, Orientation, Rotation
 from src.signal_bus import SignalBus
 from src.utils import move_file_to_output_dir
 
@@ -24,6 +24,7 @@ class ProgramCoordinator:
         self.is_running: bool = False
         self.is_merging: bool = False
         self._start_time = time.time()
+        self._current_total_task_status: FileProcessType = FileProcessType.UNPROCESSED
 
         self._signal_bus = SignalBus()
         self._processor_global_var = ProcessorGlobalVar()
@@ -31,9 +32,11 @@ class ProgramCoordinator:
 
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
         # sourcery skip: low-code-quality
-        self._processor_global_var.clear()
         engine_type: VideoProcessEngine = cfg.get(cfg.video_process_engine)
-        self._task_resumer_manager = TaskResumerManager(engine_type)
+        self._task_resumer_manager = TaskResumerManager(engine_type, orientation, rotation)
+        self._task_resumer_manager.clear()
+        self._processor_global_var.clear()
+        self._current_total_task_status = FileProcessType.PROCESSING
 
         self.is_running = True
         self.is_merging = False
@@ -86,8 +89,6 @@ class ProgramCoordinator:
             task_info: TaskDict = {
                     "input_video_path": str(video_info.video_path),
                     "task_status": 0,
-                    "rotation_angle": rotation.value,
-                    "orientation": orientation.value,
                     "target_width": best_width,
                     "target_height": best_height,
                     "crop_x": video_info.crop.x if video_info.crop else None,
@@ -97,7 +98,8 @@ class ProgramCoordinator:
                     }
             task_resumer.set_data_dict(task_info)
             self._task_resumer_manager.append_task(task_resumer)
-
+            self._task_resumer_manager.save()
+        loguru.logger.debug(f'任务恢复器保存完成,任务数:{len(self._task_resumer_manager.get_task_list())}')
         # 逐个处理视频
         self._signal_bus.set_total_progress_reset.emit()
         self._signal_bus.set_detail_progress_reset.emit()
@@ -123,12 +125,13 @@ class ProgramCoordinator:
                 finished_video_path_list.append(finished_video_path)
                 each_resumer.set_output_video_path(finished_video_path)  # 每一个已经处理完成的视频的路径,用来任务判断是否完成
                 each_resumer.set_status_completed()
+                loguru.logger.info(f'处理视频{each_resumer.get_input_video_path()}完成')
             except Exception as e:
                 loguru.logger.error(f'处理视频{each_resumer.get_input_video_path()}失败,原因:{e}')
-                each_resumer.set_status_failed()
-                self._task_resumer_manager.set_total_task_status_failed()
+                self._current_total_task_status = FileProcessType.FAILED
             finally:
                 self._signal_bus.advance_total_progress.emit(1)
+                self._task_resumer_manager.save()
 
         is_merge: bool = cfg.get(cfg.merge_video)
         if is_merge:
@@ -146,6 +149,9 @@ class ProgramCoordinator:
         self._signal_bus.finished.emit()
         loguru.logger.info(
                 f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
+        if self._current_total_task_status != FileProcessType.FAILED:
+            self._current_total_task_status = FileProcessType.COMPLETED
+        self._task_resumer_manager.set_total_task_status(self._current_total_task_status)
         self._task_resumer_manager.save()
         return output_dir
 

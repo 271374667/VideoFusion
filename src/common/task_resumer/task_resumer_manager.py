@@ -7,11 +7,17 @@ from src.common.task_resumer.task_resumer import TaskResumer
 from src.config import VideoProcessEngine, cfg
 from src.core.dicts import TaskResumerDict
 from src.core.enums import FileProcessType
+from src.core.enums import Orientation, Rotation
 from src.core.paths import RESUME_FILE
+from src.utils import singleton
 
 
+@singleton
 class TaskResumerManager:
-    def __init__(self, engine_type: VideoProcessEngine):
+    def __init__(self, engine_type: VideoProcessEngine,
+                 orientation: Orientation,
+                 rotation: Rotation
+                 ):
         self._task_index: int = 0
 
         self._resume_file_path: Path = RESUME_FILE
@@ -22,6 +28,8 @@ class TaskResumerManager:
         self._task_resumer_dict: TaskResumerDict = {
                 "engine_type": engine_type.value,
                 "total_task_status": 0,
+                "orientation": orientation.value,
+                "rotation_angle": rotation.value,
                 "task_info": []
                 }
 
@@ -38,8 +46,15 @@ class TaskResumerManager:
     def get_total_task_status(self) -> FileProcessType:
         return self._total_task_status
 
+    def get_uncompleted_task_list(self) -> list[TaskResumer]:
+        return [task for task in self._task_list if task.get_current_status() != FileProcessType.COMPLETED]
+
     def set_current_task(self, task: TaskResumer):
         self._current_task = task
+
+    def set_total_task_status(self, status: FileProcessType):
+        self._total_task_status = status
+        self._task_resumer_dict["total_task_status"] = status.value
 
     def set_total_task_status_unprocessed(self):
         self._total_task_status = FileProcessType.UNPROCESSED
@@ -73,6 +88,15 @@ class TaskResumerManager:
                 self._task_list.append(task_resumer)
         loguru.logger.debug(f"加载任务恢复文件:{self._resume_file_path},任务数:{len(self._task_list)}")
         return self._task_list
+
+    def check_last_task_completed(self) -> bool:
+        """读取本地文件，检查上次任务是否完成"""
+        if self._resume_file_path.exists():
+            with open(self._resume_file_path, "r") as f:
+                task_resumer_dict = json.load(f)
+                total_task_status = FileProcessType(task_resumer_dict["total_task_status"])
+                return total_task_status == FileProcessType.COMPLETED
+        return True
 
     def remove(self, task: TaskResumer):
         """删除任务"""

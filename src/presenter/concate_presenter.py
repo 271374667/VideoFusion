@@ -10,7 +10,8 @@ from PySide6.QtGui import QImage, QPixmap, QTransform
 from PySide6.QtWidgets import QFileDialog
 
 from src.common.black_remove.img_black_remover import BlackRemover
-from src.config import PreviewFrame, cfg
+from src.common.task_resumer.task_resumer_manager import TaskResumerManager
+from src.config import PreviewFrame, VideoProcessEngine, cfg
 from src.core.enums import Orientation, Rotation
 from src.core.paths import FFMPEG_FILE
 from src.model.concate_model import ConcateModel
@@ -38,21 +39,6 @@ class ConcatePresenter:
         return self._model
 
     def start(self):
-        if not FFMPEG_FILE.exists():
-            self.get_view().show_error_infobar("错误",
-                                               "ffmpeg文件不存在无法进行视频合成,请检查bin目录下是否有ffmpeg.exe文件",
-                                               is_closable=True)
-            return
-
-        video_list = self.get_all_video_files()
-        if not video_list:
-            loguru.logger.warning("请先选择视频文件")
-            self.get_view().show_warning_infobar("错误", "您还没有添加任何视频文件")
-            return
-
-        self._signal_bus.started.emit()
-        self._set_btns_enable(False, True)
-
         if self.get_view().get_horization_video_radio_btn().isChecked():
             video_orientation = Orientation.HORIZONTAL
         else:
@@ -69,6 +55,30 @@ class ConcatePresenter:
                 v: k for k, v in rotation2cn.items()
                 }
         video_rotation = cn2rotation[self.get_view().get_rotate_video_cb().currentText()]
+        video_engine: VideoProcessEngine = cfg.get(cfg.video_process_engine)
+        self._task_resumer_manager = TaskResumerManager(video_engine, video_orientation, video_rotation)
+
+        if not FFMPEG_FILE.exists():
+            self.get_view().show_error_infobar("错误",
+                                               "ffmpeg文件不存在无法进行视频合成,请检查bin目录下是否有ffmpeg.exe文件",
+                                               is_closable=True)
+            return
+
+        last_completed = bool(self._task_resumer_manager.check_last_task_completed())
+        if not last_completed and self.get_view().show_mask_dialog("恢复上一次的任务",
+                                                                   "您的上一次任务还未完成,是否继续上一次的任务?"):
+            video_list = [x.get_input_video_path() for x in self._task_resumer_manager.get_uncompleted_task_list()]
+            self.get_view().show_info_infobar("提示", "上一次的任务已经完成,开始新的任务", 3000)
+        else:
+            video_list = self.get_all_video_files()
+
+        if not video_list:
+            loguru.logger.warning("请先选择视频文件")
+            self.get_view().show_warning_infobar("错误", "您还没有添加任何视频文件")
+            return
+
+        self._signal_bus.started.emit()
+        self._set_btns_enable(False, True)
         self.get_model().start(video_list, video_orientation, video_rotation)
         self.start_time = time.time()
         self.get_view().show_state_tooltip("运行中……", "请耐心等待,程序正在运行")

@@ -50,6 +50,7 @@ def generate_ffmpeg_command(input_file: str | Path,
     output_codec: VideoCodec = cfg.get(cfg.output_codec).value
     ffmpeg_path = cfg.get(cfg.ffmpeg_file)
     scaling_quality: ScalingQuality = cfg.get(cfg.scaling_quality)
+    is_merging: bool = cfg.get(cfg.merge_video)
 
     filters = []
 
@@ -79,8 +80,8 @@ def generate_ffmpeg_command(input_file: str | Path,
     elif rotation_angle in {90, 270}:
         filters.append(f"transpose={2 if rotation_angle == 270 else 1}")
 
-    # 缩放(如果剪裁之后的视频分辨率和目标分辨率不一致则需要进行缩放)
-    if crop_position and (crop_position.w != target_width and crop_position.h != target_height):
+    # 缩放(如果剪裁之后的视频分辨率和目标分辨率不一致则需要进行缩放,同时还需要处于合并状态,否则只剪裁不缩放)
+    if crop_position and (crop_position.w != target_width and crop_position.h != target_height) and is_merging:
         new_width, new_height, pad_top, pad_bottom, pad_left, pad_right = calculate_dimensions(crop_position.w,
                                                                                                crop_position.h,
                                                                                                target_width,

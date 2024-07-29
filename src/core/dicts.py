@@ -26,8 +26,6 @@ class TaskDict(TypedDict):
 
     output_video_path: NotRequired[str]
     # 下面其实是VideoInfoDict的内容,不过替换了枚举类
-    rotation_angle: NotRequired[int]
-    orientation: NotRequired[int]
     target_width: NotRequired[int]
     target_height: NotRequired[int]
     crop_x: NotRequired[int | None]
@@ -39,4 +37,7 @@ class TaskDict(TypedDict):
 class TaskResumerDict(TypedDict):
     engine_type: int
     total_task_status: int  # 所有任务的状态,如果有一个任务失败则为失败
+    rotation_angle: NotRequired[int]
+    orientation: NotRequired[int]
+
     task_info: list[TaskDict]
