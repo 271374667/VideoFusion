@@ -3,8 +3,7 @@
 name: Deploy VitePress site to Pages
 
 on:
-  # 在针对 `main` 分支的推送上运行。如果你
-  # 使用 `master` 分支作为默认分支，请将其更改为 `master`
+  # 在针对 `master` 分支的推送上运行。
   push:
     branches: [master]
 
@@ -30,23 +29,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-#        with:
-#          fetch-depth: 0 # 如果未启用 lastUpdated，则不需要
-      - uses: pnpm/action-setup@v3
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v3
         with:
-          version: 9 # 指定你需要的 pnpm 版本
-      # - uses: oven-sh/setup-bun@v1 # 如果使用 Bun，请取消注释
+          version: 7 # 指定您需要的 pnpm 版本
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: npm # 或 pnpm / yarn
-      - name: Setup Pages
-        uses: actions/configure-pages@v4
+          cache: pnpm
+
       - name: Install dependencies
-        run: pnpm install # 或 pnpm install / yarn install / bun install
+        run: pnpm install
+        env:
+          NODE_ENV: development
+
       - name: Build with VitePress
-        run: pnpm docs:build # 或 pnpm docs:build / yarn docs:build / bun run docs:build
+        run: pnpm docs:build
+
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
