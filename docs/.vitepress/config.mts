@@ -6,6 +6,7 @@ export default defineConfig({
   title: "VideoFusion",
   description: "A Video Tools",
   cleanUrls: true,
+  base: '/repo/',
   themeConfig: {
     // https://vitepress.dev/reference/default-theme-config
     nav: [
