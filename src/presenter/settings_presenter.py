@@ -2,7 +2,7 @@ import loguru
 from PySide6.QtWidgets import QFileDialog
 
 from src.components.message_dialog import MessageDialog
-from src.config import VideoProcessEngine, cfg, SuperResolutionAlgorithm
+from src.config import BlackBorderAlgorithm, SuperResolutionAlgorithm, VideoProcessEngine, cfg
 from src.core.version import __version__
 from src.model.settings_model import SettingsModel
 from src.utils import RunInThread
@@ -17,6 +17,7 @@ class SettingsPresenter:
         self._version_request = VersionRequest()
         self._message_dialog = MessageDialog()
         self._engine_changed()
+        self._on_black_remove_changed()
         self._connect_signal()
 
     def get_view(self) -> SettingView:
@@ -58,6 +59,14 @@ class SettingsPresenter:
             self.get_view().show_success_infobar("提示", "输出文件路径已经设置成功", duration=1000, is_closable=True)
             return
         self.get_view().show_error_infobar("错误", "请选择一个有效的输出文件路径", duration=3000, is_closable=True)
+
+    def _on_black_remove_changed(self):
+        """动态去黑边算法和获取视频采样帧数不能同时启用"""
+        black_remove_algorithm: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
+        if black_remove_algorithm == BlackBorderAlgorithm.DYNAMIC:
+            self.get_view().video_sample_rate_card.setEnabled(False)
+            return
+        self.get_view().video_sample_rate_card.setEnabled(True)
 
     def _check_update(self):
         current_version = __version__
@@ -124,6 +133,8 @@ class SettingsPresenter:
         self._message_dialog.ok_btn.clicked.connect(self._message_dialog.close)
         self._message_dialog.cancel_btn.clicked.connect(self._message_dialog.close)
         self.get_view().engine_card.comboBox.currentIndexChanged.connect(self._engine_changed)
+        self.get_view().video_black_border_algorithm_card.comboBox.currentIndexChanged.connect(
+            self._on_black_remove_changed)
 
 
 if __name__ == '__main__':

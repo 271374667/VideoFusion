@@ -53,8 +53,8 @@ class BlackRemover:
         # 计算平均亮度阈值
         # mean_threshold = np.mean(gray)
 
-        # _, binary = cv2.threshold(gray, self.threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
-        binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
+        _, binary = cv2.threshold(gray, self.threshold, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)
+        # binary = cv2.adaptiveThreshold(gray, 255, cv2.ADAPTIVE_THRESH_MEAN_C, cv2.THRESH_BINARY, 11, 2)
         kernel = np.ones((5, 5), np.uint8)
 
         binary = cv2.morphologyEx(binary, cv2.MORPH_OPEN, kernel)

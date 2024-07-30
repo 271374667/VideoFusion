@@ -49,7 +49,7 @@ class SettingView(MessageBaseView):
     def _create_card(self):
         # 全局设置
         self.ffmpeg_file_card = PushSettingCard("FFmpeg路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置FFmpeg的路径",
-                                                "您可以选择您自己编译的ffmpeg.exe,该软件仅使用了基础的ffmpeg,可能对某些视频格式不支持",
+                                                "您可以选择您自己编译的ffmpeg.exe,来实现更多的功能,如果您不知道如何设置,请不要修改",
                                                 self.general_group)
         self.temp_dir_card = PushSettingCard("选择目录", Icon(FluentIcon.CHEVRON_RIGHT), "设置临时目录",
                                              "软件在运行的过程中会产生过程文件，请确保目标目录有足够的空间",
@@ -75,8 +75,8 @@ class SettingView(MessageBaseView):
                                                   self.general_group)
 
         # 视频质量
-        self.output_dir_path_card = PushSettingCard("输出文件路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件路径",
-                                                    "设置输出文件路径", self.video_group)
+        self.output_dir_path_card = PushSettingCard("输出文件夹路径", Icon(FluentIcon.CHEVRON_RIGHT), "设置输出文件夹路径",
+                                                    "设置输出文件夹路径", self.video_group)
         self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
                                              cfg.deband, self.video_group)
@@ -175,7 +175,7 @@ class SettingView(MessageBaseView):
         self.merge_video_card.setToolTip("所有视频的分辨率会被重新计算调整到最佳的分辨率,然后合并成一个视频文件")
 
         output_file_path = cfg.get(cfg.output_dir)
-        self.output_dir_path_card.setToolTip(f'当前输出文件路径为: {output_file_path}')
+        self.output_dir_path_card.setToolTip(f'当前输出文件夹路径为: {output_file_path}')
         self.audio_noise_reduction_card.setToolTip(
                 "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
         self.video_noise_reduction_card.setToolTip(
@@ -223,10 +223,10 @@ class SettingView(MessageBaseView):
                 self.ffmpeg_file_card,
                 self.temp_dir_card,
                 self.engine_card,
+                self.merge_video_card,
                 self.delete_temp_dir_card,
                 self.preview_video_remove_black_card,
                 self.preview_frame_card,
-                self.merge_video_card,
                 self.update_card
                 ])
         self.video_group.addSettingCards([

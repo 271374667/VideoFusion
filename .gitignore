@@ -24,7 +24,6 @@ wheels/
 /assets/images/
 TempAndTest
 /node_modules/
-docs
 /tests/test_data/images/deband1.jpg
 /package.json
 pnpm-lock.yaml### Node template

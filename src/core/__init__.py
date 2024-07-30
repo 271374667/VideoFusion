@@ -23,3 +23,6 @@ FFMPEG_ERROR_WORDS: Final[list[str]] = [
         'invalid',
         'unknown'
         ]
+
+# 最新的项目下载地址
+LATEST_RELEASE_URL: Final[str] = "https://github.com/271374667/VideoFusion/releases/latest"

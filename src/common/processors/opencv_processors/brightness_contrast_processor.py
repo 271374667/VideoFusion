@@ -45,17 +45,24 @@ class BrightnessContrastProcessor(OpenCVProcessor):
 # Example usage
 if __name__ == "__main__":
     bc_processor = BrightnessContrastProcessor()
-    cap = cv2.VideoCapture(r"E:\load\python\Project\VideoFusion\测试\video\black.mp4")
-    out = cv2.VideoWriter(r"E:\load\python\Project\VideoFusion\测试\video\black_out.mp4", cv2.VideoWriter.fourcc(*'mp4v'), 30.0,
-                          (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
-
-    while cap.isOpened():
-        ret, frame = cap.read()
-        if not ret:
-            break
-        enhanced_frame = bc_processor.process(frame)
-        out.write(enhanced_frame)
-
-    cap.release()
-    out.release()
+    origin_img = cv2.imread(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\0002.jpg")
+    enhanced_img = bc_processor.process(origin_img)
+    origin_img = cv2.resize(origin_img, (480, 720))
+    enhanced_img = cv2.resize(enhanced_img, (480, 720))
+    cv2.imshow("origin_img", origin_img)
+    cv2.imshow("enhanced_img", enhanced_img)
+    # cap = cv2.VideoCapture(r"E:\load\python\Project\VideoFusion\测试\video\black.mp4")
+    # out = cv2.VideoWriter(r"E:\load\python\Project\VideoFusion\测试\video\black_out.mp4", cv2.VideoWriter.fourcc(*'mp4v'), 30.0,
+    #                       (int(cap.get(cv2.CAP_PROP_FRAME_WIDTH)), int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))))
+    #
+    # while cap.isOpened():
+    #     ret, frame = cap.read()
+    #     if not ret:
+    #         break
+    #     enhanced_frame = bc_processor.process(frame)
+    #     out.write(enhanced_frame)
+    #
+    # cap.release()
+    # out.release()
+    cv2.waitKey(0)
     cv2.destroyAllWindows()
