@@ -25,7 +25,6 @@ wheels/
 TempAndTest
 /node_modules/
 /tests/test_data/images/deband1.jpg
-pnpm-lock.yaml### Node template
 # Logs
 logs
 *.log
@@ -130,7 +129,6 @@ dist
 
 # vuepress v2.x temp and cache directory
 .temp
-.cache
 
 # Docusaurus cache and generated files
 .docusaurus
