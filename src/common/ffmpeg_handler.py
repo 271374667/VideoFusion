@@ -7,6 +7,7 @@ import cv2
 import loguru
 
 from src.config import AudioNoiseReduction, AudioSampleRate, FrameRateAdjustment, VideoCodec, cfg
+from src.core import FFMPEG_ERROR_WORDS
 from src.core.paths import FFMPEG_FILE, ROOT
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
@@ -18,7 +19,7 @@ os.chdir(ROOT)
 class FFmpegHandler:
     def __init__(self):
         # ffmpeg错误关键字,这些字会在终端中被标红,全部小写
-        self.FFMPEG_ERROR_WORD: list[str] = ['error', 'fail', 'cannot', 'could not', 'invalid', 'nothing']
+        self.FFMPEG_ERROR_WORD: list[str] = FFMPEG_ERROR_WORDS
 
         self._temp_dir = TempDir()
         self._signal_bus = SignalBus()
