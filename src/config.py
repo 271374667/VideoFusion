@@ -155,8 +155,6 @@ class Config(QConfig):
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
-    white_balance = ConfigItem("Video", "视频白平衡", False, BoolValidator())
-    brightness_contrast = ConfigItem("Video", "自动调整视频亮度对比度", False, BoolValidator())
     video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
     video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
     video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DYNAMIC,
@@ -172,15 +170,20 @@ class Config(QConfig):
                                               EnumSerializer(VideoNoiseReduction))
     scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.SINC, OptionsValidator(ScalingQuality),
                                         EnumSerializer(ScalingQuality))
-    super_resolution_algorithm = OptionsConfigItem("Video", "超分辨率算法", SuperResolutionAlgorithm.DISABLE,
-                                                   OptionsValidator(SuperResolutionAlgorithm),
-                                                   EnumSerializer(SuperResolutionAlgorithm))
     rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.NORMAL,
                                              OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))
     output_codec = OptionsConfigItem("Video", "输出编码策略", VideoCodec.H264, OptionsValidator(VideoCodec),
                                      EnumSerializer(VideoCodec))
     audio_sample_rate = OptionsConfigItem("Video", "音频采样率", AudioSampleRate.Hz44100,
                                           OptionsValidator(AudioSampleRate), EnumSerializer(AudioSampleRate))
+
+    # OpenCV才支持的设置
+    white_balance = ConfigItem("OpenCV", "视频白平衡", False, BoolValidator())
+    brightness_contrast = ConfigItem("OpenCV", "自动调整视频亮度对比度", False, BoolValidator())
+    super_resolution_algorithm = OptionsConfigItem("OpenCV", "超分辨率算法", SuperResolutionAlgorithm.DISABLE,
+                                                   OptionsValidator(SuperResolutionAlgorithm),
+                                                   EnumSerializer(SuperResolutionAlgorithm))
+
 
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())

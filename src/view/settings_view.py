@@ -42,8 +42,9 @@ class SettingView(MessageBaseView):
         self._initialize()
 
     def _create_card_group(self):
-        self.video_group = SettingCardGroup("视频", self.scroll_widget)
         self.general_group = SettingCardGroup("通用", self.scroll_widget)
+        self.video_group = SettingCardGroup("视频", self.scroll_widget)
+        self.opencv_only_group = SettingCardGroup("OpenCV模式下专属", self.scroll_widget)
 
     def _create_card(self):
         # 全局设置
@@ -85,12 +86,7 @@ class SettingView(MessageBaseView):
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
                                             "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
                                             cfg.shake, self.video_group)
-        self.white_balance_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频白平衡",
-                                                    "如果视频本身画面偏色,请尝试勾选此选项",
-                                                    cfg.white_balance, self.video_group)
-        self.brightness_contrast_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "自动调整视频亮度对比度",
-                                                          "调整过暗或者过亮的视频画面,可能会损失一些细节",
-                                                          cfg.brightness_contrast, self.video_group)
+
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_black_border_algorithm_card = ComboBoxSettingCard(cfg.video_black_border_algorithm,
@@ -130,12 +126,7 @@ class SettingView(MessageBaseView):
                                                                 "sinc计算量极大,图像质量最高"
                                                                 ],
                                                         self.video_group)
-        self.super_resolution_algorithm_card = ComboBoxSettingCard(cfg.super_resolution_algorithm,
-                                                                   Icon(FluentIcon.CHEVRON_RIGHT),
-                                                                   "超分辨率算法平滑画面",
-                                                                   "使用超分算法先放大再缩小来大量减少画面中的噪点",
-                                                                   ["关闭", "ESPCN(速度快)", "LAPSRN(效果好)"],
-                                                                   self.video_group)
+
         self.rate_adjustment_type_card = ComboBoxSettingCard(cfg.rate_adjustment_type, Icon(FluentIcon.CHEVRON_RIGHT),
                                                              "视频补帧算法",
                                                              "调整视频帧率的算法",
@@ -156,6 +147,20 @@ class SettingView(MessageBaseView):
                                                                   "44.1kHz-CD音质",
                                                                   "96kHz-高解析度音频"],
                                                           self.video_group)
+
+        # OpenCV专属
+        self.white_balance_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频白平衡",
+                                                    "如果视频本身画面偏色,请尝试勾选此选项",
+                                                    cfg.white_balance, self.opencv_only_group)
+        self.brightness_contrast_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "自动调整视频亮度对比度",
+                                                          "调整过暗或者过亮的视频画面,可能会损失一些细节",
+                                                          cfg.brightness_contrast, self.opencv_only_group)
+        self.super_resolution_algorithm_card = ComboBoxSettingCard(cfg.super_resolution_algorithm,
+                                                                   Icon(FluentIcon.CHEVRON_RIGHT),
+                                                                   "超分辨率算法平滑画面",
+                                                                   "使用超分算法先放大再缩小来大量减少画面中的噪点",
+                                                                   ["关闭", "ESPCN(速度快)", "LAPSRN(效果好)"],
+                                                                   self.opencv_only_group)
 
     def _set_up_tooltip(self):
         ffmpeg_file_path = cfg.get(cfg.ffmpeg_file)
@@ -182,8 +187,9 @@ class SettingView(MessageBaseView):
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
         self.white_balance_card.setToolTip(
-            "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确(此功能仅在OpenCV模式下可用)")
-        self.brightness_contrast_card.setToolTip("根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗(此功能仅在OpenCV模式下可用)")
+                "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确(此功能仅在OpenCV模式下可用)")
+        self.brightness_contrast_card.setToolTip(
+            "根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗(此功能仅在OpenCV模式下可用)")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
         self.video_sample_rate_card.setToolTip(
@@ -207,6 +213,7 @@ class SettingView(MessageBaseView):
 
         self.expand_layout.addWidget(self.general_group)
         self.expand_layout.addWidget(self.video_group)
+        self.expand_layout.addWidget(self.opencv_only_group)
         self.scroll_widget.setLayout(self.expand_layout)
         self.expand_layout.setSpacing(28)
         self.expand_layout.setContentsMargins(60, 10, 60, 0)
@@ -227,8 +234,6 @@ class SettingView(MessageBaseView):
                 self.deband_card,
                 self.deblock_card,
                 self.shake_card,
-                self.white_balance_card,
-                self.brightness_contrast_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
                 self.video_black_border_algorithm_card,
@@ -236,10 +241,15 @@ class SettingView(MessageBaseView):
                 self.audio_noise_reduction_card,
                 self.video_noise_reduction_card,
                 self.scaling_quality_card,
-                self.super_resolution_algorithm_card,
                 self.rate_adjustment_type_card,
                 self.output_codec_card,
                 self.audio_sample_rate_card
+                ])
+
+        self.opencv_only_group.addSettingCards([
+                self.white_balance_card,
+                self.brightness_contrast_card,
+                self.super_resolution_algorithm_card
                 ])
 
     def _initialize(self) -> None:
