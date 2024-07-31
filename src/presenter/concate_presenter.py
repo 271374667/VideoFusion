@@ -306,6 +306,8 @@ class ConcatePresenter:
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
         self._signal_bus.failed.connect(self._show_failed_infobar)
+        self.get_view().get_video_file_list().remove_action.triggered.connect(
+                lambda: self._on_video_clicked())
 
 
 if __name__ == '__main__':

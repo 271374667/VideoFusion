@@ -34,6 +34,12 @@ class VideoInfoReader:
                              frame_count=frame_count,
                              width=width,
                              height=height)
+        elif x == 0 and y == 0 and w == 0 and h == 0:
+            return VideoInfo(video_path=self.video_path,
+                             fps=fps,
+                             frame_count=frame_count,
+                             width=width,
+                             height=height)
         return VideoInfo(video_path=self.video_path,
                          fps=fps,
                          frame_count=frame_count,
