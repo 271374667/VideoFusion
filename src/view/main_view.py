@@ -33,6 +33,10 @@ class MainView(FluentWindow):
 
     def initWindow(self):
         self.resize(1100, 750)
+        # 设置窗口的最大尺寸
+        self.setMaximumSize(1100, 750)
+        # 设置窗口的最小尺寸
+        self.setMinimumSize(1100, 750)
         self.setWindowIcon(QIcon(':/images/images/logo.ico'))
         self.setWindowTitle('VideoFusion')
 
