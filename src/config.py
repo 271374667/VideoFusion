@@ -76,7 +76,7 @@ class VideoCodec(Enum):
     H264Intel = "-c:v h264_qsv -global_quality 23 -look_ahead 1"
     H264AMD = "-c:v h264_amf -quality quality -usage transcoding -profile main -level 4.1 -tier high"
     H264Nvidia = "-c:v h264_nvenc -rc vbr -cq 23 -preset slow -profile high -level 4.1"
-    H265 = "-c:v libx265 -crf 23 -preset slow -profile:v main10 -pix_fmt yuv420p10le"
+    H265 = "-c:v libx265 -crf 23 -preset slow -profile:v main -pix_fmt yuv420p"
     H265Intel = "-c:v hevc_qsv -global_quality 23 -look_ahead 1"
     H265AMD = "-c:v hevc_amf -quality quality -usage transcoding -profile main10 -tier high"
     H265Nvidia = "-c:v hevc_nvenc -rc vbr -cq 23 -preset slow -profile main10 -pix_fmt yuv420p10le"
