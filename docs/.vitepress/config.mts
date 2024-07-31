@@ -31,6 +31,14 @@ export default defineConfig({
           { text: '高级设置', link: '/advanced_settings.md' },
           { text: 'OpenCV引擎下专属设置', link: '/opencv_only_settings.md' },
         ]
+      },
+      {
+        text: '更多',
+        items: [
+          { text: '更新日志', link: '/CHANGLOG.md' },
+          { text: '联系我', link: '/contact_me.md' },
+          { text: '捐赠', link: '/donated.md' },
+        ]
       }
     ],
 
