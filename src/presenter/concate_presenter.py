@@ -10,7 +10,7 @@ from PySide6.QtGui import QImage, QPixmap, QTransform
 from PySide6.QtWidgets import QFileDialog
 
 from src.common.black_remove.img_black_remover import BlackRemover
-from src.common.task_resumer.task_resumer_manager import TaskResumerManager
+from src.common.task_resumer.task_resumer_manager import TaskResumer, TaskResumerManager
 from src.config import PreviewFrame, VideoProcessEngine, cfg
 from src.core.enums import Orientation, Rotation
 from src.core.paths import FFMPEG_FILE
@@ -64,10 +64,17 @@ class ConcatePresenter:
                                                is_closable=True)
             return
 
+        self._task_resumer_manager.load()
         last_completed = bool(self._task_resumer_manager.check_last_task_completed())
-        if not last_completed and self.get_view().show_mask_dialog("恢复上一次的任务",
-                                                                   "您的上一次任务还未完成,是否继续上一次的任务?"):
-            video_list = [x.get_input_video_path() for x in self._task_resumer_manager.get_uncompleted_task_list()]
+        uncompleted_task_list: list[TaskResumer] = self._task_resumer_manager.get_uncompleted_task_list()
+        if (
+            not last_completed
+            and self.get_view().show_mask_dialog(
+                "恢复上一次的任务", "您的上一次任务还未完成,是否继续上一次的任务?"
+            )
+            and uncompleted_task_list
+        ):
+            video_list = [x.get_input_video_path() for x in uncompleted_task_list]
             self.get_view().show_info_infobar("提示", "上一次的任务已经完成,开始新的任务", 3000)
         else:
             video_list = self.get_all_video_files()
