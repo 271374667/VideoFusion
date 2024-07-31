@@ -21,11 +21,17 @@ export default defineConfig({
         items: [
           { text: '快速开始', link: '/quick-start.md' },
           { text: '为什么选择 VideoFusion ?', link: '/about.md' },
+
+        ]
+      },
+      {
+        text: '设置',
+        items: [
           { text: '常规设置', link: '/normal_settings.md' },
           { text: '高级设置', link: '/advanced_settings.md' },
           { text: 'OpenCV引擎下专属设置', link: '/opencv_only_settings.md' },
         ]
-      },
+      }
     ],
 
 

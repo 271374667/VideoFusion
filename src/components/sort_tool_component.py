@@ -8,8 +8,6 @@ from PySide6.QtGui import QAction, QDragEnterEvent, QDropEvent, QImage, QKeyEven
 from PySide6.QtWidgets import (QAbstractItemView, QApplication, QCheckBox, QFileDialog, QHBoxLayout, QLabel,
                                QListWidget, QListWidgetItem, QMenu, QPushButton, QSpacerItem, QVBoxLayout, QWidget)
 
-from src.common.black_remover import BlackRemover
-
 WINDOW_RENAME_FILE_REGEX = re.compile(r'.*?\((\d+)\)\..*?')
 TIME_FILE_REGEX = re.compile(r'.*?([1-2]\d{3}).([0-1]\d).([0-3]\d).*?')
 
