@@ -36,7 +36,7 @@ export default defineConfig({
 
 
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/271374667/' }
+      { icon: 'github', link: 'https://github.com/271374667/VideoFusion' }
     ],
 
     search: {
