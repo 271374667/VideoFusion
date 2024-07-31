@@ -15,12 +15,10 @@
 VideoFusion 旨在打造一个上手即用，随用随走的轻量化视频批量优化和处理工具，对于无经验的视频创作者您只需要几次点击就能实现视频拼接，AI音频降噪，超分平滑，白平衡，亮度自动调整，补帧等功能，使用 VideoFusion 帮助您预处理您的视频，您无需关心参数和更多细节，VideoFusion 会自动帮您处理好剩下复杂的逻辑
 
 
-<center>
-<div>
-<p>软件详情请前往文档进行查看</p>
-<a href="https://271374667.github.io/VideoFusion/">点我前往文档</a>
+<div align="center">
+    <p align="center">软件详情请前往文档进行查看</p>
+    <a href="https://271374667.github.io/VideoFusion/">点我前往文档</a>
 </div>
-</center>
 
 
 
