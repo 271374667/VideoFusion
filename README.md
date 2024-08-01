@@ -6,8 +6,7 @@
     点击即用，自动去黑边，智能拼接，补帧，自动调整分辨率，白平衡，AI 音频降噪
 </p>
 <p align="center">
-    <img src="https://img.shields.io/github/v/release/271374667/VideoFusion
-    " alt="最新版本">
+    <img alt="最新版本" src="https://img.shields.io/github/v/release/271374667/VideoFusion">
     <img alt="downloads" src="https://img.shields.io/github/downloads/271374667/VideoFusion/total">
     <img alt="License: LGPL-2.1" src="https://img.shields.io/github/license/271374667/VideoFusion">
     <img alt="最后提交时间" src="https://img.shields.io/github/last-commit/271374667/VideoFusion">
