@@ -12,6 +12,8 @@ from src.view.settings_view import SettingView
 
 class SettingsPresenter:
     def __init__(self):
+        self._is_first_time: bool = True
+
         self._view: SettingView = SettingView()
         self._model: SettingsModel = SettingsModel()
         self._version_request = VersionRequest()
@@ -118,9 +120,11 @@ class SettingsPresenter:
 
     def _update_engine_settings(self, flag1, flag2):
         self._view.engine_card.setToolTip(flag1)
-        self.get_view().show_success_infobar(
-                "提示", flag1, duration=1000, is_closable=True
-                )
+        if not self._is_first_time:
+            self.get_view().show_success_infobar(
+                    "提示", flag1, duration=1000, is_closable=True
+                    )
+        self._is_first_time = False
         self.get_view().white_balance_card.setEnabled(flag2)
         self.get_view().brightness_contrast_card.setEnabled(flag2)
         self.get_view().super_resolution_algorithm_card.setEnabled(flag2)
@@ -134,7 +138,7 @@ class SettingsPresenter:
         self._message_dialog.cancel_btn.clicked.connect(self._message_dialog.close)
         self.get_view().engine_card.comboBox.currentIndexChanged.connect(self._engine_changed)
         self.get_view().video_black_border_algorithm_card.comboBox.currentIndexChanged.connect(
-            self._on_black_remove_changed)
+                self._on_black_remove_changed)
 
 
 if __name__ == '__main__':
