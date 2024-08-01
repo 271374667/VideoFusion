@@ -41,10 +41,10 @@ features:
 ---
 
 <div style="margin-top:150px">
-<center><h1>1 分钟快速展示</h1>
-简单 2 步，去除视频黑边，同时合并视频，一切都是如此简单
+<center><h1>10 秒爱上VideoFusion</h1>
+简单 3 步，去除视频黑边，同时合并视频，一切都是如此简单
 
-![1分钟效果展示](./public/1分钟效果展示.gif)
+![10 秒爱上VideoFusion](/demo.gif)
 
 </center>
 </div>

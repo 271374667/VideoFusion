@@ -16,6 +16,12 @@
 
 ![logo](./README.assets/banner.png)
 
+## 10 秒爱上VideoFusion
+
+下面这个 GIF 将会带您快速查看两个有不规则黑边的视频是如何完美去除黑边然后旋转成正确的朝向最后合并的
+
+![10 秒爱上VideoFusion](README.assets/demo.gif)
+
 
 ## ✨软件介绍
 

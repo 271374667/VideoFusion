@@ -79,6 +79,9 @@ class TaskResumerManager:
 
     def load(self) -> list[TaskResumer]:
         """从json加载"""
+        if not self._resume_file_path.exists():
+            self.save()
+
         with open(self._resume_file_path, "r") as f:
             self._task_resumer_dict = json.load(f)
             self._total_task_status = FileProcessType(self._task_resumer_dict["total_task_status"])
@@ -121,6 +124,10 @@ class TaskResumerManager:
     def is_completed(self) -> bool:
         """判断是否完成"""
         return self._total_task_status == FileProcessType.COMPLETED
+
+    def is_json_exist(self) -> bool:
+        """判断json文件是否存在"""
+        return self._resume_file_path.exists()
 
     def __iter__(self):
         return self

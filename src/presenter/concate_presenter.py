@@ -64,15 +64,20 @@ class ConcatePresenter:
                                                is_closable=True)
             return
 
-        self._task_resumer_manager.load()
-        last_completed = bool(self._task_resumer_manager.check_last_task_completed())
-        uncompleted_task_list: list[TaskResumer] = self._task_resumer_manager.get_uncompleted_task_list()
+        # 读取本地文件并获取任务列表
+        if self._task_resumer_manager.is_json_exist():
+            last_completed = bool(self._task_resumer_manager.check_last_task_completed())
+            uncompleted_task_list: list[TaskResumer] = self._task_resumer_manager.get_uncompleted_task_list()
+        else:
+            last_completed = False
+            uncompleted_task_list = []
+
         if (
-            not last_completed
-            and self.get_view().show_mask_dialog(
+                not last_completed
+                and uncompleted_task_list
+                and self.get_view().show_mask_dialog(
                 "恢复上一次的任务", "您的上一次任务还未完成,是否继续上一次的任务?"
-            )
-            and uncompleted_task_list
+                )
         ):
             video_list = [x.get_input_video_path() for x in uncompleted_task_list]
             self.get_view().show_info_infobar("提示", "上一次的任务已经完成,开始新的任务", 3000)
