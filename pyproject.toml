@@ -12,6 +12,7 @@ dependencies = [
     "numpy>=1.26.4",
     "opencv-contrib-python>=4.10.0.84",
     "typing-extensions>=4.12.2",
+    "auto-editor>=24.31.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"

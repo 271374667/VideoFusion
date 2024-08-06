@@ -184,7 +184,6 @@ class Config(QConfig):
                                                    OptionsValidator(SuperResolutionAlgorithm),
                                                    EnumSerializer(SuperResolutionAlgorithm))
 
-
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())
     temp_dir = ConfigItem("General", "临时目录", str(TEMP_DIR), FolderValidator())

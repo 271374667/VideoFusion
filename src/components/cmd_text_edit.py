@@ -38,6 +38,15 @@ class CmdRunnerThread(QThread):
                 self.append_signal.emit(output.strip())
 
 
+class LoguruStream:
+    def write(self, message):
+        if no_empty_message := message.strip():
+            loguru.logger.debug(no_empty_message)
+
+    def flush(self):
+        pass
+
+
 @singleton
 class CMDTextEdit(QWidget):
     """
@@ -59,6 +68,9 @@ class CMDTextEdit(QWidget):
 
     def __init__(self, parent=None):
         super().__init__()
+        # 是否重定向print以及所有的系统输出到loguru
+        self.redirect_print: bool = False
+
         self.setObjectName("cmd_text_edit")
         self._ansi2html_converter = Ansi2HTMLConverter()
 
@@ -75,6 +87,20 @@ class CMDTextEdit(QWidget):
 
         # 为了方便直接绑定loguru
         self._hook_loguru()
+
+    @property
+    def redirect_print(self) -> bool:
+        return self._redirect_print
+
+    @redirect_print.setter
+    def redirect_print(self, value: bool) -> None:
+        self._redirect_print = value
+        if value:
+            sys.stdout = LoguruStream()
+            sys.stderr = LoguruStream()
+        else:
+            sys.stdout = sys.__stdout__
+            sys.stderr = sys.__stderr__
 
     def append_log(self, context: str) -> None:
         """手动添加一行消息"""
@@ -138,6 +164,7 @@ if __name__ == "__main__":
     loguru.logger.warning("This is a warning message")
     loguru.logger.debug("This is a debug message")
     loguru.logger.critical("我是一段中文日志信息")
+    print('PythonImporter')
 
     # 一个绿色的ANSI颜色代码
     # text = "\x1b[94m\x1b[92m我是一个绿色的字\x1b[0m"

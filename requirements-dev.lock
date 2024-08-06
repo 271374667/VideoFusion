@@ -10,7 +10,11 @@
 #   universal: false
 
 -e file:.
+ae-ffmpeg==1.2.0
+    # via auto-editor
 ansi2html==1.9.2
+    # via videomosaic
+auto-editor==24.31.1
     # via videomosaic
 colorama==0.4.6
     # via loguru
@@ -20,12 +24,15 @@ loguru==0.7.2
     # via videomosaic
 nuitka==2.4.2
 numpy==2.0.1
+    # via auto-editor
     # via opencv-contrib-python
     # via videomosaic
 opencv-contrib-python==4.10.0.84
     # via videomosaic
 ordered-set==4.1.0
     # via nuitka
+pyav==12.3.0
+    # via auto-editor
 pyside6==6.7.2
     # via pyside6-fluent-widgets
 pyside6-addons==6.7.2
