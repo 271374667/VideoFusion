@@ -21,51 +21,51 @@ locale.setlocale(locale.LC_ALL, 'en_US.UTF-8')
 
 # 去黑边算法
 class BlackBorderAlgorithm(Enum):
-    DISABLE = 0
-    STATIC = auto()
-    DYNAMIC = auto()
+    Disable = 0
+    Static = auto()
+    Dynamic = auto()
 
 
 # 音频响度标准化标准
 class AudioNormalization(Enum):
-    DISABLE = ""
-    RADIO = "loudnorm=i=-15.0:lra=2.0:tp=-1.0:"
+    Disable = ""
+    Radio = "loudnorm=i=-15.0:lra=2.0:tp=-1.0:"
     TV = "loudnorm=i=-24.0:lra=2.0:tp=-1.0:"
-    MOVIE = "loudnorm=i=-24.0:lra=7.0:tp=-2.0:"
+    Movie = "loudnorm=i=-24.0:lra=7.0:tp=-2.0:"
 
 
 # 音频降噪策略
 class AudioNoiseReduction(Enum):
-    DISABLE = ""
-    STATIC = "highpass=200,lowpass=3000,afftdn"  # 一个很好地组合过滤器
+    Disable = ""
+    Static = "highpass=200,lowpass=3000,afftdn"  # 一个很好地组合过滤器
     AI = f'arnndn=model={NOISE_REDUCE_MODEL_FILE.relative_to(ROOT)}'  # AI降噪
 
 
 # 视频降噪策略
 class VideoNoiseReduction(Enum):
-    DISABLE = 0
-    BILATERAL = "bilateral"  # 双边滤波器, 速度快, 效果一般
-    NLMEANS = "nlmeans=6.0:7.0"  # 非局部均值降噪滤镜, 更慢, 但效果更好
+    Disable = 0
+    Bilateral = "bilateral"  # 双边滤波器, 速度快, 效果一般
+    Nlmeans = "nlmeans=6.0:7.0"  # 非局部均值降噪滤镜, 更慢, 但效果更好
 
 
 # 补帧策略
 class FrameRateAdjustment(Enum):
-    NORMAL = 1
-    MOTION_INTERPOLATION = 2
+    Normal = 1
+    MotionInterpolation = 2
 
 
 # 缩放质量
 class ScalingQuality(Enum):
-    NEAREST = 'neighbor'
-    BILINEAR = 'bilinear'
-    BICUBIC = 'bicubic'
-    LANCZOS = 'lanczos'
-    SINC = "sinc"
+    Nearest = 'neighbor'
+    Bilinear = 'bilinear'
+    Bicubic = 'bicubic'
+    Lanczos = 'lanczos'
+    Sinc = "sinc"
 
 
 # 视频超分辨率算法
 class SuperResolutionAlgorithm(Enum):
-    DISABLE = 0
+    Disable = 0
     ESPCN = auto()
     LAPSRN = auto()
 
@@ -103,6 +103,18 @@ class AudioSampleRate(Enum):
 class VideoProcessEngine(Enum):
     FFmpeg = 0
     OpenCV = 1
+
+
+# 输出视频分辨率
+class VideoResolution(Enum):
+    Disable = -1
+    Auto = 0
+    P480 = 1
+    P720 = 2
+    P1080 = 3
+    P1440 = 4
+    P2160 = 5
+    P4320 = 6
 
 
 class OutputFileValidator(ConfigValidator):
@@ -150,40 +162,6 @@ class FFmpegValidator(ConfigValidator):
 
 
 class Config(QConfig):
-    # 视频质量
-    output_dir = ConfigItem("Video", "输出文件路径", str(OUTPUT_DIR), OutputDirValidator())
-    shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
-    deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
-    deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
-    video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
-    video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
-    video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.DYNAMIC,
-                                                     OptionsValidator(BlackBorderAlgorithm),
-                                                     EnumSerializer(BlackBorderAlgorithm))
-    audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.DISABLE,
-                                            OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
-    audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
-                                              OptionsValidator(AudioNoiseReduction),
-                                              EnumSerializer(AudioNoiseReduction))
-    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.BILATERAL,
-                                              OptionsValidator(VideoNoiseReduction),
-                                              EnumSerializer(VideoNoiseReduction))
-    scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.SINC, OptionsValidator(ScalingQuality),
-                                        EnumSerializer(ScalingQuality))
-    rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.NORMAL,
-                                             OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))
-    output_codec = OptionsConfigItem("Video", "输出编码策略", VideoCodec.H264, OptionsValidator(VideoCodec),
-                                     EnumSerializer(VideoCodec))
-    audio_sample_rate = OptionsConfigItem("Video", "音频采样率", AudioSampleRate.Hz44100,
-                                          OptionsValidator(AudioSampleRate), EnumSerializer(AudioSampleRate))
-
-    # OpenCV才支持的设置
-    white_balance = ConfigItem("OpenCV", "视频白平衡", False, BoolValidator())
-    brightness_contrast = ConfigItem("OpenCV", "自动调整视频亮度对比度", False, BoolValidator())
-    super_resolution_algorithm = OptionsConfigItem("OpenCV", "超分辨率算法", SuperResolutionAlgorithm.DISABLE,
-                                                   OptionsValidator(SuperResolutionAlgorithm),
-                                                   EnumSerializer(SuperResolutionAlgorithm))
-
     # 全局设置
     ffmpeg_file = ConfigItem("General", "FFmpeg路径", str(FFMPEG_FILE), FFmpegValidator())
     temp_dir = ConfigItem("General", "临时目录", str(TEMP_DIR), FolderValidator())
@@ -196,6 +174,42 @@ class Config(QConfig):
                                       EnumSerializer(PreviewFrame))
     preview_auto_play = ConfigItem("General", "预览视频自动播放", False, BoolValidator())
     merge_video = ConfigItem("General", "是否合并视频", True, BoolValidator())
+
+    # 视频质量
+    output_dir = ConfigItem("Video", "输出文件路径", str(OUTPUT_DIR), OutputDirValidator())
+    shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
+    deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
+    deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
+    video_fps = RangeConfigItem("Video", "目标视频帧率", 30, RangeValidator(1, 144))
+    video_sample_frame_number = RangeConfigItem("Video", "去黑边采样帧数", 500, RangeValidator(100, 2000))
+    video_resolution = OptionsConfigItem("Video", "输出视频分辨率", VideoResolution.P720,
+                                         OptionsValidator(VideoResolution), EnumSerializer(VideoResolution))
+    video_black_border_algorithm = OptionsConfigItem("Video", "黑边去除算法", BlackBorderAlgorithm.Dynamic,
+                                                     OptionsValidator(BlackBorderAlgorithm),
+                                                     EnumSerializer(BlackBorderAlgorithm))
+    audio_normalization = OptionsConfigItem("Video", "音频响度标准化", AudioNormalization.Disable,
+                                            OptionsValidator(AudioNormalization), EnumSerializer(AudioNormalization))
+    audio_noise_reduction = OptionsConfigItem("Video", "音频降噪", AudioNoiseReduction.AI,
+                                              OptionsValidator(AudioNoiseReduction),
+                                              EnumSerializer(AudioNoiseReduction))
+    video_noise_reduction = OptionsConfigItem("Video", "视频降噪", VideoNoiseReduction.Bilateral,
+                                              OptionsValidator(VideoNoiseReduction),
+                                              EnumSerializer(VideoNoiseReduction))
+    scaling_quality = OptionsConfigItem("Video", "缩放质量", ScalingQuality.Sinc, OptionsValidator(ScalingQuality),
+                                        EnumSerializer(ScalingQuality))
+    rate_adjustment_type = OptionsConfigItem("Video", "补帧策略", FrameRateAdjustment.Normal,
+                                             OptionsValidator(FrameRateAdjustment), EnumSerializer(FrameRateAdjustment))
+    output_codec = OptionsConfigItem("Video", "输出编码策略", VideoCodec.H264, OptionsValidator(VideoCodec),
+                                     EnumSerializer(VideoCodec))
+    audio_sample_rate = OptionsConfigItem("Video", "音频采样率", AudioSampleRate.Hz44100,
+                                          OptionsValidator(AudioSampleRate), EnumSerializer(AudioSampleRate))
+
+    # OpenCV才支持的设置
+    white_balance = ConfigItem("OpenCV", "视频白平衡", False, BoolValidator())
+    brightness_contrast = ConfigItem("OpenCV", "自动调整视频亮度对比度", False, BoolValidator())
+    super_resolution_algorithm = OptionsConfigItem("OpenCV", "超分辨率算法", SuperResolutionAlgorithm.Disable,
+                                                   OptionsValidator(SuperResolutionAlgorithm),
+                                                   EnumSerializer(SuperResolutionAlgorithm))
 
 
 cfg = Config()

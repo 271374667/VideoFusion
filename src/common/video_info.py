@@ -116,7 +116,7 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     signal_bus.set_detail_progress_max.emit(total_frames)
 
     # 是否需要去黑边
-    if cfg.get(cfg.video_black_border_algorithm) == BlackBorderAlgorithm.DISABLE:
+    if cfg.get(cfg.video_black_border_algorithm) == BlackBorderAlgorithm.Disable:
         return VideoInfo(video_path, fps, total_frames, width, height, audio_sample_rate, None)
 
     # 先判断是否有黑边(获取视频中随机的10帧)
@@ -135,9 +135,9 @@ def get_video_info(video_path: Path, sample_rate: float = 0.5) -> VideoInfo:
     video.release()
 
     black_remove_algorithm: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
-    if black_remove_algorithm == BlackBorderAlgorithm.STATIC:
+    if black_remove_algorithm == BlackBorderAlgorithm.Static:
         return _img_black_remover_start(video_path, sample_rate)
-    elif black_remove_algorithm == BlackBorderAlgorithm.DYNAMIC:
+    elif black_remove_algorithm == BlackBorderAlgorithm.Dynamic:
         return _video_black_remover_start(video_path)
     else:
         raise ValueError(f'未知的黑边去除算法:{black_remove_algorithm}')

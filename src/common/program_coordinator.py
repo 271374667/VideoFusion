@@ -43,11 +43,11 @@ class ProgramCoordinator:
 
         black_remove_algorithm_enum: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
         match black_remove_algorithm_enum:
-            case BlackBorderAlgorithm.DYNAMIC:
+            case BlackBorderAlgorithm.Dynamic:
                 black_remove_algorithm_impl = VideoRemover()
-            case BlackBorderAlgorithm.STATIC:
+            case BlackBorderAlgorithm.Static:
                 black_remove_algorithm_impl = IMGBlackRemover()
-            case BlackBorderAlgorithm.DISABLE:
+            case BlackBorderAlgorithm.Disable:
                 black_remove_algorithm_impl = None
             case _:
                 raise ValueError(f"不支持的黑边去除算法{black_remove_algorithm_enum}")

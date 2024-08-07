@@ -54,12 +54,12 @@ def generate_ffmpeg_command(input_file: str | Path,
 
     filters = []
 
-    if frame_rate_adjustment_type == FrameRateAdjustment.NORMAL:
+    if frame_rate_adjustment_type == FrameRateAdjustment.Normal:
         filters.append(f"fps=fps={framerate}")
-    elif frame_rate_adjustment_type == FrameRateAdjustment.MOTION_INTERPOLATION:
+    elif frame_rate_adjustment_type == FrameRateAdjustment.MotionInterpolation:
         filters.append(f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
 
-    if video_noise_reduction != VideoNoiseReduction.DISABLE:
+    if video_noise_reduction != VideoNoiseReduction.Disable:
         filters.append(video_noise_reduction.value)
 
     if has_shake:
@@ -96,11 +96,11 @@ def generate_ffmpeg_command(input_file: str | Path,
 
     audio_filters = []
     # 音频标准化
-    if audio_normalization != AudioNormalization.DISABLE:
+    if audio_normalization != AudioNormalization.Disable:
         audio_filters.append(audio_normalization.value)
 
     # 音频降噪
-    if audio_noise_reduction != AudioNoiseReduction.DISABLE:
+    if audio_noise_reduction != AudioNoiseReduction.Disable:
         audio_filters.append(audio_noise_reduction.value.replace("\\", "/"))
 
     # 音频重新采样

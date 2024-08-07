@@ -17,12 +17,12 @@ class AudioFFmpegProcessor(AudioProcessor):
         audio_noise_reduction_mode: AudioNoiseReduction = cfg.get(cfg.audio_noise_reduction)
         if audio_noise_reduction_mode == AudioNoiseReduction.AI:
             audio_filters.append(f"{audio_noise_reduction_mode.value}".replace('\\', '/'))
-        elif audio_noise_reduction_mode == AudioNoiseReduction.STATIC:
+        elif audio_noise_reduction_mode == AudioNoiseReduction.Static:
             audio_filters.append(audio_noise_reduction_mode.value)
 
         # 音频标准化
         audio_normalization: AudioNormalization = cfg.get(cfg.audio_normalization)
-        if audio_normalization != AudioNormalization.DISABLE:
+        if audio_normalization != AudioNormalization.Disable:
             audio_filters.append(audio_normalization.value)
 
         # 音频重新采样

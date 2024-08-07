@@ -75,13 +75,13 @@ class OpenCVProcessorManager(BaseProcessorManager[np.ndarray]):
         # 视频降噪
         denoise_value: VideoNoiseReduction = cfg.get(cfg.video_noise_reduction)
         match denoise_value:
-            case VideoNoiseReduction.DISABLE:
+            case VideoNoiseReduction.Disable:
                 self._means_denoise_processor.is_enable = False
                 self._bilateral_denoise_processor.is_enable = False
-            case VideoNoiseReduction.NLMEANS:
+            case VideoNoiseReduction.Nlmeans:
                 self._means_denoise_processor.is_enable = True
                 self._bilateral_denoise_processor.is_enable = False
-            case VideoNoiseReduction.BILATERAL:
+            case VideoNoiseReduction.Bilateral:
                 self._means_denoise_processor.is_enable = False
                 self._bilateral_denoise_processor.is_enable = True
             case _:
@@ -100,7 +100,7 @@ class OpenCVProcessorManager(BaseProcessorManager[np.ndarray]):
             case SuperResolutionAlgorithm.LAPSRN:
                 self._super_resolution_espcn_processor.is_enable = False
                 self._super_resolution_lapsrn_processor.is_enable = True
-            case SuperResolutionAlgorithm.DISABLE:
+            case SuperResolutionAlgorithm.Disable:
                 self._super_resolution_espcn_processor.is_enable = False
                 self._super_resolution_lapsrn_processor.is_enable = False
             case _:

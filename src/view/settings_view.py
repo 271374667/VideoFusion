@@ -90,6 +90,11 @@ class SettingView(MessageBaseView):
 
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
+        self.video_resolution_card = ComboBoxSettingCard(cfg.video_resolution, Icon(FluentIcon.CHEVRON_RIGHT),
+                                                        "输出视频分辨率",
+                                                        "调整输出视频的分辨率，所有输出的视频都会被调整，您也可以选择关闭",
+                                                         ["最佳分辨率", "480P", "720P", "1080P", "1440P", "2160P", "4320P"],
+                                                         self.video_group)
         self.video_black_border_algorithm_card = ComboBoxSettingCard(cfg.video_black_border_algorithm,
                                                                      Icon(FluentIcon.CHEVRON_RIGHT),
                                                                      "视频黑边去除算法",
@@ -237,6 +242,7 @@ class SettingView(MessageBaseView):
                 self.shake_card,
                 self.video_fps_card,
                 self.video_sample_rate_card,
+                self.video_resolution_card,
                 self.video_black_border_algorithm_card,
                 self.audio_normalization_card,
                 self.audio_noise_reduction_card,

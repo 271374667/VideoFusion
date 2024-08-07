@@ -67,9 +67,9 @@ class FFmpegHandler:
         video_filter = []
         frame_rate_adjustment_type: FrameRateAdjustment = cfg.get(cfg.rate_adjustment_type)
         framerate: int = cfg.get(cfg.video_fps)
-        if frame_rate_adjustment_type == FrameRateAdjustment.NORMAL:
+        if frame_rate_adjustment_type == FrameRateAdjustment.Normal:
             video_filter.append(f"fps=fps={framerate}")
-        elif frame_rate_adjustment_type == FrameRateAdjustment.MOTION_INTERPOLATION:
+        elif frame_rate_adjustment_type == FrameRateAdjustment.MotionInterpolation:
             video_filter.append(
                     f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
 
@@ -205,7 +205,7 @@ class FFmpegHandler:
                                                output_audio_path,
                                                audio_filter=audio_filter)
             self.run_command(command)
-        elif mode == AudioNoiseReduction.STATIC:
+        elif mode == AudioNoiseReduction.Static:
             audio_filter = [model_value]
             command = self._get_ffmpeg_command(input_audio_path,
                                                output_audio_path,

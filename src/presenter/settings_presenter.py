@@ -65,7 +65,7 @@ class SettingsPresenter:
     def _on_black_remove_changed(self):
         """动态去黑边算法和获取视频采样帧数不能同时启用"""
         black_remove_algorithm: BlackBorderAlgorithm = cfg.get(cfg.video_black_border_algorithm)
-        if black_remove_algorithm == BlackBorderAlgorithm.DYNAMIC:
+        if black_remove_algorithm == BlackBorderAlgorithm.Dynamic:
             self.get_view().video_sample_rate_card.setEnabled(False)
             return
         self.get_view().video_sample_rate_card.setEnabled(True)
@@ -115,7 +115,7 @@ class SettingsPresenter:
             self._update_engine_settings("当前使用FFmpeg进行视频处理", False)
             self.get_view().white_balance_card.setValue(False)
             self.get_view().brightness_contrast_card.setValue(False)
-            self.get_view().super_resolution_algorithm_card.setValue(SuperResolutionAlgorithm.DISABLE)
+            self.get_view().super_resolution_algorithm_card.setValue(SuperResolutionAlgorithm.Disable)
             return
 
     def _update_engine_settings(self, flag1, flag2):

@@ -73,15 +73,15 @@ class ResizeProcessor(OpenCVProcessor):
         # 缩放视频帧到新的尺寸
         resize_algorithm: ScalingQuality = cfg.get(cfg.scaling_quality)
         match resize_algorithm:
-            case ScalingQuality.NEAREST:
+            case ScalingQuality.Nearest:
                 resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_NEAREST)
-            case ScalingQuality.BILINEAR:
+            case ScalingQuality.Bilinear:
                 resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LINEAR)
-            case ScalingQuality.BICUBIC:
+            case ScalingQuality.Bicubic:
                 resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
-            case ScalingQuality.LANCZOS:
+            case ScalingQuality.Lanczos:
                 resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_LANCZOS4)
-            case ScalingQuality.SINC:
+            case ScalingQuality.Sinc:
                 resized_frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_CUBIC)
             case _:
                 loguru.logger.error(f"Invalid scaling quality: {resize_algorithm}")
