@@ -21,31 +21,23 @@ from src.utils import move_file_to_output_dir
 
 class ProgramCoordinator:
     def __init__(self):
-        self.is_running: bool = False
-        self.is_merging: bool = False
         self._start_time = time.time()
-        self._current_total_task_status: FileProcessType = FileProcessType.UNPROCESSED
 
         self._signal_bus = SignalBus()
+        self._task_resumer_manager = TaskResumerManager()
         self._processor_global_var = ProcessorGlobalVar()
         self._video_handler = VideoHandler()
 
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
         # sourcery skip: low-code-quality
-        engine_type: VideoProcessEngine = cfg.get(cfg.video_process_engine)
-        self._task_resumer_manager = TaskResumerManager(engine_type, orientation, rotation)
-        self._task_resumer_manager.clear()
         self._processor_global_var.clear()
-        self._current_total_task_status = FileProcessType.PROCESSING
-
-        self.is_running = True
-        self.is_merging = False
-
         self._processor_global_var.update('orientation', orientation)
         self._processor_global_var.update('rotation_angle', rotation.value)
         loguru.logger.debug(self._processor_global_var)
 
+        engine_type: VideoProcessEngine = cfg.get(cfg.video_process_engine)
         finished_video_path_list: list[Path] = []
+
         self._signal_bus.set_detail_progress_reset.emit()
         self._signal_bus.set_total_progress_reset.emit()
 
@@ -60,17 +52,12 @@ class ProgramCoordinator:
             case _:
                 raise ValueError(f"不支持的黑边去除算法{black_remove_algorithm_enum}")
 
-        self._processor_global_var.get_data()['orientation'] = orientation
-        self._processor_global_var.get_data()['rotation_angle'] = rotation.value
-
         self._signal_bus.set_total_progress_max.emit(len(input_video_path_list))
         self._signal_bus.set_total_progress_description.emit("分析视频")
 
         # 读取视频信息
         video_info_list: list[VideoInfo] = []
         for each_path in input_video_path_list:
-            if not self.is_running:
-                return None
             video_info = VideoInfoReader(str(each_path)).get_video_info(black_remove_algorithm_impl)
             loguru.logger.debug(video_info)
             video_info_list.append(video_info)
@@ -113,9 +100,6 @@ class ProgramCoordinator:
             self._processor_global_var.get_data()['height'] = video_info.height
 
             try:
-                if not self.is_running:
-                    return None
-
                 self._update_processor_global_var_with_crop_info(each_resumer.get_crop_x(),
                                                                  each_resumer.get_crop_y(),
                                                                  each_resumer.get_crop_width(),
@@ -193,9 +177,6 @@ class ProgramCoordinator:
         best_width, best_height = get_most_compatible_resolution(video_info_list, video_orientation)
         loguru.logger.info(f'最佳分辨率获取完成,最佳分辨率为: {best_width}x{best_height}')
         return best_width, best_height
-
-    def _set_merge_status(self, status: bool):
-        self.is_merging = status
 
 
 if __name__ == '__main__':

@@ -14,7 +14,5 @@ class Rotation(Enum):
 
 
 class FileProcessType(Enum):
-    UNPROCESSED = 0
-    PROCESSING = 1
-    FAILED = 2
-    COMPLETED = 3
+    UNCOMPLETED = 0
+    COMPLETED = 1
