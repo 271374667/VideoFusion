@@ -22,11 +22,12 @@ from src.view.concate_view import ConcateView
 
 class ConcatePresenter:
     def __init__(self):
-        self._signal_bus = SignalBus()
-        self._black_remover = BlackRemover()
         self.current_rotation: int = 0
         self.start_time: float = time.time()
+
+        self._signal_bus = SignalBus()
         self._temp_dir = TempDir()
+        self._black_remover = BlackRemover()
 
         self._view: ConcateView = ConcateView()
         self._model: ConcateModel = ConcateModel()
@@ -65,21 +66,17 @@ class ConcatePresenter:
             return
 
         # 读取本地文件并获取任务列表
-        if self._task_resumer_manager.is_json_exist():
-            last_completed = bool(self._task_resumer_manager.check_last_task_completed())
-            uncompleted_task_list: list[TaskResumer] = self._task_resumer_manager.get_uncompleted_task_list()
-        else:
-            last_completed = False
-            uncompleted_task_list = []
+        uncompleted_task_list: list[TaskResumer] = self._task_resumer_manager.uncompleted_task_list
 
+        # 只有当不启用合并视频时,同时还需要有未完成的任务时,才会询问是否继续上一次的任务
         if (
-                not last_completed
+                not self._model.merge_video_enabled
                 and uncompleted_task_list
                 and self.get_view().show_mask_dialog(
                 "恢复上一次的任务", "您的上一次任务还未完成,是否继续上一次的任务?"
                 )
         ):
-            video_list = [x.get_input_video_path() for x in uncompleted_task_list]
+            video_list = [x.input_video_path for x in uncompleted_task_list if x.input_video_path.exists()]
             self.get_view().show_info_infobar("提示", "上一次的任务已经完成,开始新的任务", 3000)
         else:
             video_list = self.get_all_video_files()
@@ -104,11 +101,7 @@ class ConcatePresenter:
         self.get_view().finish_state_tooltip("完成", f"视频合并完成,输出文件至: {output_path}")
 
     def cancle_worker(self):
-        if self.get_model().is_merging:
-            self.get_view().show_warning_infobar("警告", "合并操作正在进行中,合并过程中无法取消任务,请等待合并完成")
-            return
-
-        self.get_model().set_running(False)
+        self.get_model().kill_thread()
 
         self._set_btns_enable(True, False)
         self.get_view().finish_state_tooltip("取消", "合并操作已取消")

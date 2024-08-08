@@ -107,7 +107,6 @@ class VideoProcessEngine(Enum):
 
 # 输出视频分辨率
 class VideoResolution(Enum):
-    Disable = -1
     Auto = 0
     P480 = 1
     P720 = 2

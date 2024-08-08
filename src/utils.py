@@ -233,11 +233,8 @@ def get_output_file_path(input_file_path: Path, process_info: str = "out") -> Pa
 
 def move_file_to_output_dir(video_list: list[Path]) -> Path:
     output_dir: Path = Path(cfg.get(cfg.output_dir))
-    if output_dir.exists():
-        shutil.rmtree(output_dir, ignore_errors=True)
-        loguru.logger.debug(f"清空输出目录:{output_dir}")
-
     output_dir.mkdir(parents=True, exist_ok=True)
+
     # 将视频移动到输出目录
     for video in video_list:
         output_video = output_dir / video.name

@@ -8,16 +8,25 @@ from src.core.datacls import CropInfo, VideoInfo
 
 
 class VideoInfoReader:
-    def __init__(self, video_path: str):
+    def __init__(self, video_path: str | Path):
         self.video_path = Path(video_path)
 
-    def get_video_info(self, black_remove_algorithm: BlackRemoveAlgorithm | None) -> VideoInfo:
+    def get_video_info(self,
+                       black_remove_algorithm: BlackRemoveAlgorithm | None,
+                       crop_enabled: bool = True) -> VideoInfo:
         video = cv2.VideoCapture(str(self.video_path))
         frame_count = int(video.get(cv2.CAP_PROP_FRAME_COUNT))
         fps = int(video.get(cv2.CAP_PROP_FPS))
         width = int(video.get(cv2.CAP_PROP_FRAME_WIDTH))
         height = int(video.get(cv2.CAP_PROP_FRAME_HEIGHT))
         video.release()
+
+        if not crop_enabled:
+            return VideoInfo(video_path=self.video_path,
+                             fps=fps,
+                             frame_count=frame_count,
+                             width=width,
+                             height=height)
 
         if black_remove_algorithm is None:
             return VideoInfo(video_path=self.video_path,

@@ -14,8 +14,13 @@ from src.utils import singleton
 class TaskResumerManager:
     def __init__(self):
         self._resume_file_path: Path = RESUME_FILE
-        self._current_task: TaskResumer | None = None
         self._task_list: list[TaskResumer] = []
+
+        if self.finished:
+            self.clear()
+            self.save()
+        else:
+            self.load()
 
     @property
     def resume_file_path(self) -> Path:
@@ -24,10 +29,6 @@ class TaskResumerManager:
     @resume_file_path.setter
     def resume_file_path(self, value: Path):
         self._resume_file_path = value
-
-    @property
-    def current_task(self) -> TaskResumer | None:
-        return self._current_task
 
     @property
     def task_list(self) -> list[TaskResumer]:
@@ -82,5 +83,4 @@ class TaskResumerManager:
     def clear(self):
         """清空任务"""
         self._task_list.clear()
-        self.save()
         loguru.logger.debug("清空任务恢复文件")

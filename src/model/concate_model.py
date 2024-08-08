@@ -4,51 +4,36 @@ import loguru
 from PySide6.QtCore import QObject
 
 from src.common.program_coordinator import ProgramCoordinator
+from src.config import cfg
 from src.core.enums import Orientation, Rotation
 from src.signal_bus import SignalBus
-from src.utils import ForceStopThread, TempDir
-
-signal_bus = SignalBus()
-temp_dir = TempDir()
-TEMP_DIR = temp_dir.get_temp_dir()
+from src.utils import ForceStopThread
 
 
 class Worker(QObject):
     def __init__(self):
         super().__init__()
-        self.is_running: bool = False
-        self.is_merging: bool = False
-
         self._signal_bus = SignalBus()
         self._program_coordinator = ProgramCoordinator()
 
-        self._signal_bus.set_running.connect(self.set_running)
-
     def start(self, video_list: list[Path], video_orientation: Orientation, video_rotation: Rotation):
         self._program_coordinator.process(video_list, video_orientation, video_rotation)
-
-    def set_running(self, flag: bool):
-        self.is_running = flag
 
 
 class ConcateModel:
     def __init__(self):
         self._signal_bus = SignalBus()
-        self._force_stop_thread = ForceStopThread()
         self._worker = Worker()
+        self._force_stop_thread = ForceStopThread()
 
     @property
-    def is_running(self):
-        return self._worker.is_running
+    def merge_video_enabled(self) -> bool:
+        return cfg.get(cfg.merge_video)
 
-    @property
-    def is_merging(self):
-        return self._worker.is_merging
-
-    def set_running(self, flag: bool):
-        self._signal_bus.set_running.emit(flag)
-        if flag is False:
-            self._force_stop_thread.stop_task()
+    def kill_thread(self):
+        self._signal_bus.set_running.emit(False)
+        self._force_stop_thread.stop_task()
+        loguru.logger.info('程序被强制停止')
 
     def start(self, video_list: list[str | Path], video_orientation: Orientation, video_rotation: Rotation):
         video_list: list[Path] = [Path(video) for video in video_list if Path(video).exists()]
