@@ -78,6 +78,9 @@ class SettingView(MessageBaseView):
                                                   self.general_group)
 
         # 视频质量
+        self.video_auto_cut = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频自动剪辑",
+                                                "自动剪裁掉所有视频中没有声音的片段，适合各类访谈视频",
+                                                cfg.video_auto_cut, self.video_group)
         self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
                                              cfg.deband, self.video_group)
@@ -91,9 +94,10 @@ class SettingView(MessageBaseView):
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_resolution_card = ComboBoxSettingCard(cfg.video_resolution, Icon(FluentIcon.CHEVRON_RIGHT),
-                                                        "输出视频分辨率",
-                                                        "调整输出视频的分辨率，所有输出的视频都会被调整，您也可以选择关闭",
-                                                         ["最佳分辨率", "480P", "720P", "1080P", "1440P", "2160P", "4320P"],
+                                                         "输出视频分辨率",
+                                                         "调整输出视频的分辨率，所有输出的视频都会被调整，您也可以选择关闭",
+                                                         ["最佳分辨率", "480P", "720P", "1080P", "1440P", "2160P",
+                                                                 "4320P"],
                                                          self.video_group)
         self.video_black_border_algorithm_card = ComboBoxSettingCard(cfg.video_black_border_algorithm,
                                                                      Icon(FluentIcon.CHEVRON_RIGHT),
@@ -182,6 +186,7 @@ class SettingView(MessageBaseView):
 
         output_file_path = cfg.get(cfg.output_dir)
         self.output_dir_path_card.setToolTip(f'当前输出文件夹路径为: {output_file_path}')
+        self.video_auto_cut.setToolTip("自动识别视频内没有声音的片段，进行加速")
         self.audio_noise_reduction_card.setToolTip(
                 "降低音频中的底噪,杂音,爆音等异常声音,建议使用AI模型分析,速度快效果好")
         self.video_noise_reduction_card.setToolTip(
@@ -195,9 +200,11 @@ class SettingView(MessageBaseView):
         self.white_balance_card.setToolTip(
                 "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确(此功能仅在OpenCV模式下可用)")
         self.brightness_contrast_card.setToolTip(
-            "根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗(此功能仅在OpenCV模式下可用)")
+                "根据每一帧画面的明亮程度进行修改,不会让画面过亮或者过暗(此功能仅在OpenCV模式下可用)")
         self.video_fps_card.setToolTip(
                 "调整输出视频的帧率,默认为30fps,帧率距离原始视频帧率过高或者过低都有可能出现未知的异常")
+        self.video_resolution_card.setToolTip(
+                "最佳分辨率能使合成之后视频的黑边最少，但是会分析视频的时间")
         self.video_sample_rate_card.setToolTip(
                 '静态去黑边会从视频内读取一定数量的帧,然后通过这些帧计算出黑边的位置,然后进行拟合,数值越大效果越好,但是速度越慢')
         self.scaling_quality_card.setToolTip(
@@ -237,6 +244,7 @@ class SettingView(MessageBaseView):
                 self.update_card
                 ])
         self.video_group.addSettingCards([
+                self.video_auto_cut,
                 self.deband_card,
                 self.deblock_card,
                 self.shake_card,

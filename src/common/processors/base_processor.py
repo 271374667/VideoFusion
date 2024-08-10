@@ -33,6 +33,8 @@ class OpenCVProcessor(BaseProcessor):
 
 
 class FFmpegProcessor(BaseProcessor):
+    is_enable: bool = True
+
     @abstractmethod
     def process(self, ffmpeg_dto: list[FFmpegDTO]) -> list[FFmpegDTO]:
         """
@@ -48,6 +50,8 @@ class FFmpegProcessor(BaseProcessor):
 
 
 class EXEProcessor(BaseProcessor):
+    is_enable: bool = True
+
     @abstractmethod
     def process(self, input_file_path: Path) -> Path:
         """

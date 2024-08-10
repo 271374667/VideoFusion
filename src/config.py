@@ -176,6 +176,7 @@ class Config(QConfig):
 
     # 视频质量
     output_dir = ConfigItem("Video", "输出文件路径", str(OUTPUT_DIR), OutputDirValidator())
+    video_auto_cut = ConfigItem("Video", "自动剪辑", False, BoolValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())

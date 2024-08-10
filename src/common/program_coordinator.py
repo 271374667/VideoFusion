@@ -55,10 +55,6 @@ class ProgramCoordinator:
         is_merge: bool = cfg.get(cfg.merge_video)
         crop_enable = is_merge
         for each_path in input_video_path_list:
-            resolution_mode: VideoResolution = cfg.get(cfg.video_resolution)
-            if resolution_mode != VideoResolution.Auto:
-                crop_enable = False
-
             video_info = VideoInfoReader(each_path).get_video_info(black_remove_algorithm_impl, crop_enable)
             loguru.logger.debug(video_info)
             video_info_list.append(video_info)

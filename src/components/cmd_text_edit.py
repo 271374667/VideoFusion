@@ -68,9 +68,6 @@ class CMDTextEdit(QWidget):
 
     def __init__(self, parent=None):
         super().__init__()
-        # 是否重定向print以及所有的系统输出到loguru
-        self.redirect_print: bool = False
-
         self.setObjectName("cmd_text_edit")
         self._ansi2html_converter = Ansi2HTMLConverter()
 
@@ -94,6 +91,8 @@ class CMDTextEdit(QWidget):
 
     @redirect_print.setter
     def redirect_print(self, value: bool) -> None:
+        """没事不要调用这个方法，会导致其他的sys.stdout和sys.stderr失效
+        """
         self._redirect_print = value
         if value:
             sys.stdout = LoguruStream()

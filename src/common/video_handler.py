@@ -4,6 +4,7 @@ import cv2
 
 from src.common.ffmpeg_handler import FFmpegHandler
 from src.common.processors.audio_processors.audio_processor_manager import AudioProcessorManager
+from src.common.processors.exe_processors.exe_processor_manager import EXEProcessorManager
 from src.common.processors.opencv_processors.opencv_processor_manager import OpenCVProcessorManager
 from src.common.processors.processor_global_var import ProcessorGlobalVar
 from src.common.video_engines.ffmpeg_video_engine import FFmpegVideoEngine
@@ -23,6 +24,7 @@ class VideoHandler:
         self._ffmpeg_video_engine: FFmpegVideoEngine = FFmpegVideoEngine()
         self._audio_processor_manager: AudioProcessorManager = AudioProcessorManager()
         self._video_processor_manager: OpenCVProcessorManager = OpenCVProcessorManager()
+        self._exe_processor_manager: EXEProcessorManager = EXEProcessorManager()
         self._processor_global_var: ProcessorGlobalVar = ProcessorGlobalVar()
         self.is_running: bool = True
 
@@ -37,6 +39,7 @@ class VideoHandler:
         else:
             raise ValueError(f"不支持的视频处理引擎{engine_type}")
 
+        video_after_processed = self._exe_processor_manager.process(video_after_processed)
         return video_after_processed
 
     def merge_videos(self, video_list: list[Path]) -> Path:
