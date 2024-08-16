@@ -10,6 +10,7 @@ IMAGES_DIR = ASSETS_DIR / "images"
 BIN_DIR = ROOT / "bin"
 TEMP_DIR = ROOT / "Temp"
 OUTPUT_DIR = ROOT / "output"
+MODELS_DIR = ROOT / "models"
 
 # FILE
 OUTPUT_FILE = ROOT / "output.mp4"

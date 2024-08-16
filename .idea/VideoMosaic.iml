@@ -7,12 +7,18 @@
       <excludeFolder url="file://$MODULE_DIR$/output" />
       <excludeFolder url="file://$MODULE_DIR$/Temp" />
       <excludeFolder url="file://$MODULE_DIR$/tests/test_data" />
+      <excludeFolder url="file://$MODULE_DIR$/models" />
     </content>
-    <orderEntry type="jdk" jdkName="Python 3.10 (VideoFusion)" jdkType="Python SDK" />
+    <orderEntry type="inheritedJdk" />
     <orderEntry type="sourceFolder" forTests="false" />
   </component>
+  <component name="PackageRequirementsSettings">
+    <option name="requirementsPath" value="E:\load\python\Project\VideoFusion\requirements.txt" />
+    <option name="modifyBaseFiles" value="true" />
+  </component>
   <component name="PyDocumentationSettings">
-    <option name="format" value="PLAIN" />
-    <option name="myDocStringFormat" value="Plain" />
+    <option name="format" value="GOOGLE" />
+    <option name="myDocStringFormat" value="Google" />
+    <option name="renderExternalDocumentation" value="true" />
   </component>
 </module>

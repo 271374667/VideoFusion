@@ -30,6 +30,16 @@ class FFmpegHandler:
             loguru.logger.error(f"FFmpeg文件不存在: {self._ffmpeg_path}")
             raise FileNotFoundError(f"FFmpeg文件不存在: {self._ffmpeg_path}")
 
+    @staticmethod
+    def get_video_total_frame(video_path: Path) -> int:
+        cap = cv2.VideoCapture(str(video_path))
+        if not cap.isOpened():
+            raise ValueError("无法打开视频")
+
+        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        cap.release()
+        return total_frame
+
     def reencode_video(self, input_file_path: Path) -> Path:
         """
         重新编译指定的视频文件。
@@ -286,15 +296,6 @@ class FFmpegHandler:
         formats = re.findall(r'D\s+([a-zA-Z0-9]+)', result.stdout)
         return [f'.{fmt}' for fmt in formats]
 
-    def get_video_total_frame(self, video_path: Path) -> int:
-        cap = cv2.VideoCapture(str(video_path))
-        if not cap.isOpened():
-            raise ValueError("无法打开视频")
-
-        total_frame = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        cap.release()
-        return total_frame
-
     def run_command(self, command: str, progress_total: int = 0):
         if not command:
             raise ValueError("命令不能为空")
@@ -409,7 +410,7 @@ if __name__ == '__main__':
 
     f = FFmpegHandler()
     print(f.extract_audio_from_video(
-            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")))
+            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\测试\去黑边\视频  (3).mp4")))
     # print(f.reencode_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,

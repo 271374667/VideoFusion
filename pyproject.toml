@@ -1,7 +1,7 @@
 [project]
 name = "videomosaic"
 version = "0.1.0"
-description = "Add your description here"
+description = "一站式短视频拼接软件 无依赖,点击即用,自动去黑边,自动帧同步,自动调整分辨率,批量变更视频为横屏/竖屏"
 authors = [
     { name = "PythonImporter", email = "271374667@qq.com" }
 ]
@@ -9,10 +9,11 @@ dependencies = [
     "pyside6-fluent-widgets>=1.5.6",
     "ansi2html>=1.9.1",
     "loguru>=0.7.2",
-    "numpy>=1.26.4",
     "opencv-contrib-python>=4.10.0.84",
     "typing-extensions>=4.12.2",
     "auto-editor>=24.31.1",
+    "audio-separator[cpu]>=0.18.3",
+    "noisereduce>=3.0.2",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -30,6 +31,14 @@ dev-dependencies = [
 [[tool.rye.sources]]
 name = "default"
 url = "https://pypi.tuna.tsinghua.edu.cn/simple"
+
+[[tool.rye.sources]]
+name = "pypi"
+url = "https://pypi.org/simple"
+
+[[tool.rye.sources]]
+name = "pytorch"
+url = "https://download.pytorch.org/whl/cu121"
 
 [tool.hatch.metadata]
 allow-direct-references = true

@@ -1,5 +1,6 @@
 import sys
 
+import loguru
 from PySide6.QtCore import QObject, Signal
 
 from src.utils import singleton
@@ -36,6 +37,7 @@ class SystemMessageRedirect:
 
     def write(self, message):
         self._signal_bus.system_message.emit(message)
+        loguru.logger.debug(message)
         sys.__stdout__.write(message)
 
     def flush(self):
@@ -43,3 +45,4 @@ class SystemMessageRedirect:
 
 
 sys.stdout = SystemMessageRedirect()
+sys.stderr = SystemMessageRedirect()

@@ -84,6 +84,7 @@ class AutoEditProcessor(EXEProcessor):
         self._signal_bus.set_detail_progress_max.emit(100)
         edit_media(paths, ffmpeg, args, str(temp), log)
         loguru.logger.success(f"视频剪辑完成，输出文件为: {output_file}")
+        self._signal_bus.set_detail_progress_finish.emit()
         return output_file
 
 

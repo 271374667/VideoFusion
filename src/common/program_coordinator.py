@@ -29,6 +29,7 @@ class ProgramCoordinator:
         self._processor_global_var = ProcessorGlobalVar()
         self._video_handler = VideoHandler()
 
+    @loguru.logger.catch(reraise=True)
     def process(self, input_video_path_list: list[Path], orientation: Orientation, rotation: Rotation) -> Path | None:
         # sourcery skip: low-code-quality
         self._processor_global_var.clear()
@@ -53,9 +54,8 @@ class ProgramCoordinator:
         video_info_list: list[VideoInfo] = []
         finished_video_path_list: list[Path] = []
         is_merge: bool = cfg.get(cfg.merge_video)
-        crop_enable = is_merge
         for each_path in input_video_path_list:
-            video_info = VideoInfoReader(each_path).get_video_info(black_remove_algorithm_impl, crop_enable)
+            video_info = VideoInfoReader(each_path).get_video_info(black_remove_algorithm_impl)
             loguru.logger.debug(video_info)
             video_info_list.append(video_info)
 
@@ -95,8 +95,10 @@ class ProgramCoordinator:
         self._signal_bus.set_total_progress_finish.emit()
         self._signal_bus.set_detail_progress_finish.emit()
         self._signal_bus.finished.emit()
+        self._signal_bus.finished.emit()
+
         loguru.logger.info(
-                f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
+            f'程序执行完成一共处理{len(input_video_path_list)}个视频,耗时: {time.time() - self._start_time}秒')
         self._task_resumer_manager.save()
         return output_dir
 
@@ -213,9 +215,9 @@ class ProgramCoordinator:
 if __name__ == '__main__':
     p = ProgramCoordinator()
     print(p.process([
-            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\other\video_2024-03-04_16-55-20.mp4"),
-            Path(r"E:\load\python\Project\VideoFusion\测试\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")
-            ],
+        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\other\video_2024-03-04_16-55-20.mp4"),
+        Path(r"E:\load\python\Project\VideoFusion\测试\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")
+    ],
 
-            Orientation.HORIZONTAL,
-            Rotation.CLOCKWISE))
+        Orientation.HORIZONTAL,
+        Rotation.CLOCKWISE))

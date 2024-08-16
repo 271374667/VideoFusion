@@ -45,6 +45,7 @@ class SettingView(MessageBaseView):
         self.general_group = SettingCardGroup("通用", self.scroll_widget)
         self.video_group = SettingCardGroup("视频", self.scroll_widget)
         self.opencv_only_group = SettingCardGroup("OpenCV模式下专属", self.scroll_widget)
+        self.ai_group = SettingCardGroup("AI功能", self.scroll_widget)
 
     def _create_card(self):
         # 全局设置
@@ -78,9 +79,6 @@ class SettingView(MessageBaseView):
                                                   self.general_group)
 
         # 视频质量
-        self.video_auto_cut = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频自动剪辑",
-                                                "自动剪裁掉所有视频中没有声音的片段，适合各类访谈视频",
-                                                cfg.video_auto_cut, self.video_group)
         self.deband_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去色带",
                                              "色带是指画面中出现的一种颜色条纹,如果视频本身画面有色带,请尝试勾选此选项,否则可能会导致画面失真",
                                              cfg.deband, self.video_group)
@@ -88,9 +86,8 @@ class SettingView(MessageBaseView):
                                               "色块是指画面中出现的一种颜色块,如果视频本身画面有色块,请尝试勾选此选项,否则可能会导致画面失真",
                                               cfg.deblock, self.video_group)
         self.shake_card = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频去抖动",
-                                            "如果视频本身视角转动过快会导致画面大幅无规律异常抖动,请谨慎使用",
+                                            "通过在视频边缘加上黑边,使视频主体稳定在视频中心,请谨慎使用",
                                             cfg.shake, self.video_group)
-
         self.video_fps_card = RangeSettingCard(cfg.video_fps, Icon(FluentIcon.CHEVRON_RIGHT), "输出视频帧率",
                                                "调整输出视频的帧率,默认为30fps", self.video_group)
         self.video_resolution_card = ComboBoxSettingCard(cfg.video_resolution, Icon(FluentIcon.CHEVRON_RIGHT),
@@ -172,6 +169,24 @@ class SettingView(MessageBaseView):
                                                                    ["关闭", "ESPCN(速度快)", "LAPSRN(效果好)"],
                                                                    self.opencv_only_group)
 
+        # AI 功能
+        self.video_auto_cut = SwitchSettingCard(Icon(FluentIcon.CHEVRON_RIGHT), "视频自动剪辑",
+                                                "自动剪裁掉所有视频中没有声音的片段，适合各类访谈视频",
+                                                cfg.video_auto_cut, self.ai_group)
+        self.audio_separation_algorithm_card = ComboBoxSettingCard(cfg.audio_separation_algorithm,
+                                                                   Icon(FluentIcon.CHEVRON_RIGHT),
+                                                                   "AI 视频人声分离算法",
+                                                                   "音频背景分离算法,可以将视频中的人声和背景音乐分离,提取出完整的人声或者背景音乐,适合访谈类节目,需要安静的人声,或者想提取KTV伴奏的需求",
+                                                                   ["关闭",
+                                                                           "UVRMDXNETVocFT-人声(速度快)",
+                                                                           "UVRMDXNETVocFT-背景音乐(速度快)",
+                                                                           "MDX23C-人声(速度慢,效果好)",
+                                                                           "MDX23C-背景音乐(速度慢,效果好)",
+                                                                           "BsRoformer-人声(速度最慢,效果最好)",
+                                                                           "BsRoformer-背景音乐(速度最慢,效果最好)"
+                                                                           ],
+                                                                   self.ai_group)
+
     def _set_up_tooltip(self):
         ffmpeg_file_path = cfg.get(cfg.ffmpeg_file)
         self.ffmpeg_file_card.setToolTip(f'当前FFmpeg路径为: {ffmpeg_file_path}')
@@ -197,6 +212,8 @@ class SettingView(MessageBaseView):
         self.deblock_card.setToolTip(
                 '<html><head/><body><p><img src=":/tooltip/images/tooltip/Deblocking.png"/></p></body></html>')
         self.shake_card.setToolTip("实验性功能")
+        self.audio_separation_algorithm_card.setToolTip(
+                "模型后面标明人声表示只提取人声而去除背景音乐,背景音乐表示只提取背景音乐")
         self.white_balance_card.setToolTip(
                 "白平衡的调整可以消除由于光源色温不同而引起的色偏，使得图像的颜色更加自然和准确(此功能仅在OpenCV模式下可用)")
         self.brightness_contrast_card.setToolTip(
@@ -227,6 +244,7 @@ class SettingView(MessageBaseView):
         self.expand_layout.addWidget(self.general_group)
         self.expand_layout.addWidget(self.video_group)
         self.expand_layout.addWidget(self.opencv_only_group)
+        self.expand_layout.addWidget(self.ai_group)
         self.scroll_widget.setLayout(self.expand_layout)
         self.expand_layout.setSpacing(28)
         self.expand_layout.setContentsMargins(60, 10, 60, 0)
@@ -244,7 +262,6 @@ class SettingView(MessageBaseView):
                 self.update_card
                 ])
         self.video_group.addSettingCards([
-                self.video_auto_cut,
                 self.deband_card,
                 self.deblock_card,
                 self.shake_card,
@@ -265,6 +282,11 @@ class SettingView(MessageBaseView):
                 self.white_balance_card,
                 self.brightness_contrast_card,
                 self.super_resolution_algorithm_card
+                ])
+
+        self.ai_group.addSettingCards([
+                self.video_auto_cut,
+                self.audio_separation_algorithm_card
                 ])
 
     def _initialize(self) -> None:

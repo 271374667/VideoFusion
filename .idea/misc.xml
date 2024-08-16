@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="Black">
-    <option name="sdkName" value="Python 3.10 (VideoMosaic)" />
+    <option name="pathToExecutable" value="D:\Applications\Scoop\apps\anaconda3\current\App\Scripts\black.exe" />
+    <option name="sdkName" value="Python 3.10 (VideoFusion)" />
   </component>
   <component name="ProjectRootManager" version="2" project-jdk-name="Python 3.10 (VideoFusion)" project-jdk-type="Python SDK" />
 </project>

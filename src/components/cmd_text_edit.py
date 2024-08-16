@@ -68,6 +68,7 @@ class CMDTextEdit(QWidget):
 
     def __init__(self, parent=None):
         super().__init__()
+        self._redirect_print: bool = False
         self.setObjectName("cmd_text_edit")
         self._ansi2html_converter = Ansi2HTMLConverter()
 

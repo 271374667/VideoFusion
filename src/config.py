@@ -116,6 +116,17 @@ class VideoResolution(Enum):
     P4320 = 6
 
 
+# 人声提取算法
+class AudioSeparationAlgorithm(Enum):
+    Disable = 0
+    UVRMDXNETVocFTVocal = 1
+    UVRMDXNETVocFTInstructment = 2
+    MDX23CVocal = 3
+    MDX23CInstructment = 4
+    BsRoformerVocal = 5
+    BsRoformerInstructment = 6
+
+
 class OutputFileValidator(ConfigValidator):
     """ Config validator """
 
@@ -176,7 +187,6 @@ class Config(QConfig):
 
     # 视频质量
     output_dir = ConfigItem("Video", "输出文件路径", str(OUTPUT_DIR), OutputDirValidator())
-    video_auto_cut = ConfigItem("Video", "自动剪辑", False, BoolValidator())
     shake = ConfigItem("Video", "视频去抖动", False, BoolValidator())
     deband = ConfigItem("Video", "视频去色带", False, BoolValidator())
     deblock = ConfigItem("Video", "视频去色块", False, BoolValidator())
@@ -210,6 +220,13 @@ class Config(QConfig):
     super_resolution_algorithm = OptionsConfigItem("OpenCV", "超分辨率算法", SuperResolutionAlgorithm.Disable,
                                                    OptionsValidator(SuperResolutionAlgorithm),
                                                    EnumSerializer(SuperResolutionAlgorithm))
+
+    # AI功能
+    video_auto_cut = ConfigItem("AI", "自动剪辑", False, BoolValidator())
+    audio_separation_algorithm = OptionsConfigItem("AI", "人声分离算法", AudioSeparationAlgorithm.Disable,
+                                                   OptionsValidator(AudioSeparationAlgorithm),
+                                                   EnumSerializer(AudioSeparationAlgorithm))
+
 
 
 cfg = Config()
