@@ -1,6 +1,9 @@
 import re
 
-from PySide6.QtWidgets import QApplication, QLabel, QStackedWidget, QWidget
+import loguru
+from PySide6.QtCore import Qt
+from PySide6.QtGui import QKeyEvent
+from PySide6.QtWidgets import QApplication, QLabel, QStackedWidget, QWidget, QAbstractItemView
 from qfluentwidgets import ToolTipFilter
 from qfluentwidgets.components import (BodyLabel, ComboBox, PrimaryPushButton, ProgressBar, PushButton,
                                        RadioButton, SegmentedWidget, SimpleCardWidget)
@@ -63,7 +66,7 @@ class ConcateView(MessageBaseView):
     def get_video_file_list_simple_card_widget(self) -> SimpleCardWidget:
         return self.ui.SimpleCardWidget
 
-    def get_video_file_list(self) -> DraggableListWidget:
+    def get_video_file_list_widget(self) -> DraggableListWidget:
         return self.ui.listWidget
 
     def get_select_video_btn(self) -> PushButton:
@@ -229,6 +232,17 @@ class ConcateView(MessageBaseView):
         max_value: int = max(self._current_detail_progress_max, 1)
         self.get_detail_progress_percent_lb().setText(f"{min(current_value / max_value, 100):.2%}")
         self.get_detail_progress_current_value_lb().setText(str(min(current_value, max_value)))
+
+    def keyPressEvent(self, event: QKeyEvent) -> None:
+        if event.key() == Qt.Key.Key_Control:
+            self.get_video_file_list_widget().get_draggable_list_view().setSelectionMode(QAbstractItemView.SelectionMode.MultiSelection)
+        if event.key() in [Qt.Key.Key_Backspace, Qt.Key.Key_Delete]:
+            if current_item := self.get_video_file_list_widget().get_draggable_list_view().currentItem():
+                row = self.get_video_file_list_widget().get_draggable_list_view().row(current_item)
+                self.get_video_file_list_widget().get_draggable_list_view().takeItem(row)
+                loguru.logger.debug(f"删除了一个文件: {current_item.text()}")
+
+        super().keyPressEvent(event)
 
     def _initialize(self) -> None:
         def on_preview_image():

@@ -53,7 +53,6 @@ class ProgramCoordinator:
         black_remove_algorithm_impl = self._get_black_remove_algorithm()
         video_info_list: list[VideoInfo] = []
         finished_video_path_list: list[Path] = []
-        is_merge: bool = cfg.get(cfg.merge_video)
         for each_path in input_video_path_list:
             video_info = VideoInfoReader(each_path).get_video_info(black_remove_algorithm_impl)
             loguru.logger.debug(video_info)
@@ -218,6 +217,4 @@ if __name__ == '__main__':
         Path(r"E:\load\python\Project\VideoFusion\TempAndTest\other\video_2024-03-04_16-55-20.mp4"),
         Path(r"E:\load\python\Project\VideoFusion\测试\dy\b7bb97e21600b07f66c21e7932cb7550.mp4")
     ],
-
-        Orientation.HORIZONTAL,
-        Rotation.CLOCKWISE))
+))

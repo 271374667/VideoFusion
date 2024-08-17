@@ -124,9 +124,9 @@ class DraggableListWidget(QWidget):
         self.move2bottom_action.triggered.connect(self.moveToBottom)
         self.remove_action = Action()
         self.remove_action.setIcon(FluentIcon.CLOSE)
+        self.remove_action.setText("删除")
         self.remove_action.triggered.connect(self.removeCurrent)
 
-        self.remove_action.setText("删除")
         self.clear_list_action = Action()
         self.clear_list_action.setIcon(FluentIcon.DELETE)
         self.clear_list_action.setText("清空")

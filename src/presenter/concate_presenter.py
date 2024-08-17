@@ -46,15 +46,15 @@ class ConcatePresenter:
             video_orientation = Orientation.VERTICAL
 
         rotation2cn: dict[Rotation, str] = {
-                Rotation.CLOCKWISE: "顺时针旋转90°",
-                Rotation.COUNTERCLOCKWISE: "逆时针旋转90°",
-                Rotation.UPSIDE_DOWN: "上下颠倒",
-                Rotation.NOTHING: "什么都不做"
-                }
+            Rotation.CLOCKWISE: "顺时针旋转90°",
+            Rotation.COUNTERCLOCKWISE: "逆时针旋转90°",
+            Rotation.UPSIDE_DOWN: "上下颠倒",
+            Rotation.NOTHING: "什么都不做"
+        }
 
         cn2rotation: dict[str, Rotation] = {
-                v: k for k, v in rotation2cn.items()
-                }
+            v: k for k, v in rotation2cn.items()
+        }
         video_rotation = cn2rotation[self.get_view().get_rotate_video_cb().currentText()]
         video_engine: VideoProcessEngine = cfg.get(cfg.video_process_engine)
         self._task_resumer_manager = TaskResumerManager(video_engine, video_orientation, video_rotation)
@@ -73,8 +73,8 @@ class ConcatePresenter:
                 not self._model.merge_video_enabled
                 and uncompleted_task_list
                 and self.get_view().show_mask_dialog(
-                "恢复上一次的任务", "您的上一次任务还未完成,是否继续上一次的任务?"
-                )
+            "恢复上一次的任务", "您的上一次任务还未完成,是否继续上一次的任务?"
+        )
         ):
             video_list = [x.input_video_path for x in uncompleted_task_list if x.input_video_path.exists()]
             self.get_view().show_info_infobar("提示", "上一次的任务已经完成,开始新的任务", 3000)
@@ -117,7 +117,7 @@ class ConcatePresenter:
         self.get_view().get_video_file_list_simple_card_widget().setEnabled(start_btn_enable)
 
     def get_all_video_files(self) -> list[str]:
-        return self.get_view().get_video_file_list().get_draggable_list_view().get_all_items()
+        return self.get_view().get_video_file_list_widget().get_draggable_list_view().get_all_items()
 
     def _select_video_files(self):
         # 能够多选视频文件
@@ -129,17 +129,17 @@ class ConcatePresenter:
         file_dialog.setViewMode(QFileDialog.ViewMode.List)
 
         target_dir = self._temp_dir.get_temp_dir()
-        if current_item := self.get_view().get_video_file_list().get_current_item_text():
+        if current_item := self.get_view().get_video_file_list_widget().get_current_item_text():
             target_dir = Path(current_item).parent
         file_dialog.setDirectory(str(target_dir))
 
         if file_dialog.exec():
             file_paths = file_dialog.selectedFiles()
-            self.get_view().get_video_file_list().add_items(file_paths)
+            self.get_view().get_video_file_list_widget().add_items(file_paths)
             loguru.logger.debug(f"本次一共选择了{len(file_paths)}个文件: {file_paths}")
 
     def _on_video_clicked(self):
-        current_item: str = self.get_view().get_video_file_list().get_current_item_text()
+        current_item: str = self.get_view().get_video_file_list_widget().get_current_item_text()
         if not current_item or not Path(current_item).is_file():
             return
 
@@ -165,7 +165,7 @@ class ConcatePresenter:
 
     def _on_video_drop(self):
         # 获取列表中的第一个视频文件
-        video_list = self.get_view().get_video_file_list().get_draggable_list_view()
+        video_list = self.get_view().get_video_file_list_widget().get_draggable_list_view()
         first_video_path: str = video_list.get_all_items()[0]
         if not video_list.count():
             self.get_view().show_warning_infobar("错误", "您还没有添加任何视频文件")
@@ -180,6 +180,10 @@ class ConcatePresenter:
             if not self._black_remover.is_black(frame):
                 break
         self._show_frame_on_label(cap, '显示第一帧: ', first_video_path)
+
+    def _activate_drop_list_view(self):
+        self.get_view().get_video_file_list_widget().get_draggable_list_view().setFocus()
+        print("激活列表视图")
 
     # 图片预览
     def _show_first_frame(self):
@@ -202,10 +206,10 @@ class ConcatePresenter:
         self._show_frame(frame_selector)
 
     def _show_frame(self, frame_selector):
-        if not (current_item := self.get_view().get_video_file_list().currentItem()):
+        if not (current_item := self.get_view().get_video_file_list_widget().currentItem()):
             return
         video_path = current_item.text()
-        self.get_view().get_video_file_list().setEnabled(False)
+        self.get_view().get_video_file_list_widget().setEnabled(False)
 
         def start():
             cap = cv2.VideoCapture(video_path)
@@ -214,7 +218,7 @@ class ConcatePresenter:
 
         def finished(cap):
             self._show_frame_on_label(cap, '显示帧: ', video_path)
-            self.get_view().get_video_file_list().setEnabled(True)
+            self.get_view().get_video_file_list_widget().setEnabled(True)
 
         self._run_in_thread = RunInThread()
         self._run_in_thread.set_start_func(start)
@@ -302,7 +306,8 @@ class ConcatePresenter:
 
     def _connect_signal(self):
         self.get_view().get_select_video_btn().clicked.connect(self._select_video_files)
-        self.get_view().get_video_file_list().get_draggable_list_view().itemClicked.connect(self._on_video_clicked)
+        self.get_view().get_video_file_list_widget().get_draggable_list_view().itemClicked.connect(
+            self._on_video_clicked)
         self.get_view().get_clockwise_rotate_btn().clicked.connect(self._rotate_clockwise)
         self.get_view().get_counterclockwise_rotate_btn().clicked.connect(self._rotate_counterclockwise)
         self.get_view().get_upside_down_rotate_btn().clicked.connect(self._rotate_upsidedown)
@@ -311,8 +316,11 @@ class ConcatePresenter:
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
         self._signal_bus.failed.connect(self._show_failed_infobar)
-        self.get_view().get_video_file_list().remove_action.triggered.connect(
-                lambda: self._on_video_clicked())
+        self.get_view().get_video_file_list_widget().get_draggable_list_view().itemClicked.connect(
+            self._activate_drop_list_view)
+        self._signal_bus.file_droped.connect(self._activate_drop_list_view)
+        self.get_view().get_video_file_list_widget().remove_action.triggered.connect(
+            lambda: self._on_video_clicked())
 
 
 if __name__ == '__main__':
