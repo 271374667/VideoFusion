@@ -38,6 +38,7 @@ export default defineConfig({
           { text: '更新日志', link: '/CHANGLOG.md' },
           { text: '联系我', link: '/contact_me.md' },
           { text: '捐赠', link: '/donated.md' },
+          { text: '感谢', link: '/thanks.md' },
         ]
       }
     ],

@@ -8,7 +8,8 @@ from PySide6.QtWidgets import (QAbstractItemView, QApplication, QFileDialog, QLi
                                QVBoxLayout, QWidget)
 from qfluentwidgets import Action, FluentIcon, MenuAnimationType
 from qfluentwidgets.components import RoundMenu
-
+from src import settings
+from src import utils
 from src.signal_bus import SignalBus
 
 signal_bus = SignalBus()
@@ -24,7 +25,7 @@ class DraggableListWidgetView(QListWidget):
         self.setDragDropMode(QAbstractItemView.DragDropMode.InternalMove)
         self.setSelectionMode(QAbstractItemView.SelectionMode.SingleSelection)
 
-        self.video_suffix: list[str] = ['.mp4', '.avi', '.mov', '.flv', '.mkv', '.rmvb', '.wmv', '.webm', '.ts', '.m4v']
+        self.video_suffix: list[str] = settings.AVAILABLE_VIDEO_SUFFIX
 
     def get_all_items(self) -> list[str]:
         return [self.item(i).text() for i in range(self.count())]
@@ -58,13 +59,22 @@ class DraggableListWidgetView(QListWidget):
                     if file_path.endswith('.txt'):
                         txt = Path(file_path).read_text(encoding='utf-8').splitlines()
                         for line in txt:
+                            if not utils.is_available_video_file(line):
+                                loguru.logger.error(f"拖拽添加了一个不支持的文件: {line.strip()}")
+                                continue
                             self.addFileItem(line.strip().replace('"', ''))  # 去除引号
                             signal_bus.file_droped.emit(line.strip())
                             loguru.logger.debug(f"拖拽添加了一个文件: {line.strip()}")
                     elif file_path.endswith(tuple(self.video_suffix)):
+                        if not utils.is_available_video_file(file_path):
+                            loguru.logger.error(f"拖拽添加了一个不支持的文件: {file_path}")
+                            continue
                         self.addFileItem(file_path)
                         signal_bus.file_droped.emit(file_path)
                         loguru.logger.debug(f"拖拽添加了一个文件: {file_path}")
+                    else:
+                        loguru.logger.error(f"拖拽添加了一个不支持的文件: {file_path}")
+                        loguru.logger.debug(f"支持的视频格式: {self.video_suffix},以及一行一个视频文件的txt文件，同时确保文件大小大于{settings.READABLEVIDEOSIZE}kb")
             self.sortItems(Qt.SortOrder.AscendingOrder)
             event.acceptProposedAction()
         else:
@@ -194,11 +204,11 @@ class DraggableListWidget(QWidget):
         # 判断文件是否都是日期,如果是日期则按日期排序
         elif all(TIME_FILE_REGEX.match(x) for x in data):
             data.sort(key=lambda x: (
-                    int(TIME_FILE_REGEX.search(x).group(1)),
-                    int(TIME_FILE_REGEX.search(x).group(2),
-                        int(TIME_FILE_REGEX.search(x).group(3))
-                        )
+                int(TIME_FILE_REGEX.search(x).group(1)),
+                int(TIME_FILE_REGEX.search(x).group(2),
+                    int(TIME_FILE_REGEX.search(x).group(3))
                     )
+            )
                       )
             self._list_widget.set_items(data)
             loguru.logger.debug(f"按日期排序{len(data)}个文件")
@@ -222,11 +232,11 @@ class DraggableListWidget(QWidget):
         # 判断文件是否都是日期,如果是日期则按日期排序
         elif all(TIME_FILE_REGEX.match(x) for x in data):
             data.sort(reverse=True, key=lambda x: (
-                    int(TIME_FILE_REGEX.search(x).group(1)),
-                    int(TIME_FILE_REGEX.search(x).group(2),
-                        int(TIME_FILE_REGEX.search(x).group(3))
-                        )
+                int(TIME_FILE_REGEX.search(x).group(1)),
+                int(TIME_FILE_REGEX.search(x).group(2),
+                    int(TIME_FILE_REGEX.search(x).group(3))
                     )
+            )
                       )
             self._list_widget.set_items(data)
         else:

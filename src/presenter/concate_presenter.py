@@ -17,6 +17,7 @@ from src.core.paths import FFMPEG_FILE
 from src.model.concate_model import ConcateModel
 from src.signal_bus import SignalBus
 from src.utils import RunInThread, TempDir, trans_second_to_human_time
+from src import settings
 from src.view.concate_view import ConcateView
 
 
@@ -124,8 +125,7 @@ class ConcatePresenter:
         file_dialog = QFileDialog()
         file_dialog.setFileMode(QFileDialog.FileMode.ExistingFiles)
         file_dialog.setAcceptMode(QFileDialog.AcceptMode.AcceptOpen)
-        available_suffix: list[str] = ['.mp4', '.avi', '.mov', '.flv', '.mkv', '.rmvb', '.wmv', '.webm', '.ts', '.m4v']
-        file_dialog.setNameFilters([f"Video Files (*{suffix})" for suffix in available_suffix])
+        file_dialog.setNameFilters([f"Video Files (*{suffix})" for suffix in settings.AVAILABLE_VIDEO_SUFFIX])
         file_dialog.setViewMode(QFileDialog.ViewMode.List)
 
         target_dir = self._temp_dir.get_temp_dir()
@@ -180,10 +180,6 @@ class ConcatePresenter:
             if not self._black_remover.is_black(frame):
                 break
         self._show_frame_on_label(cap, '显示第一帧: ', first_video_path)
-
-    def _activate_drop_list_view(self):
-        self.get_view().get_video_file_list_widget().get_draggable_list_view().setFocus()
-        print("激活列表视图")
 
     # 图片预览
     def _show_first_frame(self):
@@ -316,9 +312,6 @@ class ConcatePresenter:
         self._signal_bus.file_droped.connect(lambda x: self._on_video_drop())
         self._signal_bus.finished.connect(self.finished)
         self._signal_bus.failed.connect(self._show_failed_infobar)
-        self.get_view().get_video_file_list_widget().get_draggable_list_view().itemClicked.connect(
-            self._activate_drop_list_view)
-        self._signal_bus.file_droped.connect(self._activate_drop_list_view)
         self.get_view().get_video_file_list_widget().remove_action.triggered.connect(
             lambda: self._on_video_clicked())
 

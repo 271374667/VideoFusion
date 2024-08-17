@@ -7,10 +7,10 @@ import cv2
 import loguru
 
 from src.config import AudioNoiseReduction, AudioSampleRate, FrameRateAdjustment, VideoCodec, cfg
-from src.core import FFMPEG_ERROR_WORDS
 from src.core.paths import FFMPEG_FILE, ROOT
 from src.signal_bus import SignalBus
 from src.utils import TempDir, get_output_file_path
+from src.settings import FFMPEG_ERROR_WORDS
 
 # ffmpeg的AI降噪模型需要在项目目录下运行
 os.chdir(ROOT)
@@ -81,7 +81,7 @@ class FFmpegHandler:
             video_filter.append(f"fps=fps={framerate}")
         elif frame_rate_adjustment_type == FrameRateAdjustment.MotionInterpolation:
             video_filter.append(
-                    f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
+                f"minterpolate='mi_mode=mci:mc_mode=aobmc:me_mode=bidir:mb_size=16:vsbmc=1:fps={framerate}'")
 
         command = self._get_ffmpeg_command(input_file_path,
                                            output_file_path,
@@ -151,7 +151,7 @@ class FFmpegHandler:
         has_audio: bool = self._check_audio_stream_with_ffmpeg(input_file_path)
         if not has_audio:
             self.run_command(
-                    f'"{self._ffmpeg_path}" -f lavfi -i anullsrc=r=44100:cl=stereo -t 10 "{output_file_path}"')
+                f'"{self._ffmpeg_path}" -f lavfi -i anullsrc=r=44100:cl=stereo -t 10 "{output_file_path}"')
             return output_file_path
         other_command = [' -vn -acodec pcm_s16le ']
         command = self._get_ffmpeg_command(input_file_path,
@@ -410,7 +410,7 @@ if __name__ == '__main__':
 
     f = FFmpegHandler()
     print(f.extract_audio_from_video(
-            Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\测试\去黑边\视频  (3).mp4")))
+        Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\测试\去黑边\视频  (3).mp4")))
     # print(f.reencode_video(Path(r"E:\load\python\Project\VideoFusion\TempAndTest\dy\v\【111.mp4")))
     # f.extract_audio_from_video(video_input_path)
     # f.replace_video_audio(video_input_path,
