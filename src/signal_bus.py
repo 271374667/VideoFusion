@@ -38,7 +38,6 @@ class SystemMessageRedirect:
     def write(self, message):
         self._signal_bus.system_message.emit(message)
         loguru.logger.debug(message)
-        sys.__stdout__.write(message)
 
     def flush(self):
         pass

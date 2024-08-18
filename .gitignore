@@ -239,3 +239,4 @@ vitepress_doc
 /bin/frame_interpolation/select.pyd
 /bin/frame_interpolation/unicodedata.pyd
 /bin/frame_interpolation/VCRUNTIME140.dll
+/nuitka-crash-report.xml
