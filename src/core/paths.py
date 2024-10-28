@@ -24,6 +24,7 @@ QRC_PY_FILE = ROOT / "resource_rc.py"
 LOG_FILE = ROOT / "log.log"
 ABOUT_HTML_FILE = ASSETS_DIR / "about.html"
 RESUME_FILE = ROOT / "task_resumer.json"
+AUDIO_SEPARATOR_EXE_FILE = BIN_DIR / 'audio_sep' / 'audio_sep.exe'
 
 # MODEL
 ESPCN_x2_FILE = BIN_DIR / "ESPCN_x2.pb"

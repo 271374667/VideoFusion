@@ -14,6 +14,8 @@ absl-py==2.1.0
     # via ml-collections
 ae-ffmpeg==1.2.0
     # via auto-editor
+altgraph==0.17.4
+    # via pyinstaller
 ansi2html==1.9.2
     # via videomosaic
 audio-separator==0.18.3
@@ -120,9 +122,10 @@ numpy==1.26.4
     # via scipy
     # via soxr
     # via torchvision
-onnx==1.16.2
+onnx==1.16.1
     # via audio-separator
     # via onnx2torch
+    # via videomosaic
 onnx2torch==1.5.15
     # via audio-separator
 onnxruntime==1.18.1
@@ -136,6 +139,10 @@ packaging==23.2
     # via matplotlib
     # via onnxruntime
     # via pooch
+    # via pyinstaller
+    # via pyinstaller-hooks-contrib
+pefile==2023.2.7
+    # via pyinstaller
 pillow==10.4.0
     # via matplotlib
     # via torchvision
@@ -152,6 +159,9 @@ pycparser==2.22
     # via cffi
 pydub==0.25.1
     # via audio-separator
+pyinstaller==6.10.0
+pyinstaller-hooks-contrib==2024.8
+    # via pyinstaller
 pyparsing==3.1.2
     # via matplotlib
 pyreadline3==3.4.1
@@ -171,6 +181,8 @@ python-dateutil==2.9.0.post0
     # via matplotlib
 pywin32==306
     # via pysidesix-frameless-window
+pywin32-ctypes==0.2.3
+    # via pyinstaller
 pyyaml==6.0.2
     # via audio-separator
     # via ml-collections
@@ -190,6 +202,9 @@ scipy==1.14.0
     # via librosa
     # via noisereduce
     # via scikit-learn
+setuptools==72.2.0
+    # via pyinstaller
+    # via pyinstaller-hooks-contrib
 shiboken6==6.7.2
     # via pyside6
     # via pyside6-addons

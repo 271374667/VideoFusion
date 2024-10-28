@@ -119,9 +119,10 @@ numpy==1.26.4
     # via scipy
     # via soxr
     # via torchvision
-onnx==1.16.2
+onnx==1.16.1
     # via audio-separator
     # via onnx2torch
+    # via videomosaic
 onnx2torch==1.5.15
     # via audio-separator
 onnxruntime==1.18.1

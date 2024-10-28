@@ -42,8 +42,6 @@ class AutoEditRedirect(QObject):
             if progress != self._pre_progress:
                 self._pre_progress = min(progress, 100)
                 self._signal_bus.set_detail_progress_current.emit(int(self._pre_progress))
-        sys.__stdout__.write(message)
-        sys.__stdout__.flush()
 
     def flush(self):
         pass

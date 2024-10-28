@@ -5,6 +5,7 @@ build/
 dist/
 wheels/
 *.egg-info
+audio_sep
 
 # venv
 .venv
@@ -240,3 +241,4 @@ vitepress_doc
 /bin/frame_interpolation/unicodedata.pyd
 /bin/frame_interpolation/VCRUNTIME140.dll
 /nuitka-crash-report.xml
+/VideoFusion.spec

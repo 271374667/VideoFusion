@@ -1,19 +1,18 @@
 import re
+from enum import Enum
 from pathlib import Path
 
 import loguru
 from PySide6.QtCore import QObject, Signal
-
-from src.common.processors.base_processor import EXEProcessor
-from src.signal_bus import SignalBus
-from src.config import cfg, AudioSeparationAlgorithm
-
 from audio_separator.separator import Separator
 
-from src.core.paths import MODELS_DIR, OUTPUT_DIR
 from src.common.ffmpeg_handler import FFmpegHandler
+from src.common.processors.base_processor import EXEProcessor
+from src.config import cfg, AudioSeparationAlgorithm
+from src.core.paths import MODELS_DIR, OUTPUT_DIR, AUDIO_SEPARATOR_EXE_FILE
+from src.signal_bus import SignalBus
 from src.utils import TempDir
-from enum import Enum
+import subprocess
 
 
 class AudioSeparationType(Enum):
@@ -72,9 +71,8 @@ class AudioSeparatorRedirect(QObject):
             self._pre_progress = min(progress, 100)
             self._signal_bus.set_detail_progress_current.emit(int(self._pre_progress))
 
-
-def flush(self):
-    pass
+    def flush(self):
+        pass
 
 
 class AudioSeparatorProcessor(EXEProcessor):
@@ -128,7 +126,6 @@ class AudioSeparatorProcessor(EXEProcessor):
 if __name__ == '__main__':
     from PySide6.QtWidgets import QApplication
     from src.components.cmd_text_edit import CMDTextEdit
-    from src.signal_bus import SignalBus
     import threading
 
 

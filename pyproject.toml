@@ -14,6 +14,7 @@ dependencies = [
     "auto-editor>=24.31.1",
     "audio-separator[cpu]>=0.18.3",
     "noisereduce>=3.0.2",
+    "onnx==1.16.1",
 ]
 readme = "README.md"
 requires-python = ">= 3.10"
@@ -26,6 +27,7 @@ build-backend = "hatchling.build"
 managed = true
 dev-dependencies = [
     "nuitka>=2.2.3",
+    "pyinstaller>=6.10.0",
 ]
 
 [[tool.rye.sources]]
